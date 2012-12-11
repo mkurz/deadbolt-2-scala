@@ -1,0 +1,9 @@
+@(handler: be.objectify.deadbolt.scala.DeadboltHandler)(body: => Html)(alternativeBody: => Html)(implicit request: Request[Any])
+
+@import scala.collection.JavaConversions._
+
+@if(handler.getSubject(request).isDefined) {
+@body
+} else {
+@alternativeBody	
+}

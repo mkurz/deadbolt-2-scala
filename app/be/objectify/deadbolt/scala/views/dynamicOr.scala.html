@@ -1,0 +1,7 @@
+@(handler: be.objectify.deadbolt.scala.DeadboltHandler, name: String, meta: String = null)(body: => Html)(alternativeBody: => Html)(implicit request: Request[Any])
+
+@if(be.objectify.deadbolt.scala.DeadboltViewSupport.viewDynamic(name, meta, handler, request)) {
+@body
+} else {
+@alternativeBody
+}
