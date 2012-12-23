@@ -8,8 +8,17 @@ import be.objectify.deadbolt.core.models.Subject
  * @author Steve Chaloner (steve@objectify.be)
  */
 
-trait DeadboltHandler
-{
+trait DeadboltHandler {
+
+  /**
+   * Invoked prior to a constraint's test.  If Option.None is returned, the constraint is applied. If
+   * the option contains a result, the constraint will not be applied and the wrapped action will not
+   * be invoked.
+   *
+   * @return an option possible containing a Result.
+   */
+  def beforeAuthCheck[A](request: Request[A]): Option[Result]
+
   /**
    * Gets the current subject e.g. the current user.
    *
