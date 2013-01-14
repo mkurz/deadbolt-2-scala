@@ -27,11 +27,11 @@ trait DeadboltHandler {
   def getSubject[A](request: Request[A]): Option[Subject]
 
   /**
-   * Invoked when an access failure is detected on <i>controllerClassName</i>.
+   * Invoked when an authorisation failure is detected for the request.
    *
    * @return the action
    */
-  def onAccessFailure[A](request: Request[A]): Result
+  def onAuthFailure[A](request: Request[A]): Result
 
   /**
    * Gets the handler used for dealing with resources restricted to specific users/groups.
