@@ -2,11 +2,10 @@ package be.objectify.deadbolt.scala
 
 import play.api.mvc.{Action, Results, BodyParsers}
 import play.cache.Cache
-import be.objectify.deadbolt.core.DeadboltAnalyzer
-import be.objectify.deadbolt.core.PatternType
+import be.objectify.deadbolt.core.{DeadboltAnalyzer, PatternType}
+import be.objectify.deadbolt.core.models.Subject
 import java.util.concurrent.Callable
 import java.util.regex.Pattern
-import be.objectify.deadbolt.core.models.Subject
 
 
 /**
@@ -25,10 +24,10 @@ trait DeadboltActions extends Results with BodyParsers {
    * @tparam A
    * @return
    */
-  def Restrictions[A](roleNames: Array[String],
-                      deadboltHandler: DeadboltHandler)(action: Action[A]): Action[A] = {
-    Restrictions[A](List(roleNames),
-                    deadboltHandler)(action)
+  def Restrict[A](roleNames: Array[String],
+                  deadboltHandler: DeadboltHandler)(action: Action[A]): Action[A] = {
+    Restrict[A](List(roleNames),
+                deadboltHandler)(action)
   }
 
   /**
@@ -41,9 +40,9 @@ trait DeadboltActions extends Results with BodyParsers {
    * @tparam A
    * @return
    */
-  def Restrictions[A](roleGroups: List[Array[String]],
-                      deadboltHandler: DeadboltHandler)
-                     (action: Action[A]): Action[A] = {
+  def Restrict[A](roleGroups: List[Array[String]],
+                  deadboltHandler: DeadboltHandler)
+                  (action: Action[A]): Action[A] = {
     Action(action.parser) { implicit request =>
 
       def check(subject: Subject, current: Array[String], remaining: List[Array[String]]): Boolean = {
