@@ -125,24 +125,29 @@ trait DeadboltActions extends Results with BodyParsers {
         deadboltHandler.beforeAuthCheck(request) match {
           case Some(result) => result
           case _ => {
-            val subject = deadboltHandler.getSubject(request).get
-            patternType match {
-              case PatternType.EQUALITY => {
-                if (DeadboltAnalyzer.checkPatternEquality(subject, value)) action(request)
-                else deadboltHandler.onAuthFailure(request)
-              }
-              case PatternType.REGEX => {
-                if (DeadboltAnalyzer.checkRegexPattern(subject, getPattern(value))) action(request)
-                else deadboltHandler.onAuthFailure(request)
-              }
-              case PatternType.CUSTOM => {
-                deadboltHandler.getDynamicResourceHandler(request) match {
-                  case Some(dynamicHandler) => {
-                    if (dynamicHandler.checkPermission(value, deadboltHandler, request)) action(request)
+            val maySubject = deadboltHandler.getSubject(request)
+            maySubject match {
+              case None => deadboltHandler.onAuthFailure(request)
+              case Some(subject) => {
+                patternType match {
+                  case PatternType.EQUALITY => {
+                    if (DeadboltAnalyzer.checkPatternEquality(subject, value)) action(request)
                     else deadboltHandler.onAuthFailure(request)
                   }
-                  case None =>
-                    throw new RuntimeException("A custom pattern is specified but no dynamic resource handler is provided")
+                  case PatternType.REGEX => {
+                    if (DeadboltAnalyzer.checkRegexPattern(subject, getPattern(value))) action(request)
+                    else deadboltHandler.onAuthFailure(request)
+                  }
+                  case PatternType.CUSTOM => {
+                    deadboltHandler.getDynamicResourceHandler(request) match {
+                      case Some(dynamicHandler) => {
+                        if (dynamicHandler.checkPermission(value, deadboltHandler, request)) action(request)
+                        else deadboltHandler.onAuthFailure(request)
+                      }
+                      case None =>
+                        throw new RuntimeException("A custom pattern is specified but no dynamic resource handler is provided")
+                    }
+                  }
                 }
               }
             }
