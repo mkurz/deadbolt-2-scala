@@ -74,19 +74,24 @@ object  DeadboltViewSupport {
                       },
                       0)
 
-    val subject = deadboltHandler.getSubject(request).get
-    patternType match {
-      case PatternType.EQUALITY => DeadboltAnalyzer.checkPatternEquality(subject, value)
-      case PatternType.REGEX => DeadboltAnalyzer.checkRegexPattern(subject, getPattern(value))
-      case PatternType.CUSTOM => {
-        deadboltHandler.getDynamicResourceHandler(request) match {
-            case Some(dynamicHandler) => {
-              if (dynamicHandler.checkPermission(value, deadboltHandler, request)) true
-              else false
+    val maySubject = deadboltHandler.getSubject(request)
+    maySubject match {
+      case None => false
+      case Some(subject) => {
+        patternType match {
+          case PatternType.EQUALITY => DeadboltAnalyzer.checkPatternEquality(subject, value)
+          case PatternType.REGEX => DeadboltAnalyzer.checkRegexPattern(subject, getPattern(value))
+          case PatternType.CUSTOM => {
+            deadboltHandler.getDynamicResourceHandler(request) match {
+              case Some(dynamicHandler) => {
+                if (dynamicHandler.checkPermission(value, deadboltHandler, request)) true
+                else false
+              }
+              case None =>
+                throw new RuntimeException("A custom pattern is specified but no dynamic resource handler is provided")
             }
-            case None =>
-              throw new RuntimeException("A custom pattern is specified but no dynamic resource handler is provided")
           }
+        }
       }
     }
   }
