@@ -43,7 +43,7 @@ trait DeadboltActions extends Results with BodyParsers {
   def Restrict[A](roleGroups: List[Array[String]],
                   deadboltHandler: DeadboltHandler)
                   (action: Action[A]): Action[A] = {
-    Action(action.parser) { implicit request =>
+    Action.async(action.parser) { implicit request =>
 
       def check(subject: Subject, current: Array[String], remaining: List[Array[String]]): Boolean = {
         if (DeadboltAnalyzer.checkRole(subject, current)) true
@@ -82,7 +82,7 @@ trait DeadboltActions extends Results with BodyParsers {
                  meta: String = "",
                  deadboltHandler: DeadboltHandler)
                 (action: Action[A]): Action[A] = {
-    Action(action.parser) { implicit request =>
+    Action.async(action.parser) { implicit request =>
       deadboltHandler.beforeAuthCheck(request) match {
           case Some(result) => result
           case _ => {
@@ -120,7 +120,7 @@ trait DeadboltActions extends Results with BodyParsers {
         },
         0)
 
-    Action(action.parser) {
+    Action.async(action.parser) {
       implicit request =>
         deadboltHandler.beforeAuthCheck(request) match {
           case Some(result) => result
@@ -165,7 +165,7 @@ trait DeadboltActions extends Results with BodyParsers {
    * @return
    */
   def SubjectPresent[A](deadboltHandler: DeadboltHandler)(action: Action[A]): Action[A] = {
-    Action(action.parser) { implicit request =>
+    Action.async(action.parser) { implicit request =>
       deadboltHandler.beforeAuthCheck(request) match {
             case Some(result) => result
             case _ => {
@@ -187,7 +187,7 @@ trait DeadboltActions extends Results with BodyParsers {
    * @return
    */
   def SubjectNotPresent[A](deadboltHandler: DeadboltHandler)(action: Action[A]): Action[A] = {
-    Action(action.parser) { implicit request =>
+    Action.async(action.parser) { implicit request =>
       deadboltHandler.beforeAuthCheck(request) match {
             case Some(result) => result
             case _ => {
