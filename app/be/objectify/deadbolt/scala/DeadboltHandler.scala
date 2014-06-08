@@ -1,6 +1,6 @@
 package be.objectify.deadbolt.scala
 
-import play.api.mvc.{SimpleResult, Request, Result}
+import play.api.mvc.{Request, Result}
 import be.objectify.deadbolt.core.models.Subject
 import scala.concurrent.Future
 
@@ -18,7 +18,7 @@ trait DeadboltHandler {
    *
    * @return an option possible containing a Result.
    */
-  def beforeAuthCheck[A](request: Request[A]): Option[Future[SimpleResult]]
+  def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]]
 
   /**
    * Gets the current subject e.g. the current user.
@@ -32,7 +32,7 @@ trait DeadboltHandler {
    *
    * @return the action
    */
-  def onAuthFailure[A](request: Request[A]): Future[SimpleResult]
+  def onAuthFailure[A](request: Request[A]): Future[Result]
 
   /**
    * Gets the handler used for dealing with resources restricted to specific users/groups.
