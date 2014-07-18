@@ -25,7 +25,7 @@ trait DeadboltHandler {
    *
    * @return an option containing the current subject
    */
-  def getSubject[A](request: Request[A]): Option[Subject]
+  def getSubject[A](request: AuthenticatedRequest[A]): Option[Subject]
 
   /**
    * Invoked when an authorisation failure is detected for the request.

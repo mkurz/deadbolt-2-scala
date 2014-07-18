@@ -23,7 +23,7 @@ object  DeadboltViewSupport {
    */
   def viewRestrict(roles: List[Array[String]],
                    deadboltHandler: DeadboltHandler,
-                   request: Request[Any]): Boolean = {
+                   request: AuthenticatedRequest[Any]): Boolean = {
     def check(subject: Subject, current: Array[String], remaining: List[Array[String]]): Boolean = {
       if (DeadboltAnalyzer.checkRole(subject, current)) true
       else if (remaining.isEmpty) false
@@ -49,7 +49,7 @@ object  DeadboltViewSupport {
   def viewDynamic(name: String,
                   meta: String,
                   deadboltHandler: DeadboltHandler,
-                  request: Request[Any]): Boolean = {
+                  request: AuthenticatedRequest[Any]): Boolean = {
     val resourceHandler = deadboltHandler.getDynamicResourceHandler(request)
     if (resourceHandler.isDefined) resourceHandler.get.isAllowed(name, meta, deadboltHandler, request)
     else throw new RuntimeException("A dynamic resource is specified but no dynamic resource handler is provided")
@@ -66,7 +66,7 @@ object  DeadboltViewSupport {
   def viewPattern(value: String,
                   patternType: PatternType,
                   deadboltHandler: DeadboltHandler,
-                  request: Request[Any]): Boolean = {
+                  request: AuthenticatedRequest[Any]): Boolean = {
     def getPattern(patternValue: String): Pattern =
       Cache.getOrElse("Deadbolt." + patternValue,
                       new Callable[Pattern]{
