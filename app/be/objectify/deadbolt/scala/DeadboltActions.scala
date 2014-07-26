@@ -179,7 +179,7 @@ trait DeadboltActions extends Results with BodyParsers {
             case Some(result) => result
             case _ => {
               deadboltHandler.getSubject(authRequest) match {
-                case Some(handler) => Future.successful(block(authRequest))
+                case Some(subject) => Future.successful(block( AuthenticatedRequest(authRequest, Some(subject)) ))
                 case None => deadboltHandler.onAuthFailure(authRequest)
               }
             }
