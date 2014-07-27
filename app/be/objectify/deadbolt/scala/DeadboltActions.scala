@@ -28,7 +28,7 @@ trait DeadboltActions extends Results with BodyParsers {
   def Restrict[A](roleNames: Array[String],
                   deadboltHandler: DeadboltHandler)
                  (bodyParser: BodyParser[A])
-                 (block: AuthenticatedRequest[A] => Result): Action[A] = {
+                 (block: AuthenticatedRequest[A] => Future[Result]): Action[A] = {
     Restrict[A](List(roleNames),
                 deadboltHandler)(bodyParser)(block)
   }
@@ -46,7 +46,7 @@ trait DeadboltActions extends Results with BodyParsers {
   def Restrict[A](roleGroups: List[Array[String]],
                   deadboltHandler: DeadboltHandler)
                  (bodyParser: BodyParser[A])
-                 (block: AuthenticatedRequest[A] => Result): Action[A] = {
+                 (block: AuthenticatedRequest[A] => Future[Result]): Action[A] = {
     SubjectActionBuilder(None).async(bodyParser){ authRequest =>
 
       def check(subject: Subject, current: Array[String], remaining: List[Array[String]]): Boolean = {
@@ -63,7 +63,7 @@ trait DeadboltActions extends Results with BodyParsers {
               deadboltHandler.getSubject(authRequest) match {
                 case Some(subject) => {
                   if (check(subject, roleGroups.head, roleGroups.tail))
-                    Future.successful( block( AuthenticatedRequest(authRequest, Some(subject)) ) )
+                     block( AuthenticatedRequest(authRequest, Some(subject)) )
                   else deadboltHandler.onAuthFailure(authRequest)
                 }
                 case _ => deadboltHandler.onAuthFailure(authRequest)
@@ -87,7 +87,7 @@ trait DeadboltActions extends Results with BodyParsers {
                  meta: String = "",
                  deadboltHandler: DeadboltHandler)
                 (bodyParser: BodyParser[A])
-                (block: AuthenticatedRequest[A] => Result): Action[A] = {
+                (block: AuthenticatedRequest[A] => Future[Result]): Action[A] = {
     SubjectActionBuilder(None).async(bodyParser) { authRequest =>
       deadboltHandler.beforeAuthCheck(authRequest) match {
           case Some(result) => result
@@ -95,7 +95,7 @@ trait DeadboltActions extends Results with BodyParsers {
             deadboltHandler.getDynamicResourceHandler(authRequest) match {
               case Some(dynamicHandler) => {
                 if (dynamicHandler.isAllowed(name, meta, deadboltHandler, authRequest))
-                  Future.successful( block(authRequest) )
+                  block(authRequest)
                 else deadboltHandler.onAuthFailure(authRequest)
               }
               case None =>
@@ -119,7 +119,7 @@ trait DeadboltActions extends Results with BodyParsers {
                  patternType: PatternType,
                  deadboltHandler: DeadboltHandler)
                 (bodyParser: BodyParser[A])
-                (block: AuthenticatedRequest[A] => Result): Action[A] = {
+                (block: AuthenticatedRequest[A] => Future[Result]): Action[A] = {
 
     def getPattern(patternValue: String): Pattern =
       Cache.getOrElse("Deadbolt." + patternValue,
@@ -138,17 +138,17 @@ trait DeadboltActions extends Results with BodyParsers {
               case Some(subject) => {
                 patternType match {
                   case PatternType.EQUALITY => {
-                    if (DeadboltAnalyzer.checkPatternEquality(subject, value)) Future.successful(block(authRequest))
+                    if (DeadboltAnalyzer.checkPatternEquality(subject, value)) block(authRequest)
                     else deadboltHandler.onAuthFailure(authRequest)
                   }
                   case PatternType.REGEX => {
-                    if (DeadboltAnalyzer.checkRegexPattern(subject, getPattern(value))) Future.successful(block(authRequest))
+                    if (DeadboltAnalyzer.checkRegexPattern(subject, getPattern(value))) block(authRequest)
                     else deadboltHandler.onAuthFailure(authRequest)
                   }
                   case PatternType.CUSTOM => {
                     deadboltHandler.getDynamicResourceHandler(authRequest) match {
                       case Some(dynamicHandler) => {
-                        if (dynamicHandler.checkPermission(value, deadboltHandler, authRequest)) Future.successful(block(authRequest))
+                        if (dynamicHandler.checkPermission(value, deadboltHandler, authRequest)) block(authRequest)
                         else deadboltHandler.onAuthFailure(authRequest)
                       }
                       case None =>
@@ -173,13 +173,13 @@ trait DeadboltActions extends Results with BodyParsers {
    */
   def SubjectPresent[A](deadboltHandler: DeadboltHandler)
                        (bodyParser: BodyParser[A])
-                       (block: AuthenticatedRequest[A] => Result): Action[A] = {
+                       (block: AuthenticatedRequest[A] => Future[Result]): Action[A] = {
     SubjectActionBuilder(None).async(bodyParser) { authRequest =>
       deadboltHandler.beforeAuthCheck(authRequest) match {
             case Some(result) => result
             case _ => {
               deadboltHandler.getSubject(authRequest) match {
-                case Some(subject) => Future.successful(block( AuthenticatedRequest(authRequest, Some(subject)) ))
+                case Some(subject) => block( AuthenticatedRequest(authRequest, Some(subject)) )
                 case None => deadboltHandler.onAuthFailure(authRequest)
               }
             }
@@ -197,14 +197,14 @@ trait DeadboltActions extends Results with BodyParsers {
    */
   def SubjectNotPresent[A](deadboltHandler: DeadboltHandler)
                           (bodyParser: BodyParser[A])
-                          (block: AuthenticatedRequest[A] => Result): Action[A] = {
+                          (block: AuthenticatedRequest[A] => Future[Result]): Action[A] = {
     SubjectActionBuilder(None).async(bodyParser) { authRequest =>
       deadboltHandler.beforeAuthCheck(authRequest) match {
             case Some(result) => result
             case _ => {
               deadboltHandler.getSubject(authRequest) match {
                 case Some(subject) => deadboltHandler.onAuthFailure(authRequest)
-                case None => Future.successful( block(authRequest) )
+                case None => block(authRequest)
               }
             }
           }
