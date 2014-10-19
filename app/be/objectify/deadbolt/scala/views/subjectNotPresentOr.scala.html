@@ -2,7 +2,7 @@
 
 @import scala.collection.JavaConversions._
 
-@if(!handler.getSubject(request).isDefined) {
+@if(!be.objectify.deadbolt.scala.DeadboltViewSupport.viewSubjectPresent(handler, request)) {
 @body
 } else {
 @alternativeBody	

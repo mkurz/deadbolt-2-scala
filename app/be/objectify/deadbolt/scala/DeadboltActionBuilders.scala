@@ -4,7 +4,7 @@ import play.api.mvc._
 import be.objectify.deadbolt.core.PatternType
 
 /**
- * Provides helpers for creating Play! Actions wrapped by DeadboltActions.
+ * Provides helpers for creating Play Actions wrapped by DeadboltActions.
  */
 object DeadboltActionBuilders {
 

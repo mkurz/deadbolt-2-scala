@@ -1,11 +1,16 @@
 package be.objectify.deadbolt.scala
 
-import be.objectify.deadbolt.core.models.Subject
-import be.objectify.deadbolt.core.{PatternType, DeadboltAnalyzer}
-import play.api.mvc.Request
-import java.util.regex.Pattern
-import play.cache.Cache
 import java.util.concurrent.Callable
+import java.util.regex.Pattern
+
+import be.objectify.deadbolt.core.models.Subject
+import be.objectify.deadbolt.core.{DeadboltAnalyzer, PatternType}
+import play.api.mvc.Request
+import play.cache.Cache
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{duration, Await, Future}
+import scala.concurrent.duration.Duration
 
 /**
  *
@@ -13,6 +18,21 @@ import java.util.concurrent.Callable
  */
 
 object  DeadboltViewSupport {
+
+  /**
+   * Used for subjectPresent and subjectNotPresent tags in the template.
+   *
+   * @param deadboltHandler application hook
+   * @return true if the view can be accessed, otherwise false
+   */
+  def viewSubjectPresent(deadboltHandler: DeadboltHandler,
+                         request: Request[Any]): Boolean = {
+    Await.result(deadboltHandler.getSubject(request).flatMap(subjectOption => subjectOption match {
+      case Some(subject) => Future(true)
+      case None => Future(false)
+    }), Duration(1000, duration.MILLISECONDS))
+  }
+
   /**
    * Used for restrict tags in the template.
    *
@@ -25,18 +45,16 @@ object  DeadboltViewSupport {
                    deadboltHandler: DeadboltHandler,
                    request: Request[Any]): Boolean = {
     def check(subject: Subject, current: Array[String], remaining: List[Array[String]]): Boolean = {
-      if (DeadboltAnalyzer.checkRole(subject, current)) true
-      else if (remaining.isEmpty) false
-      else check(subject, remaining.head, remaining.tail)
+        if (DeadboltAnalyzer.checkRole(subject, current)) true
+        else if (remaining.isEmpty) false
+        else check(subject, remaining.head, remaining.tail)
     }
 
-    deadboltHandler.getSubject(request) match {
-      case Some(subject) => {
-        if (roles.headOption.isDefined) check(subject, roles.head, roles.tail)
-        else false
-      }
-      case None => false
-    }
+
+    Await.result(deadboltHandler.getSubject(request).flatMap(subjectOption => subjectOption match {
+      case Some(subject) => Future(check(subject, roles.head, roles.tail))
+      case None => Future(false)
+    }), Duration(1000, duration.MILLISECONDS))
   }
 
   /**
@@ -74,25 +92,23 @@ object  DeadboltViewSupport {
                       },
                       0)
 
-    val maySubject = deadboltHandler.getSubject(request)
-    maySubject match {
-      case None => false
-      case Some(subject) => {
-        patternType match {
-          case PatternType.EQUALITY => DeadboltAnalyzer.checkPatternEquality(subject, value)
-          case PatternType.REGEX => DeadboltAnalyzer.checkRegexPattern(subject, getPattern(value))
-          case PatternType.CUSTOM => {
-            deadboltHandler.getDynamicResourceHandler(request) match {
-              case Some(dynamicHandler) => {
-                if (dynamicHandler.checkPermission(value, deadboltHandler, request)) true
-                else false
-              }
-              case None =>
-                throw new RuntimeException("A custom pattern is specified but no dynamic resource handler is provided")
-            }
+    val subjectFuture: Future[Option[Subject]] = deadboltHandler.getSubject(request)
+
+    Await.result(subjectFuture.flatMap((subjectOption: Option[Subject]) =>
+      subjectOption match {
+        case None => Future(false)
+        case Some(subject) => patternType match {
+          case PatternType.EQUALITY => Future(DeadboltAnalyzer.checkPatternEquality(subject, value))
+          case PatternType.REGEX => Future(DeadboltAnalyzer.checkRegexPattern(subject, getPattern(value)))
+          case PatternType.CUSTOM => deadboltHandler.getDynamicResourceHandler(request) match {
+            case Some(dynamicHandler) =>
+              if (dynamicHandler.checkPermission(value, deadboltHandler, request)) Future(true)
+              else Future(false)
+            case None =>
+              throw new RuntimeException("A custom pattern is specified but no dynamic resource handler is provided")
           }
+          case _ => Future(false)
         }
-      }
-    }
+      }), Duration(1000, duration.MILLISECONDS))
   }
 }
