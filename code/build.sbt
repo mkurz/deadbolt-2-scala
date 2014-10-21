@@ -14,3 +14,5 @@ libraryDependencies ++= Seq(
   cache,
   "be.objectify" %% "deadbolt-core" % "2.3.3-SNAPSHOT"
 )
+
+resolvers += Resolver.sonatypeRepo("snapshots") 
