@@ -1,6 +1,8 @@
 deadbolt-2-scala
 ================
 
+[![Build Status](https://travis-ci.org/schaloner/deadbolt-2-scala.svg?branch=master)](https://travis-ci.org/schaloner/deadbolt-2-scala)
+
 Idiomatic Scala API for Deadbolt 2, an authorisation module for Play 2.
 
 Deadbolt 2 comprises of several modules - a common core, and language-specific implementations for Java and Scala.  Example applications and a user guide are also available.  
