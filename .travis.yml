@@ -1,8 +1,15 @@
 language: scala
+jdk:
+- openjdk6
 scala:
-  - 2.11.1
+- 2.11.1
 script:
-  - "sbt ++$TRAVIS_SCALA_VERSION test"
-  - "sbt ++$TRAVIS_SCALA_VERSION publish-local"
-notifications:
-  email: false
+- cd code
+- sbt ++$TRAVIS_SCALA_VERSION +test
+- sbt ++$TRAVIS_SCALA_VERSION +publish-local
+after_success:
+- ! '[[ $TRAVIS_BRANCH == "master" ]] && { sbt +publish; };'
+env:
+  global:
+  - secure: Dkhil6/4bUBfOq915zjsnX4bzAFRod8ObsZmh/BZaz0pNxA2IZfrHYj8ce403ma6/ppzgMnWHGgL007djGhkKPg6fhzthO7IwGhirZuuYCU1yc/YTy3OZDtmqryfA90G9N0KDlV3Be4FfJcYVtuMSOln5creSNnCy513x7gNfCs=
+  - secure: SGvC55ABnS6a2mg6l6Nv5LkaBtSB7aCbR76bIIMKYdCM3f4wm8rb3ZqHHkoaQf0hP4jwD1FVxxRYbr1VdSSD0HhAHAq8OH1r4eEQV2yctbSFfpU4x4VtuOn6+6w2/8V0DoD/d0Ku8nbhaiDhx2gSKeCZ0TvRPb9xBTz3Qz37gqY=
