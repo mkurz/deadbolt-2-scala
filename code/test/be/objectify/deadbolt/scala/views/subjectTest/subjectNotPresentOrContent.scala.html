@@ -1,0 +1,11 @@
+@(handler: be.objectify.deadbolt.scala.DeadboltHandler)(implicit request: Request[Any])
+
+This is before the constraint.
+
+@be.objectify.deadbolt.scala.views.html.subjectNotPresentOr(handler = handler) {
+    This is protected by the constraint.
+}{
+    This is default content in case the constraint denies access to the protected content.
+}
+
+This is after the constraint.

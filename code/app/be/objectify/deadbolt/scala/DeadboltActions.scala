@@ -49,10 +49,10 @@ trait DeadboltActions extends Results with BodyParsers {
                  (action: Action[A]): Action[A] = {
     Action.async(action.parser) { implicit request =>
 
-      def check(subject: Subject, current: Array[String], remaining: List[Array[String]]): Future[Result] = {
-        if (DeadboltAnalyzer.checkRole(subject, current)) action(request)
+      def check(analyzer: DeadboltAnalyzer, subject: Subject, current: Array[String], remaining: List[Array[String]]): Future[Result] = {
+        if (analyzer.checkRole(subject, current)) action(request)
         else if (remaining.isEmpty) deadboltHandler.onAuthFailure(request)
-        else check(subject, remaining.head, remaining.tail)
+        else check(analyzer, subject, remaining.head, remaining.tail)
       }
 
       deadboltHandler.beforeAuthCheck(request) match {
@@ -60,9 +60,9 @@ trait DeadboltActions extends Results with BodyParsers {
         case _ =>
           if (roleGroups.isEmpty) deadboltHandler.onAuthFailure(request)
           else {
-            deadboltHandler.getSubject(request).flatMap((subjectOption: Option[Subject]) =>
+            Future(deadboltHandler.getSubject(request)).flatMap((subjectOption: Option[Subject]) =>
               subjectOption match {
-                case Some(subject) => check(subject, roleGroups.head, roleGroups.tail)
+                case Some(subject) => check(new DeadboltAnalyzer(), subject, roleGroups.head, roleGroups.tail)
                 case _ => deadboltHandler.onAuthFailure(request)
               })
           }
@@ -89,8 +89,10 @@ trait DeadboltActions extends Results with BodyParsers {
         case _ =>
           deadboltHandler.getDynamicResourceHandler(request) match {
             case Some(dynamicHandler) =>
-              if (dynamicHandler.isAllowed(name, meta, deadboltHandler, request)) action(request)
-              else deadboltHandler.onAuthFailure(request)
+              Future(dynamicHandler.isAllowed(name, meta, deadboltHandler, request)).flatMap((allowed: Boolean) => allowed match {
+                case true => action(request)
+                case false => deadboltHandler.onAuthFailure(request)
+              })
             case None =>
               throw new RuntimeException("A dynamic resource is specified but no dynamic resource handler is provided")
           }
@@ -124,15 +126,15 @@ trait DeadboltActions extends Results with BodyParsers {
         deadboltHandler.beforeAuthCheck(request) match {
           case Some(result) => result
           case _ =>
-            val subjectFuture: Future[Option[Subject]] = deadboltHandler.getSubject(request)
+            val subjectFuture: Future[Option[Subject]] = Future(deadboltHandler.getSubject(request))
             subjectFuture.flatMap((subjectOption: Option[Subject]) => subjectOption match {
               case None => deadboltHandler.onAuthFailure(request)
               case Some(subject) => patternType match {
                 case PatternType.EQUALITY =>
-                  if (DeadboltAnalyzer.checkPatternEquality(subject, value)) action(request)
+                  if (new DeadboltAnalyzer().checkPatternEquality(subject, value)) action(request)
                   else deadboltHandler.onAuthFailure(request)
                 case PatternType.REGEX =>
-                  if (DeadboltAnalyzer.checkRegexPattern(subject, getPattern(value))) action(request)
+                  if (new DeadboltAnalyzer().checkRegexPattern(subject, getPattern(value))) action(request)
                   else deadboltHandler.onAuthFailure(request)
                 case PatternType.CUSTOM =>
                   deadboltHandler.getDynamicResourceHandler(request) match {
@@ -149,7 +151,7 @@ trait DeadboltActions extends Results with BodyParsers {
   }
 
   /**
-   * Denies access to the action if there is no subject present.
+   * Allows access to the action if there is a subject present.
    *
    * @param deadboltHandler
    * @param action
@@ -161,7 +163,7 @@ trait DeadboltActions extends Results with BodyParsers {
       deadboltHandler.beforeAuthCheck(request) match {
         case Some(result) => result
         case _ =>
-          deadboltHandler.getSubject(request).flatMap((subjectOption: Option[Subject]) => subjectOption match {
+          Future(deadboltHandler.getSubject(request)).flatMap((subjectOption: Option[Subject]) => subjectOption match {
             case Some(subject) => action(request)
             case None => deadboltHandler.onAuthFailure(request)
           })
@@ -182,7 +184,7 @@ trait DeadboltActions extends Results with BodyParsers {
       deadboltHandler.beforeAuthCheck(request) match {
         case Some(result) => result
         case _ =>
-          deadboltHandler.getSubject(request).flatMap((subjectOption: Option[Subject]) => subjectOption match {
+          Future(deadboltHandler.getSubject(request)).flatMap((subjectOption: Option[Subject]) => subjectOption match {
             case Some(subject) => deadboltHandler.onAuthFailure(request)
             case None => action(request)
           })

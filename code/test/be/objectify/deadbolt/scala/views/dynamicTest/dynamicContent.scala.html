@@ -1,0 +1,9 @@
+@(handler: be.objectify.deadbolt.scala.DeadboltHandler, name: String, meta: String)(implicit request: Request[Any])
+
+This is before the constraint.
+
+@be.objectify.deadbolt.scala.views.html.dynamic(handler = handler, name = name, meta = meta) {
+    This is protected by the constraint.
+}
+
+This is after the constraint.

@@ -1,0 +1,9 @@
+@(handler: be.objectify.deadbolt.scala.DeadboltHandler, roles: List[Array[String]])(implicit request: Request[Any])
+
+This is before the constraint.
+
+@be.objectify.deadbolt.scala.views.html.restrict(handler = handler, roles = roles) {
+    This is protected by the constraint.
+}
+
+This is after the constraint.

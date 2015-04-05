@@ -25,7 +25,7 @@ trait DeadboltHandler {
    *
    * @return a future for an option containing the current subject
    */
-  def getSubject[A](request: Request[A]): Future[Option[Subject]]
+  def getSubject[A](request: Request[A]): Option[Subject]
 
   /**
    * Invoked when an authorisation failure is detected for the request.

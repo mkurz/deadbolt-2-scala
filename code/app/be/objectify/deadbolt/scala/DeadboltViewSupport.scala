@@ -8,10 +8,6 @@ import be.objectify.deadbolt.core.{DeadboltAnalyzer, PatternType}
 import play.api.mvc.Request
 import play.cache.Cache
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{duration, Await, Future}
-import scala.concurrent.duration.Duration
-
 /**
  *
  * @author Steve Chaloner (steve@objectify.be)
@@ -27,10 +23,10 @@ object  DeadboltViewSupport {
    */
   def viewSubjectPresent(deadboltHandler: DeadboltHandler,
                          request: Request[Any]): Boolean = {
-    Await.result(deadboltHandler.getSubject(request).flatMap(subjectOption => subjectOption match {
-      case Some(subject) => Future(true)
-      case None => Future(false)
-    }), Duration(1000, duration.MILLISECONDS))
+    deadboltHandler.getSubject(request) match {
+      case Some(subject) => true
+      case None => false
+    }
   }
 
   /**
@@ -44,17 +40,16 @@ object  DeadboltViewSupport {
   def viewRestrict(roles: List[Array[String]],
                    deadboltHandler: DeadboltHandler,
                    request: Request[Any]): Boolean = {
-    def check(subject: Subject, current: Array[String], remaining: List[Array[String]]): Boolean = {
-        if (DeadboltAnalyzer.checkRole(subject, current)) true
+    def check(analyzer: DeadboltAnalyzer, subject: Subject, current: Array[String], remaining: List[Array[String]]): Boolean = {
+        if (analyzer.checkRole(subject, current)) true
         else if (remaining.isEmpty) false
-        else check(subject, remaining.head, remaining.tail)
+        else check(analyzer, subject, remaining.head, remaining.tail)
     }
 
-
-    Await.result(deadboltHandler.getSubject(request).flatMap(subjectOption => subjectOption match {
-      case Some(subject) => Future(check(subject, roles.head, roles.tail))
-      case None => Future(false)
-    }), Duration(1000, duration.MILLISECONDS))
+    deadboltHandler.getSubject(request) match {
+      case Some(subject) => check(new DeadboltAnalyzer(), subject, roles.head, roles.tail)
+      case None => false
+    }
   }
 
   /**
@@ -92,23 +87,18 @@ object  DeadboltViewSupport {
                       },
                       0)
 
-    val subjectFuture: Future[Option[Subject]] = deadboltHandler.getSubject(request)
-
-    Await.result(subjectFuture.flatMap((subjectOption: Option[Subject]) =>
-      subjectOption match {
-        case None => Future(false)
-        case Some(subject) => patternType match {
-          case PatternType.EQUALITY => Future(DeadboltAnalyzer.checkPatternEquality(subject, value))
-          case PatternType.REGEX => Future(DeadboltAnalyzer.checkRegexPattern(subject, getPattern(value)))
-          case PatternType.CUSTOM => deadboltHandler.getDynamicResourceHandler(request) match {
-            case Some(dynamicHandler) =>
-              if (dynamicHandler.checkPermission(value, deadboltHandler, request)) Future(true)
-              else Future(false)
-            case None =>
-              throw new RuntimeException("A custom pattern is specified but no dynamic resource handler is provided")
-          }
-          case _ => Future(false)
+    deadboltHandler.getSubject(request) match {
+      case None => false
+      case Some(subject) => patternType match {
+        case PatternType.EQUALITY => new DeadboltAnalyzer().checkPatternEquality(subject, value)
+        case PatternType.REGEX => new DeadboltAnalyzer().checkRegexPattern(subject, getPattern(value))
+        case PatternType.CUSTOM => deadboltHandler.getDynamicResourceHandler(request) match {
+          case Some(dynamicHandler) => dynamicHandler.checkPermission(value, deadboltHandler, request)
+          case None =>
+            throw new RuntimeException("A custom pattern is specified but no dynamic resource handler is provided")
         }
-      }), Duration(1000, duration.MILLISECONDS))
+        case _ => false
+      }
+    }
   }
 }

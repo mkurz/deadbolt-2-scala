@@ -114,5 +114,4 @@ object DeadboltActionBuilders {
         DeadboltActionBuilder.this.apply(bodyParser)(block)(deadboltHandler)
     }
   }
-
 }

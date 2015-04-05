@@ -1,0 +1,9 @@
+@(handler: be.objectify.deadbolt.scala.DeadboltHandler, value: String, patternType: be.objectify.deadbolt.core.PatternType)(implicit request: Request[Any])
+
+This is before the constraint.
+
+@be.objectify.deadbolt.scala.views.html.pattern(handler = handler, value = value, patternType = patternType) {
+    This is protected by the constraint.
+}
+
+This is after the constraint.

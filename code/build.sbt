@@ -12,7 +12,7 @@ crossScalaVersions := Seq("2.11.1", "2.10.4")
 
 libraryDependencies ++= Seq(
   cache,
-  "be.objectify" %% "deadbolt-core" % "2.3.3-SNAPSHOT"
+  "be.objectify" %% "deadbolt-core" % "2.3.3"
 )
 
 resolvers += Resolver.sonatypeRepo("snapshots") 
