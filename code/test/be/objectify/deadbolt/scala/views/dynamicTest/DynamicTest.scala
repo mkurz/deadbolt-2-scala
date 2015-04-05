@@ -18,7 +18,7 @@ class DynamicTest extends PlaySpecification {
        val html = dynamicContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
          override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = Some(new DynamicResourceHandler() {
-           override def isAllowed[A](name: String, meta: String, deadboltHandler: DeadboltHandler, request: Request[A]): Boolean = true
+           override def isAllowed[A](name: String, meta: String, deadboltHandler: DeadboltHandler, request: Request[A]): Boolean = true // allow
            override def checkPermission[A](permissionValue: String, deadboltHandler: DeadboltHandler, request: Request[A]): Boolean = false
          })
          override def getSubject[A](request: Request[A]): Option[Subject] = None
@@ -37,7 +37,7 @@ class DynamicTest extends PlaySpecification {
        val html = dynamicContent(handler = new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
          override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = Some(new DynamicResourceHandler() {
-           override def isAllowed[A](name: String, meta: String, deadboltHandler: DeadboltHandler, request: Request[A]): Boolean = false
+           override def isAllowed[A](name: String, meta: String, deadboltHandler: DeadboltHandler, request: Request[A]): Boolean = false // deny
            override def checkPermission[A](permissionValue: String, deadboltHandler: DeadboltHandler, request: Request[A]): Boolean = false
          })
          override def getSubject[A](request: Request[A]): Option[Subject] = None
