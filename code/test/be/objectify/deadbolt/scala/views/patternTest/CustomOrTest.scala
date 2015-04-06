@@ -2,14 +2,14 @@ package be.objectify.deadbolt.scala.views.patternTest
 
 import be.objectify.deadbolt.core.PatternType
 import be.objectify.deadbolt.core.models.Subject
-import be.objectify.deadbolt.scala.testhelpers.{SecurityPermission, SecurityRole, User}
+import be.objectify.deadbolt.scala.testhelpers.{SecurityPermission, User}
+import be.objectify.deadbolt.scala.{DynamicResourceHandler, DeadboltHandler}
 import be.objectify.deadbolt.scala.views.html.patternTest.patternOrContent
-import be.objectify.deadbolt.scala.{DeadboltHandler, DynamicResourceHandler}
-import play.api.mvc.{Results, Request, Result}
-import play.api.test.{Helpers, FakeRequest, PlaySpecification, WithApplication}
+import play.api.mvc.{Results, Result, Request}
+import play.api.test.{WithApplication, PlaySpecification, FakeRequest, Helpers}
 import play.libs.Scala
-
 import scala.concurrent.Future
+
 
 /**
   * @author Steve Chaloner (steve@objectify.be)
@@ -18,6 +18,7 @@ class CustomOrTest extends PlaySpecification {
 
    "when a custom permission allows it, the view" should {
      "show constrained content and hide fallback content" in new WithApplication {
+       Request
        val html = patternOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
          override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = Some(new DynamicResourceHandler() {
