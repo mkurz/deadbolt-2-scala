@@ -18,7 +18,7 @@ A simplification of structure was also needed, so a change to the DeadboltHandle
 
 So, practical changes.
 
-- DeadboltHandler#getSubject returns a Subject in place of an F.Promise<Subject>.  Where the subject is needed, the internal code will take care of wrapping the call in a Promise.
+- DeadboltHandler#getSubject returns an Option[Subject] in place of an Future[Option[Subject]]. Where the subject is needed, the internal code will take care of wrapping the call in a Future.
 - There are no more timeouts, so deadbolt.before-auth-check-timeout and deadbolt.get-subject-timeout are no longer needed.  If they're defined in your config, they'll be ignored.
 
 **What kind of idiot makes API-level changes in a patch release?**
