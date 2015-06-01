@@ -6,9 +6,9 @@ version := "2.4.0-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(play.PlayScala)
 
-scalaVersion := "2.11.5"
+scalaVersion := "2.11.6"
 
-crossScalaVersions := Seq("2.11.5", "2.10.4")
+crossScalaVersions := Seq("2.11.6", "2.10.5")
 
 libraryDependencies ++= Seq(
   cache,
@@ -16,4 +16,8 @@ libraryDependencies ++= Seq(
   "be.objectify" %% "deadbolt-core" % "2.4.0-SNAPSHOT"
 )
 
-resolvers += Resolver.sonatypeRepo("snapshots") 
+resolvers += Resolver.sonatypeRepo("snapshots")
+
+resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
+
+routesGenerator := InjectedRoutesGenerator
