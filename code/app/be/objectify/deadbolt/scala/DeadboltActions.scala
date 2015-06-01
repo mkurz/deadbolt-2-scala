@@ -55,18 +55,20 @@ trait DeadboltActions extends Results with BodyParsers {
         else check(analyzer, subject, remaining.head, remaining.tail)
       }
 
-      deadboltHandler.beforeAuthCheck(request) match {
-        case Some(result) => result
-        case _ =>
-          if (roleGroups.isEmpty) deadboltHandler.onAuthFailure(request)
-          else {
-            Future(deadboltHandler.getSubject(request)).flatMap((subjectOption: Option[Subject]) =>
-              subjectOption match {
-                case Some(subject) => check(new DeadboltAnalyzer(), subject, roleGroups.head, roleGroups.tail)
-                case _ => deadboltHandler.onAuthFailure(request)
-              })
-          }
-      }
+      deadboltHandler.beforeAuthCheck(request).flatMap((beforeAuthOption: Option[Result]) => {
+        beforeAuthOption match {
+          case Some(result) => Future(result)
+          case None =>
+            if (roleGroups.isEmpty) deadboltHandler.onAuthFailure(request)
+            else {
+              deadboltHandler.getSubject(request).flatMap((subjectOption: Option[Subject]) =>
+                subjectOption match {
+                  case Some(subject) => check(new DeadboltAnalyzer(), subject, roleGroups.head, roleGroups.tail)
+                  case _ => deadboltHandler.onAuthFailure(request)
+                })
+            }
+        }
+      })
     }
   }
 
@@ -84,19 +86,24 @@ trait DeadboltActions extends Results with BodyParsers {
                  deadboltHandler: DeadboltHandler)
                 (action: Action[A]): Action[A] = {
     Action.async(action.parser) { implicit request =>
-      deadboltHandler.beforeAuthCheck(request) match {
-        case Some(result) => result
-        case _ =>
-          deadboltHandler.getDynamicResourceHandler(request) match {
-            case Some(dynamicHandler) =>
-              Future(dynamicHandler.isAllowed(name, meta, deadboltHandler, request)).flatMap((allowed: Boolean) => allowed match {
-                case true => action(request)
-                case false => deadboltHandler.onAuthFailure(request)
-              })
-            case None =>
-              throw new RuntimeException("A dynamic resource is specified but no dynamic resource handler is provided")
-          }
-      }
+
+      deadboltHandler.beforeAuthCheck(request).flatMap((beforeAuthOption: Option[Result]) => {
+        beforeAuthOption match {
+          case Some(result) => Future(result)
+          case None =>
+            deadboltHandler.getDynamicResourceHandler(request).flatMap((drhOption: Option[DynamicResourceHandler]) => {
+              drhOption match {
+                case Some(dynamicHandler) =>
+                  dynamicHandler.isAllowed(name, meta, deadboltHandler, request).flatMap((allowed: Boolean) => allowed match {
+                    case true => action(request)
+                    case false => deadboltHandler.onAuthFailure(request)
+                  })
+                case None =>
+                  throw new RuntimeException("A dynamic resource is specified but no dynamic resource handler is provided")
+              }
+            })
+        }
+      })
     }
   }
 
@@ -123,30 +130,37 @@ trait DeadboltActions extends Results with BodyParsers {
 
     Action.async(action.parser) {
       implicit request =>
-        deadboltHandler.beforeAuthCheck(request) match {
-          case Some(result) => result
-          case _ =>
-            val subjectFuture: Future[Option[Subject]] = Future(deadboltHandler.getSubject(request))
-            subjectFuture.flatMap((subjectOption: Option[Subject]) => subjectOption match {
-              case None => deadboltHandler.onAuthFailure(request)
-              case Some(subject) => patternType match {
-                case PatternType.EQUALITY =>
-                  if (new DeadboltAnalyzer().checkPatternEquality(subject, value)) action(request)
-                  else deadboltHandler.onAuthFailure(request)
-                case PatternType.REGEX =>
-                  if (new DeadboltAnalyzer().checkRegexPattern(subject, getPattern(value))) action(request)
-                  else deadboltHandler.onAuthFailure(request)
-                case PatternType.CUSTOM =>
-                  deadboltHandler.getDynamicResourceHandler(request) match {
-                    case Some(dynamicHandler) =>
-                      if (dynamicHandler.checkPermission(value, deadboltHandler, request)) action(request)
-                      else deadboltHandler.onAuthFailure(request)
-                    case None =>
-                      throw new RuntimeException("A custom pattern is specified but no dynamic resource handler is provided")
-                  }
-              }
-            })
-        }
+        deadboltHandler.beforeAuthCheck(request).flatMap((beforeAuthOption: Option[Result]) => {
+          beforeAuthOption match {
+            case Some(result) => Future(result)
+            case None =>
+              deadboltHandler.getSubject(request).flatMap((subjectOption: Option[Subject]) => subjectOption match {
+                case None => deadboltHandler.onAuthFailure(request)
+                case Some(subject) => patternType match {
+                  case PatternType.EQUALITY =>
+                    if (new DeadboltAnalyzer().checkPatternEquality(subject, value)) action(request)
+                    else deadboltHandler.onAuthFailure(request)
+                  case PatternType.REGEX =>
+                    if (new DeadboltAnalyzer().checkRegexPattern(subject, getPattern(value))) action(request)
+                    else deadboltHandler.onAuthFailure(request)
+                  case PatternType.CUSTOM =>
+                    deadboltHandler.getDynamicResourceHandler(request).flatMap((drhOption: Option[DynamicResourceHandler]) => {
+                      drhOption match {
+                        case Some(dynamicHandler) =>
+                          dynamicHandler.checkPermission(value, deadboltHandler, request).flatMap((allowed: Boolean) => {
+                            allowed match {
+                              case true => action(request)
+                              case false => deadboltHandler.onAuthFailure(request)
+                            }
+                          })
+                        case None =>
+                          throw new RuntimeException("A custom pattern is specified but no dynamic resource handler is provided")
+                      }
+                    })
+                }
+              })
+          }
+        })
     }
   }
 
@@ -160,14 +174,16 @@ trait DeadboltActions extends Results with BodyParsers {
    */
   def SubjectPresent[A](deadboltHandler: DeadboltHandler)(action: Action[A]): Action[A] = {
     Action.async(action.parser) { implicit request =>
-      deadboltHandler.beforeAuthCheck(request) match {
-        case Some(result) => result
-        case _ =>
-          Future(deadboltHandler.getSubject(request)).flatMap((subjectOption: Option[Subject]) => subjectOption match {
-            case Some(subject) => action(request)
-            case None => deadboltHandler.onAuthFailure(request)
-          })
-      }
+      deadboltHandler.beforeAuthCheck(request).flatMap((beforeAuthOption: Option[Result]) =>
+          beforeAuthOption match {
+            case Some(result) => Future(result)
+            case None =>
+              deadboltHandler.getSubject(request).flatMap((subjectOption: Option[Subject]) => subjectOption match {
+                case Some(subject) => action(request)
+                case None => deadboltHandler.onAuthFailure(request)
+              })
+          }
+      )
     }
   }
 
@@ -181,14 +197,17 @@ trait DeadboltActions extends Results with BodyParsers {
    */
   def SubjectNotPresent[A](deadboltHandler: DeadboltHandler)(action: Action[A]): Action[A] = {
     Action.async(action.parser) { implicit request =>
-      deadboltHandler.beforeAuthCheck(request) match {
-        case Some(result) => result
-        case _ =>
-          Future(deadboltHandler.getSubject(request)).flatMap((subjectOption: Option[Subject]) => subjectOption match {
-            case Some(subject) => deadboltHandler.onAuthFailure(request)
-            case None => action(request)
-          })
-      }
+      deadboltHandler.beforeAuthCheck(request).flatMap((beforeAuthOption: Option[Result]) =>
+          beforeAuthOption match {
+            case Some(result) => Future(result)
+            case None =>
+              deadboltHandler.getSubject(request).flatMap((subjectOption: Option[Subject]) => subjectOption match {
+                case Some(subject) => deadboltHandler.onAuthFailure(request)
+                case None => action(request)
+              })
+
+          }
+      )
     }
   }
 }

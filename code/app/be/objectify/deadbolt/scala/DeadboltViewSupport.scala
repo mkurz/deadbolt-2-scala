@@ -8,6 +8,11 @@ import be.objectify.deadbolt.core.{DeadboltAnalyzer, PatternType}
 import play.api.mvc.Request
 import play.cache.Cache
 
+import scala.concurrent.{Future, Await}
+import scala.concurrent.duration._
+
+import scala.concurrent.ExecutionContext.Implicits.global
+
 /**
  *
  * @author Steve Chaloner (steve@objectify.be)
@@ -22,11 +27,14 @@ object  DeadboltViewSupport {
    * @return true if the view can be accessed, otherwise false
    */
   def viewSubjectPresent(deadboltHandler: DeadboltHandler,
+                         timeoutInMillis: Long,
                          request: Request[Any]): Boolean = {
-    deadboltHandler.getSubject(request) match {
-      case Some(subject) => true
-      case None => false
-    }
+    Await.result(deadboltHandler.getSubject(request).map((subjectOption: Option[Subject]) => {
+      subjectOption match {
+        case Some(subject) => true
+        case None => false
+      }
+    }), timeoutInMillis milliseconds)
   }
 
   /**
@@ -39,6 +47,7 @@ object  DeadboltViewSupport {
    */
   def viewRestrict(roles: List[Array[String]],
                    deadboltHandler: DeadboltHandler,
+                   timeoutInMillis: Long,
                    request: Request[Any]): Boolean = {
     def check(analyzer: DeadboltAnalyzer, subject: Subject, current: Array[String], remaining: List[Array[String]]): Boolean = {
         if (analyzer.checkRole(subject, current)) true
@@ -46,10 +55,12 @@ object  DeadboltViewSupport {
         else check(analyzer, subject, remaining.head, remaining.tail)
     }
 
-    deadboltHandler.getSubject(request) match {
-      case Some(subject) => check(new DeadboltAnalyzer(), subject, roles.head, roles.tail)
-      case None => false
-    }
+    Await.result(deadboltHandler.getSubject(request).map((subjectOption: Option[Subject]) => {
+      subjectOption match {
+        case Some(subject) => check(new DeadboltAnalyzer(), subject, roles.head, roles.tail)
+        case None => false
+      }
+    }), timeoutInMillis milliseconds)
   }
 
   /**
@@ -62,10 +73,14 @@ object  DeadboltViewSupport {
   def viewDynamic(name: String,
                   meta: String,
                   deadboltHandler: DeadboltHandler,
+                  timeoutInMillis: Long,
                   request: Request[Any]): Boolean = {
-    val resourceHandler = deadboltHandler.getDynamicResourceHandler(request)
-    if (resourceHandler.isDefined) resourceHandler.get.isAllowed(name, meta, deadboltHandler, request)
-    else throw new RuntimeException("A dynamic resource is specified but no dynamic resource handler is provided")
+    Await.result(deadboltHandler.getDynamicResourceHandler(request).flatMap((drhOption: Option[DynamicResourceHandler]) => {
+      drhOption match {
+        case Some(drh) => drh.isAllowed(name, meta, deadboltHandler, request)
+        case None => throw new RuntimeException("A dynamic resource is specified but no dynamic resource handler is provided")
+      }
+    }), timeoutInMillis milliseconds)
   }
 
   /**
@@ -79,6 +94,7 @@ object  DeadboltViewSupport {
   def viewPattern(value: String,
                   patternType: PatternType,
                   deadboltHandler: DeadboltHandler,
+                  timeoutInMillis: Long,
                   request: Request[Any]): Boolean = {
     def getPattern(patternValue: String): Pattern =
       Cache.getOrElse("Deadbolt." + patternValue,
@@ -87,18 +103,23 @@ object  DeadboltViewSupport {
                       },
                       0)
 
-    deadboltHandler.getSubject(request) match {
-      case None => false
-      case Some(subject) => patternType match {
-        case PatternType.EQUALITY => new DeadboltAnalyzer().checkPatternEquality(subject, value)
-        case PatternType.REGEX => new DeadboltAnalyzer().checkRegexPattern(subject, getPattern(value))
-        case PatternType.CUSTOM => deadboltHandler.getDynamicResourceHandler(request) match {
-          case Some(dynamicHandler) => dynamicHandler.checkPermission(value, deadboltHandler, request)
-          case None =>
-            throw new RuntimeException("A custom pattern is specified but no dynamic resource handler is provided")
+    Await.result(deadboltHandler.getSubject(request).map((subjectOption: Option[Subject]) => {
+      subjectOption match {
+        case None => false
+        case Some(subject) => patternType match {
+          case PatternType.EQUALITY => new DeadboltAnalyzer().checkPatternEquality(subject, value)
+          case PatternType.REGEX => new DeadboltAnalyzer().checkRegexPattern(subject, getPattern(value))
+          case PatternType.CUSTOM =>
+            val future: Future[Boolean] = deadboltHandler.getDynamicResourceHandler(request).map((drhOption: Option[DynamicResourceHandler]) => {
+              drhOption match {
+                case Some(drh) => Await.result(drh.checkPermission(value, deadboltHandler, request), timeoutInMillis milliseconds)
+                case None => throw new scala.RuntimeException("A custom pattern is specified but no dynamic resource handler is provided")
+              }
+            })
+            Await.result(future, timeoutInMillis milliseconds)
+          case _ => false
         }
-        case _ => false
       }
-    }
+    }), timeoutInMillis milliseconds)
   }
 }

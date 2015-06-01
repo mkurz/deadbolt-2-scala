@@ -2,6 +2,8 @@ package be.objectify.deadbolt.scala
 
 import play.api.mvc.Request
 
+import scala.concurrent.Future
+
 /**
  *
  * @author Steve Chaloner (steve@objectify.be)
@@ -21,7 +23,7 @@ trait DynamicResourceHandler
   def isAllowed[A](name: String,
                    meta: String,
                    deadboltHandler: DeadboltHandler,
-                   request: Request[A]): Boolean
+                   request: Request[A]): Future[Boolean]
 
   /**
    * Invoked when a {@link DeadboltPattern} with a {@link PatternType#CUSTOM} type is
@@ -34,5 +36,5 @@ trait DynamicResourceHandler
    */
   def checkPermission[A](permissionValue: String,
                          deadboltHandler: DeadboltHandler,
-                         request: Request[A]): Boolean
+                         request: Request[A]): Future[Boolean]
 }

@@ -1,7 +1,7 @@
-@(handler: be.objectify.deadbolt.scala.DeadboltHandler)(body: => play.twirl.api.Html)(implicit request: Request[Any])
+@(handler: be.objectify.deadbolt.scala.DeadboltHandler, timeoutInMillis: Long = 1000)(body: => play.twirl.api.Html)(implicit request: Request[Any])
 
 @import scala.collection.JavaConversions._
 
-@if(!be.objectify.deadbolt.scala.DeadboltViewSupport.viewSubjectPresent(handler, request)) {
+@if(!be.objectify.deadbolt.scala.DeadboltViewSupport.viewSubjectPresent(handler, timeoutInMillis, request)) {
     @body
 }

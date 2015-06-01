@@ -18,14 +18,14 @@ trait DeadboltHandler {
    *
    * @return an option possible containing a Result.
    */
-  def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]]
+  def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]]
 
   /**
    * Gets the current subject e.g. the current user.
    *
    * @return a future for an option containing the current subject
    */
-  def getSubject[A](request: Request[A]): Option[Subject]
+  def getSubject[A](request: Request[A]): Future[Option[Subject]]
 
   /**
    * Invoked when an authorisation failure is detected for the request.
@@ -39,5 +39,5 @@ trait DeadboltHandler {
    *
    * @return an option containing the handler for restricted resources
    */
-  def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler]
+  def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]]
 }

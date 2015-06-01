@@ -21,12 +21,12 @@ class EqualityTest extends PlaySpecification {
    "when the subject has a permission that is equal to the pattern, the view" should {
      "show constrained content" in new WithApplication {
        val html = patternContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = Some(new DynamicResourceHandler() {
-           override def isAllowed[A](name: String, meta: String, deadboltHandler: DeadboltHandler, request: Request[A]): Boolean = true
-           override def checkPermission[A](permissionValue: String, deadboltHandler: DeadboltHandler, request: Request[A]): Boolean = true
-         })
-         override def getSubject[A](request: Request[A]): Option[Subject] = Some(new User("foo", Scala.asJava(List.empty), Scala.asJava(List(new SecurityPermission("killer.undead.zombie")))))
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(Some(new DynamicResourceHandler() {
+           override def isAllowed[A](name: String, meta: String, deadboltHandler: DeadboltHandler, request: Request[A]): Future[Boolean] = Future(true)
+           override def checkPermission[A](permissionValue: String, deadboltHandler: DeadboltHandler, request: Request[A]): Future[Boolean] = Future(true)
+         }))
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List.empty), Scala.asJava(List(new SecurityPermission("killer.undead.zombie"))))))
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, value = "killer.undead.zombie", patternType = PatternType.EQUALITY)(FakeRequest())
 
@@ -40,12 +40,12 @@ class EqualityTest extends PlaySpecification {
   "when the subject has no permissions that are equal to the pattern, the view" should {
     "hide constrained content" in new WithApplication {
       val html = patternContent(new DeadboltHandler() {
-        override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-        override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = Some(new DynamicResourceHandler() {
-          override def isAllowed[A](name: String, meta: String, deadboltHandler: DeadboltHandler, request: Request[A]): Boolean = true
-          override def checkPermission[A](permissionValue: String, deadboltHandler: DeadboltHandler, request: Request[A]): Boolean = true
-        })
-        override def getSubject[A](request: Request[A]): Option[Subject] = Some(new User("foo", Scala.asJava(List.empty), Scala.asJava(List(new SecurityPermission("killer.undead.vampire")))))
+        override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+        override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(Some(new DynamicResourceHandler() {
+          override def isAllowed[A](name: String, meta: String, deadboltHandler: DeadboltHandler, request: Request[A]): Future[Boolean] = Future(true)
+          override def checkPermission[A](permissionValue: String, deadboltHandler: DeadboltHandler, request: Request[A]): Future[Boolean] = Future(true)
+        }))
+        override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List.empty), Scala.asJava(List(new SecurityPermission("killer.undead.vampire"))))))
         override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
       }, value = "killer.undead.zombie", patternType = PatternType.EQUALITY)(FakeRequest())
 

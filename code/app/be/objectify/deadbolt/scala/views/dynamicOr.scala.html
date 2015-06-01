@@ -1,6 +1,6 @@
-@(handler: be.objectify.deadbolt.scala.DeadboltHandler, name: String, meta: String = null)(body: => play.twirl.api.Html)(alternativeBody: => play.twirl.api.Html)(implicit request: Request[Any])
+@(handler: be.objectify.deadbolt.scala.DeadboltHandler, name: String, meta: String = null, timeoutInMillis: Long = 1000)(body: => play.twirl.api.Html)(alternativeBody: => play.twirl.api.Html)(implicit request: Request[Any])
 
-@if(be.objectify.deadbolt.scala.DeadboltViewSupport.viewDynamic(name, meta, handler, request)) {
+@if(be.objectify.deadbolt.scala.DeadboltViewSupport.viewDynamic(name, meta, handler, timeoutInMillis, request)) {
 @body
 } else {
 @alternativeBody

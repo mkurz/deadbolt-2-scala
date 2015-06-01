@@ -19,9 +19,9 @@ class SubjectPresentTest extends PlaySpecification {
 
   "show constrained content when subject is present" in new WithApplication {
     val html = subjectPresentContent(new DeadboltHandler() {
-      override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-      override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-      override def getSubject[A](request: Request[A]): Option[Subject] = Some(new User("foo", Scala.asJava(List()), Scala.asJava(List())))
+      override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+      override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+      override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List()), Scala.asJava(List()))))
       override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
     })(FakeRequest())
 
@@ -33,9 +33,9 @@ class SubjectPresentTest extends PlaySpecification {
 
   "hide constrained content when subject is not present" in new WithApplication {
     val html = subjectPresentContent(new DeadboltHandler() {
-      override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-      override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-      override def getSubject[A](request: Request[A]): Option[Subject] = None
+      override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+      override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+      override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(None)
       override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
     })(FakeRequest())
 

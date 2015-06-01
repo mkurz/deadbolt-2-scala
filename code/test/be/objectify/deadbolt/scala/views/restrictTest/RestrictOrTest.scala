@@ -20,9 +20,9 @@ class RestrictOrTest extends PlaySpecification {
    "when protected by a single role, the view" should {
      "hide constrained content and show fallback content when subject is not present" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-         override def getSubject[A](request: Request[A]): Option[Subject] = None
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(None)
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, List(Array("foo")))(FakeRequest())
 
@@ -35,9 +35,9 @@ class RestrictOrTest extends PlaySpecification {
 
      "hide constrained content and show fallback content when subject does not have necessary role" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-         override def getSubject[A](request: Request[A]): Option[Subject] = Some(new User("foo", Scala.asJava(List(new SecurityRole("user"))), Scala.asJava(List.empty)))
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List(new SecurityRole("user"))), Scala.asJava(List.empty))))
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, List(Array("admin")))(FakeRequest())
 
@@ -50,9 +50,9 @@ class RestrictOrTest extends PlaySpecification {
 
      "hide constrained content and show fallback content when subject does not have any roles" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-         override def getSubject[A](request: Request[A]): Option[Subject] = Some(new User("foo", Scala.asJava(List.empty), Scala.asJava(List.empty)))
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List.empty), Scala.asJava(List.empty))))
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, List(Array("admin")))(FakeRequest())
 
@@ -65,9 +65,9 @@ class RestrictOrTest extends PlaySpecification {
 
      "hide constrained content and show fallback content when subject has other roles" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-         override def getSubject[A](request: Request[A]): Option[Subject] = Some(new User("foo", Scala.asJava(List()), Scala.asJava(List.empty)))
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List()), Scala.asJava(List.empty))))
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, List(Array("admin")))(FakeRequest())
 
@@ -80,9 +80,9 @@ class RestrictOrTest extends PlaySpecification {
 
      "show constrained content and hode fallback content when subject has necessary role" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-         override def getSubject[A](request: Request[A]): Option[Subject] = Some(new User("foo", Scala.asJava(List(new SecurityRole("admin"))), Scala.asJava(List.empty)))
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List(new SecurityRole("admin"))), Scala.asJava(List.empty))))
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, List(Array("admin")))(FakeRequest())
 
@@ -98,9 +98,9 @@ class RestrictOrTest extends PlaySpecification {
 
      "hide constrained content and show fallback content when subject is not present" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-         override def getSubject[A](request: Request[A]): Option[Subject] = None
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(None)
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, List(Array("admin", "watchdog")))(FakeRequest())
 
@@ -113,9 +113,9 @@ class RestrictOrTest extends PlaySpecification {
 
      "hide constrained content and show fallback content when subject does not have necessary role" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-         override def getSubject[A](request: Request[A]): Option[Subject] = Some(new User("foo", Scala.asJava(List(new SecurityRole("user"))), Scala.asJava(List.empty)))
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List(new SecurityRole("user"))), Scala.asJava(List.empty))))
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, List(Array("admin", "watchdog")))(FakeRequest())
 
@@ -128,9 +128,9 @@ class RestrictOrTest extends PlaySpecification {
 
      "hide constrained content and show fallback content when subject does not have any roles" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-         override def getSubject[A](request: Request[A]): Option[Subject] = Some(new User("foo", Scala.asJava(List.empty), Scala.asJava(List.empty)))
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List.empty), Scala.asJava(List.empty))))
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, List(Array("admin", "watchdog")))(FakeRequest())
 
@@ -143,9 +143,9 @@ class RestrictOrTest extends PlaySpecification {
 
      "show constrained content and hide fallback content when subject has both roles" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-         override def getSubject[A](request: Request[A]): Option[Subject] = Some(new User("foo", Scala.asJava(List(new SecurityRole("admin"), new SecurityRole("watchdog"))), Scala.asJava(List.empty)))
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List(new SecurityRole("admin"), new SecurityRole("watchdog"))), Scala.asJava(List.empty))))
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, List(Array("admin", "watchdog")))(FakeRequest())
 
@@ -162,9 +162,9 @@ class RestrictOrTest extends PlaySpecification {
 
      "hide constrained content and show fallback content when subject is not present" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-         override def getSubject[A](request: Request[A]): Option[Subject] = None
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(None)
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, List(Array("admin"), Array("watchdog")))(FakeRequest())
 
@@ -177,9 +177,9 @@ class RestrictOrTest extends PlaySpecification {
 
      "hide constrained content and show fallback content when subject does not have either of the necessary roles" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-         override def getSubject[A](request: Request[A]): Option[Subject] = Some(new User("foo", Scala.asJava(List(new SecurityRole("user"))), Scala.asJava(List.empty)))
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List(new SecurityRole("user"))), Scala.asJava(List.empty))))
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, List(Array("admin"), Array("watchdog")))(FakeRequest())
 
@@ -192,9 +192,9 @@ class RestrictOrTest extends PlaySpecification {
 
      "hide constrained content and show fallback content when subject does not have any roles" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-         override def getSubject[A](request: Request[A]): Option[Subject] = Some(new User("foo", Scala.asJava(List.empty), Scala.asJava(List.empty)))
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List.empty), Scala.asJava(List.empty))))
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, List(Array("admin"), Array("watchdog")))(FakeRequest())
 
@@ -207,9 +207,9 @@ class RestrictOrTest extends PlaySpecification {
 
      "show constrained content and hide fallback content when subject has both roles" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-         override def getSubject[A](request: Request[A]): Option[Subject] = Some(new User("foo", Scala.asJava(List(new SecurityRole("admin"), new SecurityRole("watchdog"))), Scala.asJava(List.empty)))
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List(new SecurityRole("admin"), new SecurityRole("watchdog"))), Scala.asJava(List.empty))))
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, List(Array("admin"), Array("watchdog")))(FakeRequest())
 
@@ -222,9 +222,9 @@ class RestrictOrTest extends PlaySpecification {
 
      "show constrained content and hide fallback content when subject has one of the roles" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-         override def getSubject[A](request: Request[A]): Option[Subject] = Some(new User("foo", Scala.asJava(List(new SecurityRole("admin"))), Scala.asJava(List.empty)))
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List(new SecurityRole("admin"))), Scala.asJava(List.empty))))
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, List(Array("admin"), Array("watchdog")))(FakeRequest())
 
@@ -237,9 +237,9 @@ class RestrictOrTest extends PlaySpecification {
 
      "show constrained content and hide fallback content when subject has another one of the roles" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-         override def getSubject[A](request: Request[A]): Option[Subject] = Some(new User("foo", Scala.asJava(List(new SecurityRole("watchdog"))), Scala.asJava(List.empty)))
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List(new SecurityRole("watchdog"))), Scala.asJava(List.empty))))
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, List(Array("admin"), Array("watchdog")))(FakeRequest())
 
@@ -254,9 +254,9 @@ class RestrictOrTest extends PlaySpecification {
    "when a single role is present and negated, the view" should {
      "hide constrained content and show fallback content when subject is not present" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-         override def getSubject[A](request: Request[A]): Option[Subject] = None
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(None)
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, List(Array("!foo")))(FakeRequest())
 
@@ -269,9 +269,9 @@ class RestrictOrTest extends PlaySpecification {
 
      "hide constrained content and show fallback content when subject has the negated role" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-         override def getSubject[A](request: Request[A]): Option[Subject] = Some(new User("foo", Scala.asJava(List(new SecurityRole("admin"))), Scala.asJava(List.empty)))
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List(new SecurityRole("admin"))), Scala.asJava(List.empty))))
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, List(Array("!admin")))(FakeRequest())
 
@@ -284,9 +284,9 @@ class RestrictOrTest extends PlaySpecification {
 
      "show constrained content and hide fallback content when subject does not have the negated role" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-         override def getSubject[A](request: Request[A]): Option[Subject] = Some(new User("foo", Scala.asJava(List(new SecurityRole("user"))), Scala.asJava(List.empty)))
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List(new SecurityRole("user"))), Scala.asJava(List.empty))))
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, List(Array("!admin")))(FakeRequest())
 
@@ -301,9 +301,9 @@ class RestrictOrTest extends PlaySpecification {
    "when ANDed roles contain a negated role, the view" should {
      "show constrained content and hide fallback content when subject is not present" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-         override def getSubject[A](request: Request[A]): Option[Subject] = None
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(None)
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, List(Array("!admin", "watchdog")))(FakeRequest())
 
@@ -316,9 +316,9 @@ class RestrictOrTest extends PlaySpecification {
 
      "hide constrained content and show fallback content when subject has the negated role" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-         override def getSubject[A](request: Request[A]): Option[Subject] = Some(new User("foo", Scala.asJava(List(new SecurityRole("admin"), new SecurityRole("watchdog"))), Scala.asJava(List.empty)))
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List(new SecurityRole("admin"), new SecurityRole("watchdog"))), Scala.asJava(List.empty))))
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, List(Array("!admin", "watchdog")))(FakeRequest())
 
@@ -331,9 +331,9 @@ class RestrictOrTest extends PlaySpecification {
 
      "show constrained content and hide fallback content when subject has the non-negated role but does not have the negated role" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = None
-         override def getSubject[A](request: Request[A]): Option[Subject] = Some(new User("foo", Scala.asJava(List(new SecurityRole("watchdog"))), Scala.asJava(List.empty)))
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List(new SecurityRole("watchdog"))), Scala.asJava(List.empty))))
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, List(Array("!admin", "watchdog")))(FakeRequest())
 

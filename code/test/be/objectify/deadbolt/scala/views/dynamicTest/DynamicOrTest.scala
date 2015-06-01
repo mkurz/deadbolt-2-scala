@@ -18,12 +18,12 @@ class DynamicOrTest extends PlaySpecification {
    "when allowed by the dynamic handler, the view" should {
      "show constrained content and hide fallback content" in new WithApplication {
        val html = dynamicOrContent(new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = Some(new DynamicResourceHandler() {
-           override def isAllowed[A](name: String, meta: String, deadboltHandler: DeadboltHandler, request: Request[A]): Boolean = true // allow
-           override def checkPermission[A](permissionValue: String, deadboltHandler: DeadboltHandler, request: Request[A]): Boolean = false
-         })
-         override def getSubject[A](request: Request[A]): Option[Subject] = None
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(Some(new DynamicResourceHandler() {
+           override def isAllowed[A](name: String, meta: String, deadboltHandler: DeadboltHandler, request: Request[A]): Future[Boolean] = Future(true) // allow
+           override def checkPermission[A](permissionValue: String, deadboltHandler: DeadboltHandler, request: Request[A]): Future[Boolean] = Future(false)
+         }))
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(None)
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, name = "the name of this constraint", meta = "some additional info")(FakeRequest())
 
@@ -38,12 +38,12 @@ class DynamicOrTest extends PlaySpecification {
    "when denied by the dynamic handler, the view" should {
      "hide constrained content and show fallback content" in new WithApplication {
        val html = dynamicOrContent(handler = new DeadboltHandler() {
-         override def beforeAuthCheck[A](request: Request[A]): Option[Future[Result]] = None
-         override def getDynamicResourceHandler[A](request: Request[A]): Option[DynamicResourceHandler] = Some(new DynamicResourceHandler() {
-           override def isAllowed[A](name: String, meta: String, deadboltHandler: DeadboltHandler, request: Request[A]): Boolean = false //deny
-           override def checkPermission[A](permissionValue: String, deadboltHandler: DeadboltHandler, request: Request[A]): Boolean = false
-         })
-         override def getSubject[A](request: Request[A]): Option[Subject] = None
+         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
+         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(Some(new DynamicResourceHandler() {
+           override def isAllowed[A](name: String, meta: String, deadboltHandler: DeadboltHandler, request: Request[A]): Future[Boolean] = Future(false) //deny
+           override def checkPermission[A](permissionValue: String, deadboltHandler: DeadboltHandler, request: Request[A]): Future[Boolean] = Future(false)
+         }))
+         override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(None)
          override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
        }, name = "the name of this constraint", meta = "some additional info")(FakeRequest())
 
