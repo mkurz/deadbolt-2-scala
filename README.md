@@ -3,7 +3,7 @@ deadbolt-2-scala
 
 [![Build Status](https://travis-ci.org/schaloner/deadbolt-2-scala.svg?branch=master)](https://travis-ci.org/schaloner/deadbolt-2-scala)
 
-**Latest version:** "be.objectify" %% "deadbolt-scala" % "2.4.0-SNAPSHOT
+**Latest version:** "be.objectify" %% "deadbolt-scala" % "2.4.0-SNAPSHOT"
 
 Idiomatic Scala API for Deadbolt 2, an authorisation module for Play 2.
 
