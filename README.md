@@ -3,6 +3,8 @@ deadbolt-2-scala
 
 [![Build Status](https://travis-ci.org/schaloner/deadbolt-2-scala.svg?branch=master)](https://travis-ci.org/schaloner/deadbolt-2-scala)
 
+**Latest version:** "be.objectify" %% "deadbolt-scala" % "2.4.0-SNAPSHOT
+
 Idiomatic Scala API for Deadbolt 2, an authorisation module for Play 2.
 
 Deadbolt 2 comprises of several modules - a common core, and language-specific implementations for Java and Scala.  Example applications and a user guide are also available.  
@@ -12,7 +14,18 @@ All modules related to Deadbolt 2, including the user guide, are grouped togethe
 2.4.x Release notes
 -------------------
 
-This is still a work in progress!  At the moment, changes have been made to point to the latest version of Play, but none of the planned API changes have been put into effect.
+Futures everywhere!  Well, almost...
+
+**DeadboltHandler**
+- Every function now returns a `Future`
+- **NB** `beforeAuthCheck` previously returned `Option[Future[Result]]`.  To bring it in line with the rest of the trait, it now returns `Future[Option[Result]]`
+
+**DynamicResourceHandler**
+- Every function now returns a `Future`
+
+**Views**
+- there's an unfortunate need to use `Await.result` because we need ordered rendering.  If anyone knows a way around this, please let me know!
+- as a result of this call to Await, there's a new template parameter called `timeoutInMillis`.  This defaults to `1000` (i.e. 1 second), but you can specify your own value as required. 
 
 2.3.3 Release notes
 -------------------
