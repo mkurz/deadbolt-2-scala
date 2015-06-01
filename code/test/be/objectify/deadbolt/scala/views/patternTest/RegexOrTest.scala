@@ -11,6 +11,8 @@ import play.libs.Scala
 
 import scala.concurrent.Future
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 /**
   * @author Steve Chaloner (steve@objectify.be)
   */

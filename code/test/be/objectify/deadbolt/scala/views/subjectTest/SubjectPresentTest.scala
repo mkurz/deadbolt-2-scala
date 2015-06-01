@@ -10,6 +10,8 @@ import be.objectify.deadbolt.scala.views.html.subjectTest.subjectPresentContent
 
 import scala.concurrent.Future
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 /**
  * @author Steve Chaloner (steve@objectify.be)
  */
