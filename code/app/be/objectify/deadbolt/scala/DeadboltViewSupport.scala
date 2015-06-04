@@ -1,5 +1,6 @@
 package be.objectify.deadbolt.scala
 
+import java.util.Optional
 import java.util.concurrent.Callable
 import java.util.regex.Pattern
 
@@ -49,7 +50,7 @@ object  DeadboltViewSupport {
                    deadboltHandler: DeadboltHandler,
                    timeoutInMillis: Long,
                    request: Request[Any]): Boolean = {
-    def check(analyzer: DeadboltAnalyzer, subject: Subject, current: Array[String], remaining: List[Array[String]]): Boolean = {
+    def check(analyzer: DeadboltAnalyzer, subject: Optional[Subject], current: Array[String], remaining: List[Array[String]]): Boolean = {
         if (analyzer.checkRole(subject, current)) true
         else if (remaining.isEmpty) false
         else check(analyzer, subject, remaining.head, remaining.tail)
@@ -57,7 +58,7 @@ object  DeadboltViewSupport {
 
     Await.result(deadboltHandler.getSubject(request).map((subjectOption: Option[Subject]) => {
       subjectOption match {
-        case Some(subject) => check(new DeadboltAnalyzer(), subject, roles.head, roles.tail)
+        case Some(subject) => check(new DeadboltAnalyzer(), Optional.ofNullable(subject), roles.head, roles.tail)
         case None => false
       }
     }), timeoutInMillis milliseconds)
@@ -107,8 +108,8 @@ object  DeadboltViewSupport {
       subjectOption match {
         case None => false
         case Some(subject) => patternType match {
-          case PatternType.EQUALITY => new DeadboltAnalyzer().checkPatternEquality(subject, value)
-          case PatternType.REGEX => new DeadboltAnalyzer().checkRegexPattern(subject, getPattern(value))
+          case PatternType.EQUALITY => new DeadboltAnalyzer().checkPatternEquality(Optional.ofNullable(subject), Optional.ofNullable(value))
+          case PatternType.REGEX => new DeadboltAnalyzer().checkRegexPattern(Optional.ofNullable(subject), Optional.ofNullable(getPattern(value)))
           case PatternType.CUSTOM =>
             val future: Future[Boolean] = deadboltHandler.getDynamicResourceHandler(request).map((drhOption: Option[DynamicResourceHandler]) => {
               drhOption match {

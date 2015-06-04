@@ -1,5 +1,6 @@
 package be.objectify.deadbolt.scala
 
+import java.util.Optional
 import java.util.concurrent.Callable
 import java.util.regex.Pattern
 
@@ -49,7 +50,7 @@ trait DeadboltActions extends Results with BodyParsers {
                  (action: Action[A]): Action[A] = {
     Action.async(action.parser) { implicit request =>
 
-      def check(analyzer: DeadboltAnalyzer, subject: Subject, current: Array[String], remaining: List[Array[String]]): Future[Result] = {
+      def check(analyzer: DeadboltAnalyzer, subject: Optional[Subject], current: Array[String], remaining: List[Array[String]]): Future[Result] = {
         if (analyzer.checkRole(subject, current)) action(request)
         else if (remaining.isEmpty) deadboltHandler.onAuthFailure(request)
         else check(analyzer, subject, remaining.head, remaining.tail)
@@ -63,7 +64,7 @@ trait DeadboltActions extends Results with BodyParsers {
             else {
               deadboltHandler.getSubject(request).flatMap((subjectOption: Option[Subject]) =>
                 subjectOption match {
-                  case Some(subject) => check(new DeadboltAnalyzer(), subject, roleGroups.head, roleGroups.tail)
+                  case Some(subject) => check(new DeadboltAnalyzer(), Optional.ofNullable(subject), roleGroups.head, roleGroups.tail)
                   case _ => deadboltHandler.onAuthFailure(request)
                 })
             }
@@ -138,10 +139,10 @@ trait DeadboltActions extends Results with BodyParsers {
                 case None => deadboltHandler.onAuthFailure(request)
                 case Some(subject) => patternType match {
                   case PatternType.EQUALITY =>
-                    if (new DeadboltAnalyzer().checkPatternEquality(subject, value)) action(request)
+                    if (new DeadboltAnalyzer().checkPatternEquality(Optional.ofNullable(subject), Optional.ofNullable(value))) action(request)
                     else deadboltHandler.onAuthFailure(request)
                   case PatternType.REGEX =>
-                    if (new DeadboltAnalyzer().checkRegexPattern(subject, getPattern(value))) action(request)
+                    if (new DeadboltAnalyzer().checkRegexPattern(Optional.ofNullable(subject), Optional.ofNullable(getPattern(value)))) action(request)
                     else deadboltHandler.onAuthFailure(request)
                   case PatternType.CUSTOM =>
                     deadboltHandler.getDynamicResourceHandler(request).flatMap((drhOption: Option[DynamicResourceHandler]) => {
