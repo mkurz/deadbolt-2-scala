@@ -19,7 +19,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
  * @author Steve Chaloner (steve@objectify.be)
  */
 
-object  DeadboltViewSupport {
+object DeadboltViewSupport {
 
   /**
    * Used for subjectPresent and subjectNotPresent tags in the template.
