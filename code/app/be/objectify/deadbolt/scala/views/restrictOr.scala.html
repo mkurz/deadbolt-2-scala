@@ -1,8 +1,9 @@
-@(handler: be.objectify.deadbolt.scala.DeadboltHandler, roles: List[Array[String]], timeout: Function0[Long] = () => 1000L)(body: => play.twirl.api.Html)(alternativeBody: => play.twirl.api.Html)(implicit request: Request[Any])
-
+@import be.objectify.deadbolt.scala.DeadboltHandler
+@import be.objectify.deadbolt.scala.ViewAccessPoint.viewSupport
 @import scala.collection.JavaConversions._
+@(handler: DeadboltHandler, roles: List[Array[String]], timeout: Function0[Long] = viewSupport.defaultTimeout)(body: => play.twirl.api.Html)(alternativeBody: => play.twirl.api.Html)(implicit request: Request[Any])
 
-@if(be.objectify.deadbolt.scala.DeadboltViewSupport.viewRestrict(roles, handler, timeout(), request)) {
+@if(viewSupport.viewRestrict(roles, handler, timeout(), request)) {
 @body
 } else {
 @alternativeBody

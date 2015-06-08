@@ -4,7 +4,8 @@ import be.objectify.deadbolt.core.PatternType
 import be.objectify.deadbolt.core.models.Subject
 import be.objectify.deadbolt.scala.testhelpers.{SecurityPermission, User}
 import be.objectify.deadbolt.scala.views.html.patternTest.patternOrContent
-import be.objectify.deadbolt.scala.{DeadboltHandler, DynamicResourceHandler}
+import be.objectify.deadbolt.scala.{DeadboltModule, DeadboltHandler, DynamicResourceHandler}
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{Results, Request, Result}
 import play.api.test.{Helpers, FakeRequest, PlaySpecification, WithApplication}
 import play.libs.Scala
@@ -18,8 +19,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
   */
 class RegexOrTest extends PlaySpecification {
 
+
+
    "when the subject has a permission that matches the pattern, the view" should {
-     "show constrained content and hide fallback content" in new WithApplication {
+     "show constrained content and hide fallback content" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                   .bindings(new DeadboltModule())
+                                                                                   .build()) {
        val html = patternOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(Some(new DynamicResourceHandler() {
@@ -39,7 +44,9 @@ class RegexOrTest extends PlaySpecification {
    }
 
   "when the subject has no permissions that match the pattern, the view" should {
-    "hide constrained content and show fallback content" in new WithApplication {
+    "hide constrained content and show fallback content" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                  .bindings(new DeadboltModule())
+                                                                                  .build()) {
       val html = patternOrContent(new DeadboltHandler() {
         override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
         override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(Some(new DynamicResourceHandler() {

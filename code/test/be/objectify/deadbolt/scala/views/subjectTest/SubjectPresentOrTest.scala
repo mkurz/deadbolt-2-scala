@@ -3,7 +3,8 @@ package be.objectify.deadbolt.scala.views.subjectTest
 import be.objectify.deadbolt.core.models.Subject
 import be.objectify.deadbolt.scala.testhelpers.User
 import be.objectify.deadbolt.scala.views.html.subjectTest.subjectPresentOrContent
-import be.objectify.deadbolt.scala.{DeadboltHandler, DynamicResourceHandler}
+import be.objectify.deadbolt.scala.{DeadboltModule, DeadboltHandler, DynamicResourceHandler}
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{Request, Result, Results}
 import play.api.test.{FakeRequest, Helpers, PlaySpecification, WithApplication}
 import play.libs.Scala
@@ -17,7 +18,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
  */
 class SubjectPresentOrTest extends PlaySpecification {
 
-  "show constrained content and hide fallback content when subject is present" in new WithApplication {
+  "show constrained content and hide fallback content when subject is present" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                        .bindings(new DeadboltModule())
+                                                                                                        .build()) {
     val html = subjectPresentOrContent(new DeadboltHandler() {
       override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
       override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
@@ -32,7 +35,9 @@ class SubjectPresentOrTest extends PlaySpecification {
     content must contain("This is after the constraint.")
   }
 
-  "hide constrained content and show fallback content when subject is not present" in new WithApplication {
+  "hide constrained content and show fallback content when subject is not present" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                            .bindings(new DeadboltModule())
+                                                                                                            .build()) {
     val html = subjectPresentOrContent(new DeadboltHandler() {
       override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
       override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)

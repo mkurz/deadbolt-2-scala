@@ -1,100 +1,98 @@
 package be.objectify.deadbolt.scala
 
+import javax.inject.{Inject, Singleton}
+
 import play.api.mvc._
 import be.objectify.deadbolt.core.PatternType
 
 /**
  * Provides helpers for creating Play Actions wrapped by DeadboltActions.
  */
-object DeadboltActionBuilders {
+@Singleton
+class ActionBuilders @Inject() (deadboltActions: DeadboltActions) {
 
-  object RestrictAction extends DeadboltActions {
+  object RestrictAction {
 
     def apply(roles: String*) = RestrictActionBuilder(roles:_*)
 
     case class RestrictActionBuilder(roles: String*) extends DeadboltActionBuilder {
 
       def apply(block: => Result)(implicit deadboltHandler: DeadboltHandler): Action[AnyContent] =
-        Restrict(roles.toArray, deadboltHandler) { Action { block } }
+        deadboltActions.Restrict(roles.toArray, deadboltHandler) { Action { block } }
 
       def apply(block: Request[AnyContent] => Result)(implicit deadboltHandler: DeadboltHandler) : Action[AnyContent] =
-        Restrict(roles.toArray, deadboltHandler) { Action { request => block(request) } }
+        deadboltActions.Restrict(roles.toArray, deadboltHandler) { Action { request => block(request) } }
 
       def apply[A](bodyParser: BodyParser[A])(block: Request[A] => Result)(implicit deadboltHandler: DeadboltHandler) : Action[A] =
-        Restrict(roles.toArray, deadboltHandler) { Action(bodyParser) { request:Request[A]  => block(request) } }
-
+        deadboltActions.Restrict(roles.toArray, deadboltHandler) { Action(bodyParser) { request:Request[A]  => block(request) } }
     }
   }
 
-  object DynamicAction extends DeadboltActions {
+  object DynamicAction {
 
     def apply(name: String, meta: String = "") = DynamicActionBuilder(name, meta)
 
     case class DynamicActionBuilder(name: String, meta: String = "") extends DeadboltActionBuilder {
 
       def apply(block: => Result)(implicit deadboltHandler: DeadboltHandler): Action[AnyContent] =
-        Dynamic(name, meta, deadboltHandler) { Action { block } }
+        deadboltActions.Dynamic(name, meta, deadboltHandler) { Action { block } }
 
       def apply(block: Request[AnyContent] => Result)(implicit deadboltHandler: DeadboltHandler) : Action[AnyContent] =
-        Dynamic(name, meta, deadboltHandler) { Action { request => block(request) } }
+        deadboltActions.Dynamic(name, meta, deadboltHandler) { Action { request => block(request) } }
 
       def apply[A](bodyParser: BodyParser[A])(block: Request[A] => Result)(implicit deadboltHandler: DeadboltHandler) : Action[A] =
-        Dynamic(name, meta, deadboltHandler) { Action(bodyParser) { request:Request[A]  => block(request) } }
-
+        deadboltActions.Dynamic(name, meta, deadboltHandler) { Action(bodyParser) { request:Request[A]  => block(request) } }
     }
   }
 
-  object PatternAction extends DeadboltActions {
+  object PatternAction {
 
     def apply(value: String, patternType: PatternType) = PatternActionBuilder(value, patternType)
 
     case class PatternActionBuilder(value: String, patternType: PatternType) extends DeadboltActionBuilder {
 
       def apply(block: => Result)(implicit deadboltHandler: DeadboltHandler): Action[AnyContent] =
-        Pattern(value, patternType, deadboltHandler) { Action { block } }
+        deadboltActions.Pattern(value, patternType, deadboltHandler) { Action { block } }
 
       def apply(block: Request[AnyContent] => Result)(implicit deadboltHandler: DeadboltHandler) : Action[AnyContent] =
-        Pattern(value, patternType, deadboltHandler) { Action { request => block(request) } }
+        deadboltActions.Pattern(value, patternType, deadboltHandler) { Action { request => block(request) } }
 
       def apply[A](bodyParser: BodyParser[A])(block: Request[A] => Result)(implicit deadboltHandler: DeadboltHandler) : Action[A] =
-        Pattern(value, patternType, deadboltHandler) { Action(bodyParser) { request:Request[A]  => block(request) } }
-
+        deadboltActions.Pattern(value, patternType, deadboltHandler) { Action(bodyParser) { request:Request[A]  => block(request) } }
     }
   }
 
-  object SubjectPresentAction extends DeadboltActions {
+  object SubjectPresentAction {
 
     def apply() = SubjectPresentActionBuilder()
 
     case class SubjectPresentActionBuilder() extends DeadboltActionBuilder {
 
       def apply(block: => Result)(implicit deadboltHandler: DeadboltHandler): Action[AnyContent] =
-        SubjectPresent(deadboltHandler) { Action { block } }
+        deadboltActions.SubjectPresent(deadboltHandler) { Action { block } }
 
       def apply(block: Request[AnyContent] => Result)(implicit deadboltHandler: DeadboltHandler) : Action[AnyContent] =
-        SubjectPresent(deadboltHandler) { Action { request => block(request) } }
+        deadboltActions.SubjectPresent(deadboltHandler) { Action { request => block(request) } }
 
       def apply[A](bodyParser: BodyParser[A])(block: Request[A] => Result)(implicit deadboltHandler: DeadboltHandler) : Action[A] =
-        SubjectPresent(deadboltHandler) { Action(bodyParser) { request:Request[A]  => block(request) } }
-
+        deadboltActions.SubjectPresent(deadboltHandler) { Action(bodyParser) { request:Request[A]  => block(request) } }
     }
   }
 
-  object SubjectNotPresentAction extends DeadboltActions {
+  object SubjectNotPresentAction {
 
     def apply() = SubjectNotPresentActionBuilder()
 
     case class SubjectNotPresentActionBuilder() extends DeadboltActionBuilder {
       def apply(block: => Result)(implicit deadboltHandler: DeadboltHandler): Action[AnyContent] =
-        SubjectNotPresent(deadboltHandler) { Action { block } }
+        deadboltActions.SubjectNotPresent(deadboltHandler) { Action { block } }
 
       def apply(block: Request[AnyContent] => Result)(implicit deadboltHandler: DeadboltHandler) : Action[AnyContent] =
-        SubjectNotPresent(deadboltHandler) { Action { request => block(request) } }
+        deadboltActions.SubjectNotPresent(deadboltHandler) { Action { request => block(request) } }
 
       def apply[A](bodyParser: BodyParser[A])(block: Request[A] => Result)(implicit deadboltHandler: DeadboltHandler) : Action[A] =
-        SubjectNotPresent(deadboltHandler) { Action(bodyParser) { request:Request[A]  => block(request) } }
+        deadboltActions.SubjectNotPresent(deadboltHandler) { Action(bodyParser) { request:Request[A]  => block(request) } }
     }
-
   }
 
   trait DeadboltActionBuilder {

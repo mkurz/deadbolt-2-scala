@@ -1,5 +1,7 @@
-@(handler: be.objectify.deadbolt.scala.DeadboltHandler, name: String, meta: String = null, timeout: Function0[Long] = () => 1000L)(body: => play.twirl.api.Html)(implicit request: Request[Any])
+@import be.objectify.deadbolt.scala.DeadboltHandler
+@import be.objectify.deadbolt.scala.ViewAccessPoint.viewSupport
+@(handler: DeadboltHandler, name: String, meta: String = null, timeout: Function0[Long] = viewSupport.defaultTimeout)(body: => play.twirl.api.Html)(implicit request: Request[Any])
 
-@if(be.objectify.deadbolt.scala.DeadboltViewSupport.viewDynamic(name, meta, handler, timeout(), request)) {
+@if(viewSupport.viewDynamic(name, meta, handler, timeout(), request)) {
 @body
 }

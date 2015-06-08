@@ -25,7 +25,7 @@ Futures everywhere!  Well, almost...
 
 **Views**
 - there's an unfortunate need to use `Await.result` because we need ordered rendering.  If anyone knows a way around this, please let me know!
-- as a result of this call to Await, there's a new template parameter called `timeoutInMillis`.  This defaults to `1000` (i.e. 1 second), but you can specify your own value as required. 
+- as a result of this call to Await, there's a new template parameter called `timeout`.  This defaults to `1000` (i.e. 1 second), but you can specify your own value as required. 
 
 2.3.3 Release notes
 -------------------

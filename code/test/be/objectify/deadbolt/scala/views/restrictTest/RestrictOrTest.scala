@@ -3,7 +3,8 @@ package be.objectify.deadbolt.scala.views.restrictTest
 import be.objectify.deadbolt.core.models.Subject
 import be.objectify.deadbolt.scala.testhelpers.{SecurityRole, User}
 import be.objectify.deadbolt.scala.views.html.restrictTest.restrictOrContent
-import be.objectify.deadbolt.scala.{DeadboltHandler, DynamicResourceHandler}
+import be.objectify.deadbolt.scala.{DeadboltModule, DeadboltHandler, DynamicResourceHandler}
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{Request, Result, Results}
 import play.api.test.{FakeRequest, Helpers, PlaySpecification, WithApplication}
 import play.libs.Scala
@@ -18,7 +19,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class RestrictOrTest extends PlaySpecification {
 
    "when protected by a single role, the view" should {
-     "hide constrained content and show fallback content when subject is not present" in new WithApplication {
+     "hide constrained content and show fallback content when subject is not present" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                               .bindings(new DeadboltModule())
+                                                                                                               .build()) {
        val html = restrictOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
@@ -33,7 +36,9 @@ class RestrictOrTest extends PlaySpecification {
        content must contain("This is after the constraint.")
      }
 
-     "hide constrained content and show fallback content when subject does not have necessary role" in new WithApplication {
+     "hide constrained content and show fallback content when subject does not have necessary role" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                                             .bindings(new DeadboltModule())
+                                                                                                                             .build()) {
        val html = restrictOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
@@ -48,7 +53,9 @@ class RestrictOrTest extends PlaySpecification {
        content must contain("This is after the constraint.")
      }
 
-     "hide constrained content and show fallback content when subject does not have any roles" in new WithApplication {
+     "hide constrained content and show fallback content when subject does not have any roles" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                                        .bindings(new DeadboltModule())
+                                                                                                                        .build()) {
        val html = restrictOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
@@ -63,7 +70,9 @@ class RestrictOrTest extends PlaySpecification {
        content must contain("This is after the constraint.")
      }
 
-     "hide constrained content and show fallback content when subject has other roles" in new WithApplication {
+     "hide constrained content and show fallback content when subject has other roles" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                                .bindings(new DeadboltModule())
+                                                                                                                .build()) {
        val html = restrictOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
@@ -78,7 +87,9 @@ class RestrictOrTest extends PlaySpecification {
        content must contain("This is after the constraint.")
      }
 
-     "show constrained content and hode fallback content when subject has necessary role" in new WithApplication {
+     "show constrained content and hode fallback content when subject has necessary role" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                                   .bindings(new DeadboltModule())
+                                                                                                                   .build()) {
        val html = restrictOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
@@ -95,8 +106,9 @@ class RestrictOrTest extends PlaySpecification {
    }
 
    "when protected by two ANDed roles, the view" should {
-
-     "hide constrained content and show fallback content when subject is not present" in new WithApplication {
+     "hide constrained content and show fallback content when subject is not present" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                               .bindings(new DeadboltModule())
+                                                                                                               .build()) {
        val html = restrictOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
@@ -111,7 +123,9 @@ class RestrictOrTest extends PlaySpecification {
        content must contain("This is after the constraint.")
      }
 
-     "hide constrained content and show fallback content when subject does not have necessary role" in new WithApplication {
+     "hide constrained content and show fallback content when subject does not have necessary role" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                                             .bindings(new DeadboltModule())
+                                                                                                                             .build()) {
        val html = restrictOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
@@ -126,7 +140,9 @@ class RestrictOrTest extends PlaySpecification {
        content must contain("This is after the constraint.")
      }
 
-     "hide constrained content and show fallback content when subject does not have any roles" in new WithApplication {
+     "hide constrained content and show fallback content when subject does not have any roles" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                                        .bindings(new DeadboltModule())
+                                                                                                                        .build()) {
        val html = restrictOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
@@ -141,7 +157,9 @@ class RestrictOrTest extends PlaySpecification {
        content must contain("This is after the constraint.")
      }
 
-     "show constrained content and hide fallback content when subject has both roles" in new WithApplication {
+     "show constrained content and hide fallback content when subject has both roles" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                               .bindings(new DeadboltModule())
+                                                                                                               .build()) {
        val html = restrictOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
@@ -155,11 +173,9 @@ class RestrictOrTest extends PlaySpecification {
        content must not contain("This is default content in case the constraint denies access to the protected content.")
        content must contain("This is after the constraint.")
      }
-
    }
 
    "when protected by two ORed roles, the view" should {
-
      "hide constrained content and show fallback content when subject is not present" in new WithApplication {
        val html = restrictOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
@@ -175,7 +191,9 @@ class RestrictOrTest extends PlaySpecification {
        content must contain("This is after the constraint.")
      }
 
-     "hide constrained content and show fallback content when subject does not have either of the necessary roles" in new WithApplication {
+     "hide constrained content and show fallback content when subject does not have either of the necessary roles" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                                                            .bindings(new DeadboltModule())
+                                                                                                                                            .build()) {
        val html = restrictOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
@@ -190,7 +208,9 @@ class RestrictOrTest extends PlaySpecification {
        content must contain("This is after the constraint.")
      }
 
-     "hide constrained content and show fallback content when subject does not have any roles" in new WithApplication {
+     "hide constrained content and show fallback content when subject does not have any roles" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                                        .bindings(new DeadboltModule())
+                                                                                                                        .build()) {
        val html = restrictOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
@@ -205,7 +225,9 @@ class RestrictOrTest extends PlaySpecification {
        content must contain("This is after the constraint.")
      }
 
-     "show constrained content and hide fallback content when subject has both roles" in new WithApplication {
+     "show constrained content and hide fallback content when subject has both roles" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                               .bindings(new DeadboltModule())
+                                                                                                               .build()) {
        val html = restrictOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
@@ -220,7 +242,9 @@ class RestrictOrTest extends PlaySpecification {
        content must contain("This is after the constraint.")
      }
 
-     "show constrained content and hide fallback content when subject has one of the roles" in new WithApplication {
+     "show constrained content and hide fallback content when subject has one of the roles" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                                     .bindings(new DeadboltModule())
+                                                                                                                     .build()) {
        val html = restrictOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
@@ -235,7 +259,9 @@ class RestrictOrTest extends PlaySpecification {
        content must contain("This is after the constraint.")
      }
 
-     "show constrained content and hide fallback content when subject has another one of the roles" in new WithApplication {
+     "show constrained content and hide fallback content when subject has another one of the roles" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                                             .bindings(new DeadboltModule())
+                                                                                                                             .build()) {
        val html = restrictOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
@@ -252,7 +278,9 @@ class RestrictOrTest extends PlaySpecification {
    }
 
    "when a single role is present and negated, the view" should {
-     "hide constrained content and show fallback content when subject is not present" in new WithApplication {
+     "hide constrained content and show fallback content when subject is not present" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                               .bindings(new DeadboltModule())
+                                                                                                               .build()) {
        val html = restrictOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
@@ -267,7 +295,9 @@ class RestrictOrTest extends PlaySpecification {
        content must contain("This is after the constraint.")
      }
 
-     "hide constrained content and show fallback content when subject has the negated role" in new WithApplication {
+     "hide constrained content and show fallback content when subject has the negated role" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                                     .bindings(new DeadboltModule())
+                                                                                                                     .build()) {
        val html = restrictOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
@@ -282,7 +312,9 @@ class RestrictOrTest extends PlaySpecification {
        content must contain("This is after the constraint.")
      }
 
-     "show constrained content and hide fallback content when subject does not have the negated role" in new WithApplication {
+     "show constrained content and hide fallback content when subject does not have the negated role" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                                               .bindings(new DeadboltModule())
+                                                                                                                               .build()) {
        val html = restrictOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
@@ -299,7 +331,9 @@ class RestrictOrTest extends PlaySpecification {
    }
 
    "when ANDed roles contain a negated role, the view" should {
-     "show constrained content and hide fallback content when subject is not present" in new WithApplication {
+     "show constrained content and hide fallback content when subject is not present" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                               .bindings(new DeadboltModule())
+                                                                                                               .build()) {
        val html = restrictOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
@@ -314,7 +348,9 @@ class RestrictOrTest extends PlaySpecification {
        content must contain("This is after the constraint.")
      }
 
-     "hide constrained content and show fallback content when subject has the negated role" in new WithApplication {
+     "hide constrained content and show fallback content when subject has the negated role" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                                     .bindings(new DeadboltModule())
+                                                                                                                     .build()) {
        val html = restrictOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
@@ -329,7 +365,9 @@ class RestrictOrTest extends PlaySpecification {
        content must contain("This is after the constraint.")
      }
 
-     "show constrained content and hide fallback content when subject has the non-negated role but does not have the negated role" in new WithApplication {
+     "show constrained content and hide fallback content when subject has the non-negated role but does not have the negated role" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                                                                                            .bindings(new DeadboltModule())
+                                                                                                                                                            .build()) {
        val html = restrictOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)

@@ -1,13 +1,10 @@
 package be.objectify.deadbolt.scala
 
-import java.util.Optional
-import java.util.concurrent.Callable
-import java.util.regex.Pattern
+import javax.inject.{Inject, Singleton}
 
 import be.objectify.deadbolt.core.models.Subject
-import be.objectify.deadbolt.core.{DeadboltAnalyzer, PatternType}
+import be.objectify.deadbolt.core.PatternType
 import play.api.mvc.{Action, BodyParsers, Result, Results}
-import play.cache.Cache
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -18,14 +15,15 @@ import scala.concurrent.Future
  *
  * @author Steve Chaloner
  */
-trait DeadboltActions extends Results with BodyParsers {
+@Singleton
+class DeadboltActions @Inject() (analyzer: ScalaAnalyzer) extends Results with BodyParsers {
 
   /**
    * Restrict access to an action to users that have all the specified roles.
    *
    * @param roleNames
-   * @param deadboltHandler
-   * @param action
+   * @param deadboltHandler the handler to use for constraint testing
+   * @param action the wrapped action
    * @tparam A
    * @return
    */
@@ -40,8 +38,8 @@ trait DeadboltActions extends Results with BodyParsers {
    * an array of strings, is checked in turn.
    *
    * @param roleGroups
-   * @param deadboltHandler
-   * @param action
+   * @param deadboltHandler the handler to use for constraint testing
+   * @param action the wrapped action
    * @tparam A
    * @return
    */
@@ -50,10 +48,10 @@ trait DeadboltActions extends Results with BodyParsers {
                  (action: Action[A]): Action[A] = {
     Action.async(action.parser) { implicit request =>
 
-      def check(analyzer: DeadboltAnalyzer, subject: Optional[Subject], current: Array[String], remaining: List[Array[String]]): Future[Result] = {
+      def check(subject: Option[Subject], current: Array[String], remaining: List[Array[String]]): Future[Result] = {
         if (analyzer.checkRole(subject, current)) action(request)
         else if (remaining.isEmpty) deadboltHandler.onAuthFailure(request)
-        else check(analyzer, subject, remaining.head, remaining.tail)
+        else check(subject, remaining.head, remaining.tail)
       }
 
       deadboltHandler.beforeAuthCheck(request).flatMap((beforeAuthOption: Option[Result]) => {
@@ -64,7 +62,7 @@ trait DeadboltActions extends Results with BodyParsers {
             else {
               deadboltHandler.getSubject(request).flatMap((subjectOption: Option[Subject]) =>
                 subjectOption match {
-                  case Some(subject) => check(new DeadboltAnalyzer(), Optional.ofNullable(subject), roleGroups.head, roleGroups.tail)
+                  case Some(subject) => check(subjectOption, roleGroups.head, roleGroups.tail)
                   case _ => deadboltHandler.onAuthFailure(request)
                 })
             }
@@ -77,8 +75,8 @@ trait DeadboltActions extends Results with BodyParsers {
    *
    * @param name
    * @param meta
-   * @param deadboltHandler
-   * @param action
+   * @param deadboltHandler the handler to use for constraint testing
+   * @param action the wrapped action
    * @tparam A
    * @return
    */
@@ -112,8 +110,8 @@ trait DeadboltActions extends Results with BodyParsers {
    *
    * @param value
    * @param patternType
-   * @param deadboltHandler
-   * @param action
+   * @param deadboltHandler the handler to use for constraint testing
+   * @param action the wrapped action
    * @tparam A
    * @return
    */
@@ -121,13 +119,6 @@ trait DeadboltActions extends Results with BodyParsers {
                  patternType: PatternType,
                  deadboltHandler: DeadboltHandler)
                 (action: Action[A]): Action[A] = {
-
-    def getPattern(patternValue: String): Pattern =
-      Cache.getOrElse("Deadbolt." + patternValue,
-        new Callable[Pattern] {
-          def call() = java.util.regex.Pattern.compile(patternValue)
-        },
-        0)
 
     Action.async(action.parser) {
       implicit request =>
@@ -139,10 +130,10 @@ trait DeadboltActions extends Results with BodyParsers {
                 case None => deadboltHandler.onAuthFailure(request)
                 case Some(subject) => patternType match {
                   case PatternType.EQUALITY =>
-                    if (new DeadboltAnalyzer().checkPatternEquality(Optional.ofNullable(subject), Optional.ofNullable(value))) action(request)
+                    if (analyzer.checkPatternEquality(subjectOption, Option(value))) action(request)
                     else deadboltHandler.onAuthFailure(request)
                   case PatternType.REGEX =>
-                    if (new DeadboltAnalyzer().checkRegexPattern(Optional.ofNullable(subject), Optional.ofNullable(getPattern(value)))) action(request)
+                    if (analyzer.checkRegexPattern(subjectOption, value)) action(request)
                     else deadboltHandler.onAuthFailure(request)
                   case PatternType.CUSTOM =>
                     deadboltHandler.getDynamicResourceHandler(request).flatMap((drhOption: Option[DynamicResourceHandler]) => {
@@ -168,8 +159,8 @@ trait DeadboltActions extends Results with BodyParsers {
   /**
    * Allows access to the action if there is a subject present.
    *
-   * @param deadboltHandler
-   * @param action
+   * @param deadboltHandler the handler to use for constraint testing
+   * @param action the wrapped action
    * @tparam A
    * @return
    */
@@ -191,8 +182,8 @@ trait DeadboltActions extends Results with BodyParsers {
   /**
    * Denies access to the action if there is a subject present.
    *
-   * @param deadboltHandler
-   * @param action
+   * @param deadboltHandler the handler to use for constraint testing
+   * @param action the wrapped action
    * @tparam A
    * @return
    */

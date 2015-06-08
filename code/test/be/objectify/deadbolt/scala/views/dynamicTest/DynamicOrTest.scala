@@ -2,7 +2,8 @@ package be.objectify.deadbolt.scala.views.dynamicTest
 
 import be.objectify.deadbolt.core.models.Subject
 import be.objectify.deadbolt.scala.views.html.dynamicTest.dynamicOrContent
-import be.objectify.deadbolt.scala.{DeadboltHandler, DynamicResourceHandler}
+import be.objectify.deadbolt.scala.{DeadboltModule, DeadboltHandler, DynamicResourceHandler}
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{Results, Request, Result}
 import play.api.test.{FakeRequest, Helpers, PlaySpecification, WithApplication}
 
@@ -16,7 +17,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class DynamicOrTest extends PlaySpecification {
 
    "when allowed by the dynamic handler, the view" should {
-     "show constrained content and hide fallback content" in new WithApplication {
+     "show constrained content and hide fallback content" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                   .bindings(new DeadboltModule())
+                                                                                   .build()) {
        val html = dynamicOrContent(new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(Some(new DynamicResourceHandler() {
@@ -36,7 +39,9 @@ class DynamicOrTest extends PlaySpecification {
    }
 
    "when denied by the dynamic handler, the view" should {
-     "hide constrained content and show fallback content" in new WithApplication {
+     "hide constrained content and show fallback content" in new WithApplication(new GuiceApplicationBuilder()
+                                                                                   .bindings(new DeadboltModule())
+                                                                                   .build()) {
        val html = dynamicOrContent(handler = new DeadboltHandler() {
          override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
          override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(Some(new DynamicResourceHandler() {

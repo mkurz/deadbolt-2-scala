@@ -3,9 +3,11 @@ package be.objectify.deadbolt.scala
 import java.util.Optional
 import java.util.concurrent.Callable
 import java.util.regex.Pattern
+import javax.inject.{Inject, Singleton}
 
 import be.objectify.deadbolt.core.models.Subject
 import be.objectify.deadbolt.core.{DeadboltAnalyzer, PatternType}
+import play.api.{Configuration, Logger}
 import play.api.mvc.Request
 import play.cache.Cache
 
@@ -13,13 +15,21 @@ import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Failure, Try, Success}
 
 /**
  *
  * @author Steve Chaloner (steve@objectify.be)
  */
+@Singleton
+class ViewSupport @Inject() (config: Configuration, analyzer: ScalaAnalyzer) {
 
-object DeadboltViewSupport {
+  val logger: Logger = Logger("deadbolt")
+
+  val timeout: Long = config.getLong("deadbolt.scala.view-timeout").getOrElse(1000L)
+  logger.info(s"Default timeout period for blocking views is [$timeout]ms")
+
+  val defaultTimeout: Function0[Long] = () => timeout
 
   /**
    * Used for subjectPresent and subjectNotPresent tags in the template.
@@ -30,12 +40,12 @@ object DeadboltViewSupport {
   def viewSubjectPresent(deadboltHandler: DeadboltHandler,
                          timeoutInMillis: Long,
                          request: Request[Any]): Boolean = {
-    Await.result(deadboltHandler.getSubject(request).map((subjectOption: Option[Subject]) => {
+    tryToComplete(deadboltHandler.getSubject(request).map((subjectOption: Option[Subject]) => {
       subjectOption match {
         case Some(subject) => true
         case None => false
       }
-    }), timeoutInMillis milliseconds)
+    }), timeoutInMillis)
   }
 
   /**
@@ -56,12 +66,12 @@ object DeadboltViewSupport {
         else check(analyzer, subject, remaining.head, remaining.tail)
     }
 
-    Await.result(deadboltHandler.getSubject(request).map((subjectOption: Option[Subject]) => {
+    tryToComplete(deadboltHandler.getSubject(request).map((subjectOption: Option[Subject]) => {
       subjectOption match {
         case Some(subject) => check(new DeadboltAnalyzer(), Optional.ofNullable(subject), roles.head, roles.tail)
         case None => false
       }
-    }), timeoutInMillis milliseconds)
+    }), timeoutInMillis)
   }
 
   /**
@@ -76,12 +86,12 @@ object DeadboltViewSupport {
                   deadboltHandler: DeadboltHandler,
                   timeoutInMillis: Long,
                   request: Request[Any]): Boolean = {
-    Await.result(deadboltHandler.getDynamicResourceHandler(request).flatMap((drhOption: Option[DynamicResourceHandler]) => {
+    tryToComplete(deadboltHandler.getDynamicResourceHandler(request).flatMap((drhOption: Option[DynamicResourceHandler]) => {
       drhOption match {
         case Some(drh) => drh.isAllowed(name, meta, deadboltHandler, request)
         case None => throw new RuntimeException("A dynamic resource is specified but no dynamic resource handler is provided")
       }
-    }), timeoutInMillis milliseconds)
+    }), timeoutInMillis)
   }
 
   /**
@@ -104,7 +114,7 @@ object DeadboltViewSupport {
                       },
                       0)
 
-    Await.result(deadboltHandler.getSubject(request).map((subjectOption: Option[Subject]) => {
+    tryToComplete(deadboltHandler.getSubject(request).map((subjectOption: Option[Subject]) => {
       subjectOption match {
         case None => false
         case Some(subject) => patternType match {
@@ -121,6 +131,15 @@ object DeadboltViewSupport {
           case _ => false
         }
       }
-    }), timeoutInMillis milliseconds)
+    }), timeoutInMillis)
   }
+
+  private def tryToComplete(future: Future[Boolean], timeoutInMillis: Long): Boolean =
+    Try(Await.result(future, timeoutInMillis milliseconds)) match {
+      case Success(allowed) => allowed
+      case Failure(ex) => {
+        logger.error("Error when checking view constraint", ex)
+        false
+      }
+    }
 }
