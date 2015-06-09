@@ -2,8 +2,8 @@ package be.objectify.deadbolt.scala
 
 import javax.inject.{Inject, Singleton}
 
-import be.objectify.deadbolt.core.models.Subject
 import be.objectify.deadbolt.core.PatternType
+import be.objectify.deadbolt.core.models.Subject
 import play.api.mvc.{Action, BodyParsers, Result, Results}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -73,8 +73,8 @@ class DeadboltActions @Inject() (analyzer: ScalaAnalyzer) extends Results with B
 
   /**
    *
-   * @param name
-   * @param meta
+   * @param name the name of the dynamic constraint
+   * @param meta additional information
    * @param deadboltHandler the handler to use for constraint testing
    * @param action the wrapped action
    * @tparam A
@@ -108,8 +108,8 @@ class DeadboltActions @Inject() (analyzer: ScalaAnalyzer) extends Results with B
 
   /**
    *
-   * @param value
-   * @param patternType
+   * @param value the value of the pattern, e.g. a regex
+   * @param patternType the type of the pattern
    * @param deadboltHandler the handler to use for constraint testing
    * @param action the wrapped action
    * @tparam A

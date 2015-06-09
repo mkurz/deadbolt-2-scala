@@ -22,14 +22,16 @@ import scala.util.{Failure, Try, Success}
  * @author Steve Chaloner (steve@objectify.be)
  */
 @Singleton
-class ViewSupport @Inject() (config: Configuration, analyzer: ScalaAnalyzer) {
+class ViewSupport @Inject() (config: Configuration,
+                             analyzer: ScalaAnalyzer,
+                             templateFailureListener: TemplateFailureListener) {
 
-  val logger: Logger = Logger("deadbolt")
+  val logger: Logger = Logger("deadbolt.template")
 
   val timeout: Long = config.getLong("deadbolt.scala.view-timeout").getOrElse(1000L)
   logger.info(s"Default timeout period for blocking views is [$timeout]ms")
 
-  val defaultTimeout: Function0[Long] = () => timeout
+  val defaultTimeout: () => Long = () => timeout
 
   /**
    * Used for subjectPresent and subjectNotPresent tags in the template.
@@ -96,10 +98,10 @@ class ViewSupport @Inject() (config: Configuration, analyzer: ScalaAnalyzer) {
 
   /**
    *
-   * @param value
-   * @param patternType
-   * @param deadboltHandler
-   * @param request
+   * @param value the value of the pattern, e.g. the regex
+   * @param patternType the type of pattern
+   * @param deadboltHandler the handler to use for this request
+   * @param request the request
    * @return
    */
   def viewPattern(value: String,
@@ -123,8 +125,11 @@ class ViewSupport @Inject() (config: Configuration, analyzer: ScalaAnalyzer) {
           case PatternType.CUSTOM =>
             val future: Future[Boolean] = deadboltHandler.getDynamicResourceHandler(request).map((drhOption: Option[DynamicResourceHandler]) => {
               drhOption match {
-                case Some(drh) => Await.result(drh.checkPermission(value, deadboltHandler, request), timeoutInMillis milliseconds)
-                case None => throw new scala.RuntimeException("A custom pattern is specified but no dynamic resource handler is provided")
+                case Some(drh) =>
+                  Await.result(drh.checkPermission(value, deadboltHandler, request), timeoutInMillis milliseconds)
+                case None =>
+                  logger.error("A custom pattern is specified but no dynamic resource handler is provided")
+                  throw new scala.RuntimeException("A custom pattern is specified but no dynamic resource handler is provided")
               }
             })
             Await.result(future, timeoutInMillis milliseconds)
@@ -134,12 +139,20 @@ class ViewSupport @Inject() (config: Configuration, analyzer: ScalaAnalyzer) {
     }), timeoutInMillis)
   }
 
+  /**
+   * Attempts to complete the future within the given number of milliseconds.
+   *
+   * @param future the future to complete
+   * @param timeoutInMillis the number of milliseconds to wait for a result
+   * @return false if the future times out, otherwise the result of the future
+   */
   private def tryToComplete(future: Future[Boolean], timeoutInMillis: Long): Boolean =
     Try(Await.result(future, timeoutInMillis milliseconds)) match {
       case Success(allowed) => allowed
-      case Failure(ex) => {
+      case Failure(ex) =>
         logger.error("Error when checking view constraint", ex)
+        templateFailureListener.failure(s"Error when checking view constraint: [${ex.getMessage}]",
+                                        timeout)
         false
-      }
     }
 }

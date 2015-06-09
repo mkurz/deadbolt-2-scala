@@ -13,6 +13,7 @@ class DeadboltModule extends Module {
     bind[ScalaAnalyzer].toSelf,
     bind[DeadboltActions].toSelf,
     bind[ViewSupport].toSelf,
-    bind[ActionBuilders].toSelf
+    bind[ActionBuilders].toSelf,
+    bind[TemplateFailureListener].to[NoOpTemplateFailureListener]
   )
 }

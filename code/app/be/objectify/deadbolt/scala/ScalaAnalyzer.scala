@@ -1,8 +1,7 @@
 package be.objectify.deadbolt.scala
 
 import java.util
-import java.util.{List, Optional}
-import java.util.regex.Pattern
+import java.util.Optional
 import javax.inject.{Inject, Singleton}
 
 import be.objectify.deadbolt.core.DeadboltAnalyzer
@@ -10,7 +9,7 @@ import be.objectify.deadbolt.core.models.Subject
 import be.objectify.deadbolt.scala.cache.PatternCache
 
 /**
- * Scala wrapper for {@link DeadboltAnalyzer}.
+ * Scala wrapper for [[be.objectify.deadbolt.core.DeadboltAnalyzer]].
  *
  * @author Steve Chaloner (steve@objectify.be)
  */

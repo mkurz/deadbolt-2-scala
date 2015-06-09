@@ -26,8 +26,7 @@ trait DynamicResourceHandler
                    request: Request[A]): Future[Boolean]
 
   /**
-   * Invoked when a {@link DeadboltPattern} with a {@link PatternType#CUSTOM} type is
-   * used.
+   * Invoked when a pattern constraint with a [[be.objectify.deadbolt.core.PatternType#CUSTOM]] type is used.
    *
    * @param permissionValue the permission value
    * @param deadboltHandler the current { @link DeadboltHandler}
