@@ -82,7 +82,7 @@ Using the ActionsBuilders class, you can quickly assemble constraints around you
 
     class ExampleController @Inject() (actionBuilder: ActionBuilders) extends Controller
 
-You now have builders for all the constraint types, which we'll take a quick look at in a minute.  In the following examples I'm using the default handler, i.e. `.defaultHandler()` but it's also possible to use a different handler with ´.key(HandlerKey)` or pass in a handler directly using `.withHandler(DeadboltHandler)`.
+You now have builders for all the constraint types, which we'll take a quick look at in a minute.  In the following examples I'm using the default handler, i.e. `.defaultHandler()` but it's also possible to use a different handler with `.key(HandlerKey)` or pass in a handler directly using `.withHandler(DeadboltHandler)`.
 
 **SubjectPresent** and **SubjectNotPresent**
 Sometimes, you don't need fine-grained checked - you just need to see if there is a user present (or not present)
@@ -94,7 +94,7 @@ Sometimes, you don't need fine-grained checked - you just need to see if there i
     def someFunctionB = actionBuilder.SubjectNotPresentAction().defaultHandler() { Ok(accessOk()) }
 
 **Restrict**
-This uses the `Subject`s `Role`s to perform AND/OR/NOT checks.  The values given to the builder must match the ´Role.name` of the subject's roles.
+This uses the `Subject`s `Role`s to perform AND/OR/NOT checks.  The values given to the builder must match the `Role.name` of the subject's roles.
 
 AND is defined as an `Array[String]` (or more correctly, `String*`, OR is a `List[Array[String]], and NOT is a rolename with a `!` preceding it.
 
@@ -132,7 +132,7 @@ Using the DeadboltActions class, you can compose constrained functions.  To get 
 
     class ExampleController @Inject() (deadbolt: DeadboltActions) extends Controller
 
-You now have functions equivalent to those of the builders mentioned above.  In the following examples I'm using the default handler, i.e. no handler is specified, but it's also possible to use a different handler with ´handler = <some handler, possibly from the handler cache>`.
+You now have functions equivalent to those of the builders mentioned above.  In the following examples I'm using the default handler, i.e. no handler is specified, but it's also possible to use a different handler with `handler = <some handler, possibly from the handler cache>`.
 
 **SubjectPresent** and **SubjectNotPresent**
 
