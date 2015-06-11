@@ -38,7 +38,7 @@ class AbstractViewTest extends PlaySpecification {
               subject: Option[User] = None,
               onAuthFailure: Result = Results.Forbidden,
               drh: Option[DynamicResourceHandler] = None): DeadboltHandler = {
-    val h = new LightweightHandler(Future.(beforeAuthCheck),
+    val h = new LightweightHandler(Future(beforeAuthCheck),
                                    Future(subject),
                                    Future(onAuthFailure),
                                    Future(drh))
