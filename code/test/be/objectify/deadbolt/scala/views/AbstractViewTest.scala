@@ -1,7 +1,7 @@
 package be.objectify.deadbolt.scala.views
 
 import be.objectify.deadbolt.core.models.{Permission, Role, Subject}
-import be.objectify.deadbolt.scala.cache.{DefaultHandlerCache, HandlerCache}
+import be.objectify.deadbolt.scala.cache.HandlerCache
 import be.objectify.deadbolt.scala.testhelpers.{FakeCache, User}
 import be.objectify.deadbolt.scala.{DeadboltHandler, DeadboltModule, DynamicResourceHandler, HandlerKey}
 import play.api.cache.CacheApi
@@ -21,11 +21,9 @@ import scala.concurrent.Future
 class AbstractViewTest extends PlaySpecification {
 
   def testApp(handler: DeadboltHandler): Application = {
-    val key = BasicHandlerKey("foo")
-    val cache = new DefaultHandlerCache(Map(key -> handler), key)
     val app = new GuiceApplicationBuilder()
               .bindings(new DeadboltModule())
-              .overrides(bind[HandlerCache].toInstance(cache))
+              .bindings(bind[HandlerCache].toInstance(LightweightHandlerCache(handler)))
               .overrides(bind[CacheApi].to[FakeCache])
               .in(Mode.Test)
               .build()
@@ -34,13 +32,13 @@ class AbstractViewTest extends PlaySpecification {
 
   def user(name: String = "foo",
            roles: List[_ <: Role] = List.empty,
-           permissions: List[_ <: Permission] = List.empty): User =  new User("foo", Scala.asJava(roles), Scala.asJava(permissions))
+           permissions: List[_ <: Permission] = List.empty): User =  User("foo", Scala.asJava(roles), Scala.asJava(permissions))
 
   def handler(beforeAuthCheck: Option[Result] = None,
               subject: Option[User] = None,
               onAuthFailure: Result = Results.Forbidden,
               drh: Option[DynamicResourceHandler] = None): DeadboltHandler = {
-    val h = new LightweightHandler(Future(beforeAuthCheck),
+    val h = new LightweightHandler(Future.(beforeAuthCheck),
                                    Future(subject),
                                    Future(onAuthFailure),
                                    Future(drh))
@@ -55,13 +53,18 @@ case class drh(allowed: Boolean, check: Boolean) extends DynamicResourceHandler 
 
 case class BasicHandlerKey(name: String) extends HandlerKey
 
-class LightweightHandler(beforeAuthCheck: Future[Option[Result]],
-                         getSubject: Future[Option[Subject]],
-                         onAuthFailure: Future[Result],
-                         getDRH: Future[Option[DynamicResourceHandler]]) extends DeadboltHandler {
+case class LightweightHandler(bac: Future[Option[Result]],
+                              subj: Future[Option[Subject]],
+                              authFail: Future[Result],
+                              drh: Future[Option[DynamicResourceHandler]]) extends DeadboltHandler {
 
-  override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = beforeAuthCheck
-  override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = getDRH
-  override def getSubject[A](request: Request[A]): Future[Option[Subject]] = getSubject
-  override def onAuthFailure[A](request: Request[A]): Future[Result] = onAuthFailure
+  override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = bac
+  override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = drh
+  override def getSubject[A](request: Request[A]): Future[Option[Subject]] = subj
+  override def onAuthFailure[A](request: Request[A]): Future[Result] = authFail
+}
+
+case class LightweightHandlerCache(handler: DeadboltHandler) extends HandlerCache {
+  override def apply() = handler
+  override def apply(key: HandlerKey) = handler
 }

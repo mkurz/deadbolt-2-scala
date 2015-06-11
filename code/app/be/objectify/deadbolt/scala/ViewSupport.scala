@@ -35,18 +35,47 @@ class ViewSupport @Inject() (config: Configuration,
   val listener = listenerProvider.get()
 
   /**
-   * Used for subjectPresent and subjectNotPresent tags in the template.
+   * Returns true if [[DeadboltHandler.getSubject()]] results in Some
    *
    * @param deadboltHandler application hook
    * @return true if the view can be accessed, otherwise false
    */
-  def viewSubjectPresent(deadboltHandler: DeadboltHandler,
-                         timeoutInMillis: Long,
-                         request: Request[Any]): Boolean = {
+  def subjectPresent(deadboltHandler: DeadboltHandler,
+                     timeoutInMillis: Long,
+                     request: Request[Any]): Boolean = {
     tryToComplete(deadboltHandler.getSubject(request).map((subjectOption: Option[Subject]) => {
       subjectOption match {
-        case Some(subject) => true
-        case None => false
+        case Some(subject) => {
+          Logger.logger.debug(s"handler [$deadboltHandler] :: subject is present - allowing")
+          true
+        }
+        case None => {
+          Logger.logger.debug(s"handler [$deadboltHandler] :: subject is not present - denying")
+          false
+        }
+      }
+    }), timeoutInMillis)
+  }
+
+  /**
+   * Returns true if [[DeadboltHandler.getSubject()]] results in None
+   *
+   * @param deadboltHandler application hook
+   * @return true if the view can be accessed, otherwise false
+   */
+  def subjectNotPresent(deadboltHandler: DeadboltHandler,
+                        timeoutInMillis: Long,
+                        request: Request[Any]): Boolean = {
+    tryToComplete(deadboltHandler.getSubject(request).map((subjectOption: Option[Subject]) => {
+      subjectOption match {
+        case None => {
+          Logger.logger.debug(s"handler [$deadboltHandler] :: subject is not present - allowing")
+          true
+        }
+        case Some(subject) => {
+          Logger.logger.debug(s"handler [$deadboltHandler] :: subject is present - denying")
+          false
+        }
       }
     }), timeoutInMillis)
   }
@@ -59,10 +88,10 @@ class ViewSupport @Inject() (config: Configuration,
    * @param deadboltHandler application hook
    * @return true if the view can be accessed, otherwise false
    */
-  def viewRestrict(roles: List[Array[String]],
-                   deadboltHandler: DeadboltHandler,
-                   timeoutInMillis: Long,
-                   request: Request[Any]): Boolean = {
+  def restrict(roles: List[Array[String]],
+               deadboltHandler: DeadboltHandler,
+               timeoutInMillis: Long,
+               request: Request[Any]): Boolean = {
     def check(analyzer: DeadboltAnalyzer, subject: Optional[Subject], current: Array[String], remaining: List[Array[String]]): Boolean = {
         if (analyzer.checkRole(subject, current)) true
         else if (remaining.isEmpty) false
@@ -84,11 +113,11 @@ class ViewSupport @Inject() (config: Configuration,
    * @param meta meta information on the resource
    * @return true if the view can be accessed, otherwise false
    */
-  def viewDynamic(name: String,
-                  meta: String,
-                  deadboltHandler: DeadboltHandler,
-                  timeoutInMillis: Long,
-                  request: Request[Any]): Boolean = {
+  def dynamic(name: String,
+              meta: String,
+              deadboltHandler: DeadboltHandler,
+              timeoutInMillis: Long,
+              request: Request[Any]): Boolean = {
     tryToComplete(deadboltHandler.getDynamicResourceHandler(request).flatMap((drhOption: Option[DynamicResourceHandler]) => {
       drhOption match {
         case Some(drh) => drh.isAllowed(name, meta, deadboltHandler, request)
@@ -105,11 +134,11 @@ class ViewSupport @Inject() (config: Configuration,
    * @param request the request
    * @return
    */
-  def viewPattern(value: String,
-                  patternType: PatternType,
-                  deadboltHandler: DeadboltHandler,
-                  timeoutInMillis: Long,
-                  request: Request[Any]): Boolean = {
+  def pattern(value: String,
+              patternType: PatternType,
+              deadboltHandler: DeadboltHandler,
+              timeoutInMillis: Long,
+              request: Request[Any]): Boolean = {
     def getPattern(patternValue: String): Pattern =
       Cache.getOrElse("Deadbolt." + patternValue,
                       new Callable[Pattern]{

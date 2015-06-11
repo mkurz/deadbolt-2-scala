@@ -13,7 +13,7 @@ import play.api.test.{FakeRequest, Helpers, WithApplication}
 class CustomOrTest extends AbstractViewTest {
 
   "when a custom permission allows it, the view" should {
-    "show constrained content and hide fallback content" in new WithApplication(testApp(handler(subject = Some(user(permissions = List(new SecurityPermission("killer.undead.zombie")))), drh = Some(drh(allowed = true, check = true))))) {
+    "show constrained content and hide fallback content" in new WithApplication(testApp(handler(subject = Some(user(permissions = List(SecurityPermission("killer.undead.zombie")))), drh = Some(drh(allowed = true, check = true))))) {
       Request
       val html = patternOrContent(value = "something arbitrary", patternType = PatternType.CUSTOM)(FakeRequest())
 
@@ -26,7 +26,7 @@ class CustomOrTest extends AbstractViewTest {
   }
 
   "when a custom permission denies it, the view" should {
-    "hide constrained content and show fallback content" in new WithApplication(testApp(handler(subject = Some(user(permissions = List(new SecurityPermission("killer.undead.zombie")))), drh = Some(drh(allowed = true, check = false))))) {
+    "hide constrained content and show fallback content" in new WithApplication(testApp(handler(subject = Some(user(permissions = List(SecurityPermission("killer.undead.zombie")))), drh = Some(drh(allowed = true, check = false))))) {
       val html = patternOrContent(value = "something arbitrary", patternType = PatternType.CUSTOM)(FakeRequest())
 
       private val content: String = Helpers.contentAsString(html)

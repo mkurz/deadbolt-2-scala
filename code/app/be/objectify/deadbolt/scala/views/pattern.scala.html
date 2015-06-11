@@ -4,6 +4,6 @@
 @import scala.collection.JavaConversions._
 @(handler: DeadboltHandler = handlers(), value: String, patternType: PatternType = PatternType.EQUALITY, timeout: Function0[Long] = viewSupport.defaultTimeout)(body: => play.twirl.api.Html)(implicit request: Request[Any])
 
-@if(be.objectify.deadbolt.scala.ViewAccessPoint.viewSupport.viewPattern(value, patternType, handler, timeout(), request)) {
+@if(viewSupport.pattern(value, patternType, handler, timeout(), request)) {
 @body
 }

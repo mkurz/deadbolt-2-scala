@@ -12,7 +12,7 @@ import play.api.test.{FakeRequest, Helpers, WithApplication}
 class EqualityTest extends AbstractViewTest {
 
    "when the subject has a permission that is equal to the pattern, the view" should {
-     "show constrained content" in new WithApplication(testApp(handler(subject = Some(user(permissions = List(new SecurityPermission("killer.undead.zombie")))), drh = Some(drh(allowed = true, check = true))))) {
+     "show constrained content" in new WithApplication(testApp(handler(subject = Some(user(permissions = List(SecurityPermission("killer.undead.zombie")))), drh = Some(drh(allowed = true, check = true))))) {
        val html = patternContent(value = "killer.undead.zombie", patternType = PatternType.EQUALITY)(FakeRequest())
 
        private val content: String = Helpers.contentAsString(html)
@@ -23,7 +23,7 @@ class EqualityTest extends AbstractViewTest {
    }
 
   "when the subject has no permissions that are equal to the pattern, the view" should {
-    "hide constrained content" in new WithApplication(testApp(handler(subject = Some(user(permissions = List(new SecurityPermission("killer.undead.vampire")))), drh = Some(drh(true, true))))) {
+    "hide constrained content" in new WithApplication(testApp(handler(subject = Some(user(permissions = List(SecurityPermission("killer.undead.vampire")))), drh = Some(drh(allowed = true, check = true))))) {
       val html = patternContent(value = "killer.undead.zombie", patternType = PatternType.EQUALITY)(FakeRequest())
 
       private val content: String = Helpers.contentAsString(html)

@@ -3,6 +3,6 @@
 @import scala.collection.JavaConversions._
 @(handler: DeadboltHandler = handlers(), timeout: Function0[Long] = viewSupport.defaultTimeout)(body: => play.twirl.api.Html)(implicit request: Request[Any])
 
-@if(viewSupport.viewSubjectPresent(handler, timeout(), request)) {
+@if(viewSupport.subjectPresent(handler, timeout(), request)) {
 @body
 }

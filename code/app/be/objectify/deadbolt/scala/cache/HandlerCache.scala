@@ -17,14 +17,14 @@ trait HandlerCache extends Function[HandlerKey, DeadboltHandler] with Function0[
    *
    * @return a handler
    */
-  def withCaching = new SubjectCachingHandler(apply())
+  def withCaching: DeadboltHandler = new SubjectCachingHandler(apply())
 
   /**
    * Wraps the handler in another handler that caches the result of getSubject.  Use this on a per-request basis.
    *
    * @return a handler
    */
-  def withCaching(handlerKey: HandlerKey) = new SubjectCachingHandler(apply(handlerKey))
+  def withCaching(handlerKey: HandlerKey): DeadboltHandler = new SubjectCachingHandler(apply(handlerKey))
 
   private class SubjectCachingHandler(delegate: DeadboltHandler) extends DeadboltHandler {
     private[this] var subject: Option[Future[Option[Subject]]] = None

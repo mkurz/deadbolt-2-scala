@@ -12,7 +12,7 @@ import play.api.test.{FakeRequest, Helpers, WithApplication}
 class RegexOrTest extends AbstractViewTest {
 
    "when the subject has a permission that matches the pattern, the view" should {
-     "show constrained content and hide fallback content" in new WithApplication(testApp(handler(subject = Some(user(permissions = List(new SecurityPermission("killer.undead.zombie")))), drh = Some(drh(allowed = true, check = true))))) {
+     "show constrained content and hide fallback content" in new WithApplication(testApp(handler(subject = Some(user(permissions = List(SecurityPermission("killer.undead.zombie")))), drh = Some(drh(allowed = true, check = true))))) {
        val html = patternOrContent(value = "killer.undead.*", patternType = PatternType.REGEX)(FakeRequest())
 
        private val content: String = Helpers.contentAsString(html)
@@ -24,7 +24,7 @@ class RegexOrTest extends AbstractViewTest {
    }
 
   "when the subject has no permissions that match the pattern, the view" should {
-    "hide constrained content and show fallback content" in new WithApplication(testApp(handler(subject = Some(user(permissions = List(new SecurityPermission("killer.foo.bar")))), drh = Some(drh(allowed = true, check = true))))) {
+    "hide constrained content and show fallback content" in new WithApplication(testApp(handler(subject = Some(user(permissions = List(SecurityPermission("killer.foo.bar")))), drh = Some(drh(allowed = true, check = true))))) {
       val html = patternOrContent(value = "killer.undead.*", patternType = PatternType.EQUALITY)(FakeRequest())
 
       private val content: String = Helpers.contentAsString(html)

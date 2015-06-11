@@ -16,6 +16,7 @@ libraryDependencies ++= Seq(
   "be.objectify" %% "deadbolt-core" % "2.4.0"
 )
 
-resolvers += Resolver.sonatypeRepo("snapshots")
+
+parallelExecution in Test := false
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"

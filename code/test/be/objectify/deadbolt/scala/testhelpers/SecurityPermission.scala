@@ -5,6 +5,6 @@ import be.objectify.deadbolt.core.models.Permission
 /**
  * @author Steve Chaloner (steve@objectify.be)
  */
-class SecurityPermission(value: String) extends Permission {
+case class SecurityPermission(value: String) extends Permission {
   override def getValue: String = value
 }

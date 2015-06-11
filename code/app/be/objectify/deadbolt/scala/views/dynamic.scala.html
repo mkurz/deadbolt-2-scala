@@ -2,6 +2,6 @@
 @import be.objectify.deadbolt.scala.ViewAccessPoint.{viewSupport, handlers}
 @(handler: DeadboltHandler = handlers(), name: String, meta: String = null, timeout: Function0[Long] = viewSupport.defaultTimeout)(body: => play.twirl.api.Html)(implicit request: Request[Any])
 
-@if(viewSupport.viewDynamic(name, meta, handler, timeout(), request)) {
+@if(viewSupport.dynamic(name, meta, handler, timeout(), request)) {
 @body
 }
