@@ -27,6 +27,17 @@ Futures everywhere!  Well, almost...
 - there's an unfortunate need to use `Await.result` because we need ordered rendering.  If anyone knows a way around this, please let me know!
 - as a result of this call to Await, there's a new template parameter called `timeout`.  This defaults to `1000` (i.e. 1 second), but you can specify your own value as required. 
 
+**Controllers**
+
+- You will need to inject `DeadboltActions` into controllers where you want to use action modifiers like `SubjectPresent`, `Restrict` and `Pattern`.
+
+**application.conf**
+
+- You need to enable the deadbolt-2 module as follows (add this line to `application.conf`)
+ - `play.modules.enabled += "be.objectify.deadbolt.scala.DeadboltModule"`
+
+- An example play 2.4 app can be found [here](https://github.com/schaloner/deadbolt-2-scala-examples)
+
 2.3.3 Release notes
 -------------------
 
