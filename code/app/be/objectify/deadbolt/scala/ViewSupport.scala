@@ -7,15 +7,14 @@ import javax.inject.{Inject, Singleton}
 
 import be.objectify.deadbolt.core.models.Subject
 import be.objectify.deadbolt.core.{DeadboltAnalyzer, PatternType}
-import play.api.{Configuration, Logger}
 import play.api.mvc.Request
+import play.api.{Configuration, Logger}
 import play.cache.Cache
 
-import scala.concurrent.{Future, Await}
-import scala.concurrent.duration._
-
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{Failure, Try, Success}
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
+import scala.util.{Failure, Success, Try}
 
 /**
  *
@@ -24,7 +23,7 @@ import scala.util.{Failure, Try, Success}
 @Singleton
 class ViewSupport @Inject() (config: Configuration,
                              analyzer: ScalaAnalyzer,
-                             templateFailureListener: TemplateFailureListener) {
+                             listenerProvider: TemplateFailureListenerProvider) {
 
   val logger: Logger = Logger("deadbolt.template")
 
@@ -32,6 +31,8 @@ class ViewSupport @Inject() (config: Configuration,
   logger.info(s"Default timeout period for blocking views is [$timeout]ms")
 
   val defaultTimeout: () => Long = () => timeout
+
+  val listener = listenerProvider.get()
 
   /**
    * Used for subjectPresent and subjectNotPresent tags in the template.
@@ -151,8 +152,8 @@ class ViewSupport @Inject() (config: Configuration,
       case Success(allowed) => allowed
       case Failure(ex) =>
         logger.error("Error when checking view constraint", ex)
-        templateFailureListener.failure(s"Error when checking view constraint: [${ex.getMessage}]",
-                                        timeout)
+        listener.failure(s"Error when checking view constraint: [${ex.getMessage}]",
+                         timeout)
         false
     }
 }

@@ -1,32 +1,16 @@
 package be.objectify.deadbolt.scala.views.subjectTest
 
-import be.objectify.deadbolt.core.models.Subject
-import be.objectify.deadbolt.scala.testhelpers.User
+import be.objectify.deadbolt.scala.views.AbstractViewTest
 import be.objectify.deadbolt.scala.views.html.subjectTest.subjectPresentOrContent
-import be.objectify.deadbolt.scala.{DeadboltModule, DeadboltHandler, DynamicResourceHandler}
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.{Request, Result, Results}
-import play.api.test.{FakeRequest, Helpers, PlaySpecification, WithApplication}
-import play.libs.Scala
-
-import scala.concurrent.Future
-
-import scala.concurrent.ExecutionContext.Implicits.global
+import play.api.test.{FakeRequest, Helpers, WithApplication}
 
 /**
  * @author Steve Chaloner (steve@objectify.be)
  */
-class SubjectPresentOrTest extends PlaySpecification {
+class SubjectPresentOrTest extends AbstractViewTest {
 
-  "show constrained content and hide fallback content when subject is present" in new WithApplication(new GuiceApplicationBuilder()
-                                                                                                        .bindings(new DeadboltModule())
-                                                                                                        .build()) {
-    val html = subjectPresentOrContent(new DeadboltHandler() {
-      override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
-      override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
-      override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List()), Scala.asJava(List()))))
-      override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
-    })(FakeRequest())
+  "show constrained content and hide fallback content when subject is present" in new WithApplication(testApp(handler(subject = Some(user())))) {
+    val html = subjectPresentOrContent(FakeRequest())
 
     private val content: String = Helpers.contentAsString(html)
     content must contain("This is before the constraint.")
@@ -35,15 +19,8 @@ class SubjectPresentOrTest extends PlaySpecification {
     content must contain("This is after the constraint.")
   }
 
-  "hide constrained content and show fallback content when subject is not present" in new WithApplication(new GuiceApplicationBuilder()
-                                                                                                            .bindings(new DeadboltModule())
-                                                                                                            .build()) {
-    val html = subjectPresentOrContent(new DeadboltHandler() {
-      override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
-      override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(None)
-      override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(None)
-      override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
-    })(FakeRequest())
+  "hide constrained content and show fallback content when subject is not present" in new WithApplication(testApp(handler())) {
+    val html = subjectPresentOrContent(FakeRequest())
 
     private val content: String = Helpers.contentAsString(html)
     content must contain("This is before the constraint.")

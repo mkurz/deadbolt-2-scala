@@ -1,10 +1,8 @@
-@(handler: be.objectify.deadbolt.scala.DeadboltHandler, roles: List[Array[String]])(implicit request: Request[Any])
-
-@import scala.collection.JavaConversions._
+@(roles: List[Array[String]])(implicit request: Request[Any])
 
 This is before the constraint.
 
-@be.objectify.deadbolt.scala.views.html.restrictOr(handler = handler, roles = roles) {
+@be.objectify.deadbolt.scala.views.html.restrictOr(roles = roles) {
     This is protected by the constraint.
 }{
     This is default content in case the constraint denies access to the protected content.

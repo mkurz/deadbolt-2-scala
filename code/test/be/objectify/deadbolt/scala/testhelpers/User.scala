@@ -2,7 +2,7 @@ package be.objectify.deadbolt.scala.testhelpers
 
 import java.util
 
-import be.objectify.deadbolt.core.models.{Role, Permission, Subject}
+import be.objectify.deadbolt.core.models.{Permission, Role, Subject}
 
 /**
  * @author Steve Chaloner (steve@objectify.be)

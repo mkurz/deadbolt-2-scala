@@ -1,38 +1,21 @@
 package be.objectify.deadbolt.scala.views.patternTest
 
 import be.objectify.deadbolt.core.PatternType
-import be.objectify.deadbolt.core.models.Subject
-import be.objectify.deadbolt.scala.testhelpers.{SecurityPermission, User}
-import be.objectify.deadbolt.scala.{DeadboltModule, DynamicResourceHandler, DeadboltHandler}
+import be.objectify.deadbolt.scala.testhelpers.SecurityPermission
+import be.objectify.deadbolt.scala.views.{drh, AbstractViewTest}
 import be.objectify.deadbolt.scala.views.html.patternTest.patternOrContent
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.{Results, Result, Request}
-import play.api.test.{WithApplication, PlaySpecification, FakeRequest, Helpers}
-import play.libs.Scala
-import scala.concurrent.Future
-
-import scala.concurrent.ExecutionContext.Implicits.global
-
+import play.api.mvc.Request
+import play.api.test.{FakeRequest, Helpers, WithApplication}
 
 /**
   * @author Steve Chaloner (steve@objectify.be)
   */
-class CustomOrTest extends PlaySpecification {
+class CustomOrTest extends AbstractViewTest {
 
   "when a custom permission allows it, the view" should {
-    "show constrained content and hide fallback content" in new WithApplication(new GuiceApplicationBuilder()
-                                                                                  .bindings(new DeadboltModule())
-                                                                                  .build()) {
+    "show constrained content and hide fallback content" in new WithApplication(testApp(handler(subject = Some(user(permissions = List(new SecurityPermission("killer.undead.zombie")))), drh = Some(drh(allowed = true, check = true))))) {
       Request
-      val html = patternOrContent(new DeadboltHandler() {
-        override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
-        override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(Some(new DynamicResourceHandler() {
-          override def isAllowed[A](name: String, meta: String, deadboltHandler: DeadboltHandler, request: Request[A]): Future[Boolean] = Future(true)
-          override def checkPermission[A](permissionValue: String, deadboltHandler: DeadboltHandler, request: Request[A]): Future[Boolean] = Future(true) // allow permission
-        }))
-        override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List.empty), Scala.asJava(List(new SecurityPermission("killer.undead.zombie"))))))
-        override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
-      }, value = "something arbitrary", patternType = PatternType.CUSTOM)(FakeRequest())
+      val html = patternOrContent(value = "something arbitrary", patternType = PatternType.CUSTOM)(FakeRequest())
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -43,18 +26,8 @@ class CustomOrTest extends PlaySpecification {
   }
 
   "when a custom permission denies it, the view" should {
-    "hide constrained content and show fallback content" in new WithApplication(new GuiceApplicationBuilder()
-                                                                                  .bindings(new DeadboltModule())
-                                                                                  .build()) {
-      val html = patternOrContent(new DeadboltHandler() {
-        override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
-        override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(Some(new DynamicResourceHandler() {
-          override def isAllowed[A](name: String, meta: String, deadboltHandler: DeadboltHandler, request: Request[A]): Future[Boolean] = Future(true)
-          override def checkPermission[A](permissionValue: String, deadboltHandler: DeadboltHandler, request: Request[A]): Future[Boolean] = Future(false) //deny permission
-        }))
-        override def getSubject[A](request: Request[A]): Future[Option[Subject]] = Future(Some(new User("foo", Scala.asJava(List.empty), Scala.asJava(List(new SecurityPermission("killer.undead.zombie"))))))
-        override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Forbidden)
-      }, value = "something arbitrary", patternType = PatternType.CUSTOM)(FakeRequest())
+    "hide constrained content and show fallback content" in new WithApplication(testApp(handler(subject = Some(user(permissions = List(new SecurityPermission("killer.undead.zombie")))), drh = Some(drh(allowed = true, check = false))))) {
+      val html = patternOrContent(value = "something arbitrary", patternType = PatternType.CUSTOM)(FakeRequest())
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
