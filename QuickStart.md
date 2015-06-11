@@ -3,7 +3,11 @@ DeadBolt 2 Scala - Quick start
 
 Add the dependency to your build
 
-    `"be.objectify" %% "deadbolt-scala" % "2.4.0"`
+    `"be.objectify" %% "deadbolt-scala" % "2.4.0-SNAPSHOT"`
+
+Don't forget to add the snapshot repository, if you don't already have it.
+
+    resolvers += Resolver.sonatypeRepo("snapshots")
 
 Add the Deadbolt module to your Play application
 
