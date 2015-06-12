@@ -58,7 +58,7 @@ An example implementation follows, based on the sample app.  You can also use `b
     }
 
 
-Finally, expose your handlers to Deadbolt.  To do this, you will need to create a small module that binds your handler cache by type.
+Finally, expose your handlers to Deadbolt.  To do this, you will need to create a small module that binds your handler cache by type...
 
     package com.example.modules
 
@@ -71,6 +71,15 @@ Finally, expose your handlers to Deadbolt.  To do this, you will need to create 
         override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = Seq(
             bind[HandlerCache].to[MyHandlerCache]
         )
+    }
+
+...and add it to your application.conf
+
+    play {
+        modules {
+            enabled += be.objectify.deadbolt.scala.DeadboltModule
+            enabled += com.example.modules.CustomDeadboltHook
+        }
     }
 
 You're now ready to secure access to controller functions and templates in your Play 2 application.
