@@ -5,7 +5,6 @@ scala:
 - 2.11.6
 script:
 - cd code
-- sbt ++$TRAVIS_SCALA_VERSION +test
 - sbt ++$TRAVIS_SCALA_VERSION +publish-local
 after_success:
 - ! '[[ $TRAVIS_BRANCH == "master" ]] && { sbt +publish; };'

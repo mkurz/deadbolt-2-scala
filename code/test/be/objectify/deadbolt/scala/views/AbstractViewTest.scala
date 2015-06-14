@@ -20,15 +20,12 @@ import scala.concurrent.Future
  */
 class AbstractViewTest extends PlaySpecification {
 
-  def testApp(handler: DeadboltHandler): Application = {
-    val app = new GuiceApplicationBuilder()
-              .bindings(new DeadboltModule())
-              .bindings(bind[HandlerCache].toInstance(LightweightHandlerCache(handler)))
-              .overrides(bind[CacheApi].to[FakeCache])
-              .in(Mode.Test)
-              .build()
-    app
-  }
+  def testApp(handler: DeadboltHandler): Application = new GuiceApplicationBuilder()
+                                                       .bindings(new DeadboltModule())
+                                                       .bindings(bind[HandlerCache].toInstance(LightweightHandlerCache(handler)))
+                                                       .overrides(bind[CacheApi].to[FakeCache])
+                                                       .in(Mode.Test)
+                                                       .build()
 
   def user(name: String = "foo",
            roles: List[_ <: Role] = List.empty,
@@ -37,13 +34,10 @@ class AbstractViewTest extends PlaySpecification {
   def handler(beforeAuthCheck: Option[Result] = None,
               subject: Option[User] = None,
               onAuthFailure: Result = Results.Forbidden,
-              drh: Option[DynamicResourceHandler] = None): DeadboltHandler = {
-    val h = new LightweightHandler(Future(beforeAuthCheck),
-                                   Future(subject),
-                                   Future(onAuthFailure),
-                                   Future(drh))
-    h
-  }
+              drh: Option[DynamicResourceHandler] = None): DeadboltHandler = new LightweightHandler(Future(beforeAuthCheck),
+                                                                                                    Future(subject),
+                                                                                                    Future(onAuthFailure),
+                                                                                                    Future(drh))
 }
 
 case class drh(allowed: Boolean, check: Boolean) extends DynamicResourceHandler {

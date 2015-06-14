@@ -9,7 +9,7 @@ import play.libs.Scala
 /**
  * @author Steve Chaloner (steve@objectify.be)
  */
-object SubjectNotPresentOrTest extends AbstractViewTest {
+class SubjectNotPresentOrTest extends AbstractViewTest {
 
   "show constrained content and hide fallback content when subject is not present" in new WithApplication(testApp(handler())) {
     val html = subjectNotPresentOrContent(FakeRequest())
