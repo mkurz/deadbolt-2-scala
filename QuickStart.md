@@ -260,7 +260,7 @@ Each constraint has a variant which allows you to define fallback content.  This
         Subject requires the foo role for this to be visible
     }
     
-    @restrict(List(Array["foo", "bar"]) {
+    @restrict(List(Array("foo", "bar")) {
          Subject requires the foo AND bar roles for this to be visible
     }
     
@@ -268,7 +268,7 @@ Each constraint has a variant which allows you to define fallback content.  This
          Subject requires the foo OR bar role for this to be visible
     }
     
-    @restrictOr(List(Array["foo", "bar"]) {
+    @restrictOr(List(Array("foo", "bar")) {
          Subject requires the foo AND bar roles for this to be visible
     } {
     	Subject does not have the necessary roles
