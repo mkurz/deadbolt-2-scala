@@ -35,7 +35,7 @@ Implement the `be.objectify.deadbolt.scala.HandlerCache` trait.  This is used by
 1. A default handler.  You can always use a specific handler in a template or controller, but if nothing is specified a well-known instance will be used.
 2. Named handlers.  
 
-An example implementation follows, based on the sample app.  You can also use `be.objectify.deadbolt.scala.cache.DefaultHandlerCache`.
+An example implementation follows, based on the sample app.
 
     @Singleton
     class MyHandlerCache extends HandlerCache {
