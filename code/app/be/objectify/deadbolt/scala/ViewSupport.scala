@@ -1,15 +1,13 @@
 package be.objectify.deadbolt.scala
 
 import java.util.Optional
-import java.util.concurrent.Callable
-import java.util.regex.Pattern
 import javax.inject.{Inject, Singleton}
 
 import be.objectify.deadbolt.core.models.Subject
 import be.objectify.deadbolt.core.{DeadboltAnalyzer, PatternType}
+import be.objectify.deadbolt.scala.cache.PatternCache
 import play.api.mvc.Request
 import play.api.{Configuration, Logger}
-import play.cache.Cache
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -23,6 +21,7 @@ import scala.util.{Failure, Success, Try}
 @Singleton
 class ViewSupport @Inject() (config: Configuration,
                              analyzer: ScalaAnalyzer,
+                             patternCache: PatternCache,
                              listenerProvider: TemplateFailureListenerProvider) {
 
   val logger: Logger = Logger("deadbolt.template")
@@ -139,19 +138,13 @@ class ViewSupport @Inject() (config: Configuration,
               deadboltHandler: DeadboltHandler,
               timeoutInMillis: Long,
               request: Request[Any]): Boolean = {
-    def getPattern(patternValue: String): Pattern =
-      Cache.getOrElse("Deadbolt." + patternValue,
-                      new Callable[Pattern]{
-                        def call() = Pattern.compile(patternValue)
-                      },
-                      0)
 
     tryToComplete(deadboltHandler.getSubject(request).map((subjectOption: Option[Subject]) => {
       subjectOption match {
         case None => false
         case Some(subject) => patternType match {
           case PatternType.EQUALITY => new DeadboltAnalyzer().checkPatternEquality(Optional.ofNullable(subject), Optional.ofNullable(value))
-          case PatternType.REGEX => new DeadboltAnalyzer().checkRegexPattern(Optional.ofNullable(subject), Optional.ofNullable(getPattern(value)))
+          case PatternType.REGEX => new DeadboltAnalyzer().checkRegexPattern(Optional.ofNullable(subject), Optional.ofNullable(patternCache(value).orNull))
           case PatternType.CUSTOM =>
             val future: Future[Boolean] = deadboltHandler.getDynamicResourceHandler(request).map((drhOption: Option[DynamicResourceHandler]) => {
               drhOption match {
