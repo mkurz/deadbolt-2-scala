@@ -1,8 +1,9 @@
 @import be.objectify.deadbolt.core.PatternType
 @import be.objectify.deadbolt.scala.DeadboltHandler
-@import be.objectify.deadbolt.scala.ViewAccessPoint.{viewSupport, handlers}
+@import play.api.Play.current
+@import be.objectify.deadbolt.scala.ViewAccessPoint.Implicits._
 @import scala.collection.JavaConversions._
-@(handler: DeadboltHandler = handlers(), value: String, patternType: PatternType = PatternType.EQUALITY, timeout: Function0[Long] = viewSupport.defaultTimeout)(body: => play.twirl.api.Html)(alternativeBody: => play.twirl.api.Html)(implicit request: Request[Any])
+@(handler: DeadboltHandler = handlerCache.apply(), value: String, patternType: PatternType = PatternType.EQUALITY, timeout: Function0[Long] = viewSupport.defaultTimeout)(body: => play.twirl.api.Html)(alternativeBody: => play.twirl.api.Html)(implicit request: Request[Any])
 
 @if(viewSupport.pattern(value, patternType, handler, timeout(), request)) {
 @body

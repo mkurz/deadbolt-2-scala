@@ -1,15 +1,19 @@
 package be.objectify.deadbolt.scala
 
 import be.objectify.deadbolt.scala.cache.HandlerCache
-import play.api.Play
+import play.api.{Application, Play}
 
 /**
- * We can't inject into views, or objects...so it's back to a static reference here
- * Todo - This is also the point that's causing the tests to fail, needs writng up as a bug
+ * We can't inject into views, or objects, so an injector look-up and some implicits to the rescue...
  *
  * @author Steve Chaloner (steve@objectify.be)
  */
 object ViewAccessPoint {
-  val viewSupport: ViewSupport = Play.current.injector.instanceOf[ViewSupport]
-  val handlers: HandlerCache = Play.current.injector.instanceOf[HandlerCache]
+  private[deadbolt] val viewStuff = Application.instanceCache[ViewSupport]
+  private[deadbolt] val handlerStuff = Application.instanceCache[HandlerCache]
+
+  object Implicits {
+    implicit def viewSupport(implicit application: Application): ViewSupport = viewStuff(application)
+    implicit def handlerCache(implicit application: Application): HandlerCache = handlerStuff(application)
+  }
 }
