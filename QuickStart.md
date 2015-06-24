@@ -3,7 +3,7 @@ DeadBolt 2 Scala - Quick start
 
 Add the dependency to your build
 
-    `"be.objectify" %% "deadbolt-scala" % "2.4.0.1"`
+    "be.objectify" %% "deadbolt-scala" % "2.4.0.1"
 
 Add the Deadbolt module to your Play application
 
@@ -35,7 +35,7 @@ Implement the `be.objectify.deadbolt.scala.HandlerCache` trait.  This is used by
 1. A default handler.  You can always use a specific handler in a template or controller, but if nothing is specified a well-known instance will be used.
 2. Named handlers.  
 
-An example implementation follows, based on the sample app.  You can also use `be.objectify.deadbolt.scala.cache.DefaultHandlerCache`.
+An example implementation follows, based on the sample app.
 
     @Singleton
     class MyHandlerCache extends HandlerCache {
@@ -260,7 +260,7 @@ Each constraint has a variant which allows you to define fallback content.  This
         Subject requires the foo role for this to be visible
     }
     
-    @restrict(List(Array["foo", "bar"]) {
+    @restrict(List(Array("foo", "bar")) {
          Subject requires the foo AND bar roles for this to be visible
     }
     
@@ -268,7 +268,7 @@ Each constraint has a variant which allows you to define fallback content.  This
          Subject requires the foo OR bar role for this to be visible
     }
     
-    @restrictOr(List(Array["foo", "bar"]) {
+    @restrictOr(List(Array("foo", "bar")) {
          Subject requires the foo AND bar roles for this to be visible
     } {
     	Subject does not have the necessary roles
