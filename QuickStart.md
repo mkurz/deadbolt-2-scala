@@ -169,7 +169,7 @@ You now have functions equivalent to those of the builders mentioned above.  In 
     }
 
     // subject must have the "foo" AND "bar" roles 
-    def restrictedFunctionB = deadbolt.Restrict(List(Array["foo", "bar"]) {
+    def restrictedFunctionB = deadbolt.Restrict(List(Array("foo", "bar")) {
     	Action {
     		Ok(accessOk())
     	}
