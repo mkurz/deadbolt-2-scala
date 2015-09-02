@@ -309,3 +309,24 @@ Each constraint has a variant which allows you to define fallback content.  This
     	Custom test failed
     }
 
+
+Execution context
+=================
+By default, all futures are executed in the `scala.concurrent.ExecutionContext.global` context.  If you want to provide a separate execution context, you can plug it into Deadbolt by implementing the `DeadboltExecutionContextProvider` trait.
+
+    import be.objectify.deadbolt.scala.DeadboltExecutionContextProvider
+    
+    class CustomDeadboltExecutionContextProvider extends DeadboltExecutionContextProvider {
+        override def get(): ExecutionContext = ???
+    }
+
+**NB:** This provider is invoked twice, once in `DeadboltActions` and once in `ViewSupport`.
+
+Once you've implemented the provider, you need to declare it in your custom module (see introduction above).
+
+    class CustomDeadboltHook extends Module {
+        override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = Seq(
+            bind[HandlerCache].to[MyHandlerCache],
+            bind[DeadboltExecutionContextProvider].to[CustomDeadboltExecutionContextProvider]
+        )
+    }
