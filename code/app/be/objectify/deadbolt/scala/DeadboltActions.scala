@@ -7,7 +7,6 @@ import be.objectify.deadbolt.core.models.Subject
 import be.objectify.deadbolt.scala.cache.HandlerCache
 import play.api.mvc.{Action, BodyParsers, Result, Results}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
@@ -17,7 +16,11 @@ import scala.concurrent.Future
  * @author Steve Chaloner
  */
 @Singleton
-class DeadboltActions @Inject()(analyzer: ScalaAnalyzer, handlers: HandlerCache) extends Results with BodyParsers {
+class DeadboltActions @Inject()(analyzer: ScalaAnalyzer,
+                                handlers: HandlerCache,
+                                ecProvider: ExecutionContextProvider) extends Results with BodyParsers {
+
+  val ec = ecProvider.get()
 
   /**
    * Restrict access to an action to users that have all the specified roles.
@@ -54,7 +57,7 @@ class DeadboltActions @Inject()(analyzer: ScalaAnalyzer, handlers: HandlerCache)
 
       handler.beforeAuthCheck(request).flatMap((beforeAuthOption: Option[Result]) => {
         beforeAuthOption match {
-          case Some(result) => Future(result)
+          case Some(result) => Future(result)(ec)
           case None =>
             if (roleGroups.isEmpty) handler.onAuthFailure(request)
             else {
@@ -62,10 +65,10 @@ class DeadboltActions @Inject()(analyzer: ScalaAnalyzer, handlers: HandlerCache)
                                                             subjectOption match {
                                                               case Some(subject) => check(subjectOption, roleGroups.head, roleGroups.tail)
                                                               case _ => handler.onAuthFailure(request)
-                                                            })
+                                                            })(ec)
             }
         }
-      })
+      })(ec)
                                 }
   }
 
@@ -85,7 +88,7 @@ class DeadboltActions @Inject()(analyzer: ScalaAnalyzer, handlers: HandlerCache)
 
       handler.beforeAuthCheck(request).flatMap((beforeAuthOption: Option[Result]) => {
         beforeAuthOption match {
-          case Some(result) => Future(result)
+          case Some(result) => Future(result)(ec)
           case None =>
             handler.getDynamicResourceHandler(request).flatMap((drhOption: Option[DynamicResourceHandler]) => {
               drhOption match {
@@ -93,13 +96,13 @@ class DeadboltActions @Inject()(analyzer: ScalaAnalyzer, handlers: HandlerCache)
                   dynamicHandler.isAllowed(name, meta, handler, request).flatMap((allowed: Boolean) => allowed match {
                     case true => action(request)
                     case false => handler.onAuthFailure(request)
-                  })
+                  })(ec)
                 case None =>
                   throw new RuntimeException("A dynamic resource is specified but no dynamic resource handler is provided")
               }
-            })
+            })(ec)
         }
-      })
+      })(ec)
                                 }
   }
 
@@ -108,47 +111,51 @@ class DeadboltActions @Inject()(analyzer: ScalaAnalyzer, handlers: HandlerCache)
    * @param value the value of the pattern, e.g. a regex
    * @param patternType the type of the pattern
    * @param handler the handler to use for constraint testing
+   * @param invert if true, invert the constraint, i.e. deny access if the pattern matches
    * @param action the wrapped action
    * @tparam A
    * @return
    */
   def Pattern[A](value: String,
                  patternType: PatternType,
-                 handler: DeadboltHandler = handlers())(action: Action[A]): Action[A] = {
+                 handler: DeadboltHandler = handlers(),
+                 invert: Boolean = false)(action: Action[A]): Action[A] = {
 
     Action.async(action.parser) {
                                   implicit request =>
                                     handler.beforeAuthCheck(request).flatMap((beforeAuthOption: Option[Result]) => {
                                       beforeAuthOption match {
-                                        case Some(result) => Future(result)
+                                        case Some(result) => Future(result)(ec)
                                         case None =>
                                           handler.getSubject(request).flatMap((subjectOption: Option[Subject]) => subjectOption match {
                                             case None => handler.onAuthFailure(request)
                                             case Some(subject) => patternType match {
                                               case PatternType.EQUALITY =>
-                                                if (analyzer.checkPatternEquality(subjectOption, Option(value))) action(request)
+                                                val equal: Boolean = analyzer.checkPatternEquality(subjectOption, Option(value))
+                                                if (if (invert) !equal else equal) action(request)
                                                 else handler.onAuthFailure(request)
                                               case PatternType.REGEX =>
-                                                if (analyzer.checkRegexPattern(subjectOption, value)) action(request)
+                                                val patternMatch: Boolean = analyzer.checkRegexPattern(subjectOption, value)
+                                                if (if (invert) !patternMatch else patternMatch) action(request)
                                                 else handler.onAuthFailure(request)
                                               case PatternType.CUSTOM =>
                                                 handler.getDynamicResourceHandler(request).flatMap((drhOption: Option[DynamicResourceHandler]) => {
                                                   drhOption match {
                                                     case Some(dynamicHandler) =>
                                                       dynamicHandler.checkPermission(value, handler, request).flatMap((allowed: Boolean) => {
-                                                        allowed match {
+                                                        (if (invert) !allowed else allowed) match {
                                                           case true => action(request)
                                                           case false => handler.onAuthFailure(request)
                                                         }
-                                                      })
+                                                      })(ec)
                                                     case None =>
                                                       throw new RuntimeException("A custom pattern is specified but no dynamic resource handler is provided")
                                                   }
-                                                })
+                                                })(ec)
                                             }
-                                          })
+                                          })(ec)
                                       }
-                                    })
+                                    })(ec)
                                 }
   }
 
@@ -164,13 +171,13 @@ class DeadboltActions @Inject()(analyzer: ScalaAnalyzer, handlers: HandlerCache)
     Action.async(action.parser) { implicit request =>
       handler.beforeAuthCheck(request).flatMap((beforeAuthOption: Option[Result]) =>
                                                          beforeAuthOption match {
-                                                           case Some(result) => Future(result)
+                                                           case Some(result) => Future(result)(ec)
                                                            case None =>
                                                              handler.getSubject(request).flatMap((subjectOption: Option[Subject]) => subjectOption match {
                                                                case Some(subject) => action(request)
                                                                case None => handler.onAuthFailure(request)
-                                                             })
-                                                         })
+                                                             })(ec)
+                                                         })(ec)
                                 }
   }
 
@@ -186,13 +193,13 @@ class DeadboltActions @Inject()(analyzer: ScalaAnalyzer, handlers: HandlerCache)
     Action.async(action.parser) { implicit request =>
       handler.beforeAuthCheck(request).flatMap((beforeAuthOption: Option[Result]) =>
                                                          beforeAuthOption match {
-                                                           case Some(result) => Future(result)
+                                                           case Some(result) => Future(result)(ec)
                                                            case None =>
                                                              handler.getSubject(request).flatMap((subjectOption: Option[Subject]) => subjectOption match {
                                                                case Some(subject) => handler.onAuthFailure(request)
                                                                case None => action(request)
-                                                             })
-                                                         })
+                                                             })(ec)
+                                                         })(ec)
                                 }
   }
 }

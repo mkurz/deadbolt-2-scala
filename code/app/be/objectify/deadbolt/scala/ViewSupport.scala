@@ -9,9 +9,8 @@ import be.objectify.deadbolt.scala.cache.PatternCache
 import play.api.mvc.Request
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{ExecutionContext, Await, Future}
 import scala.util.{Failure, Success, Try}
 
 /**
@@ -22,7 +21,8 @@ import scala.util.{Failure, Success, Try}
 class ViewSupport @Inject() (config: Configuration,
                              analyzer: ScalaAnalyzer,
                              patternCache: PatternCache,
-                             listenerProvider: TemplateFailureListenerProvider) {
+                             listenerProvider: TemplateFailureListenerProvider,
+                             ecProvider: ExecutionContextProvider) {
 
   val logger: Logger = Logger("deadbolt.template")
 
@@ -32,6 +32,8 @@ class ViewSupport @Inject() (config: Configuration,
   val defaultTimeout: () => Long = () => timeout
 
   val listener = listenerProvider.get()
+
+  val ec: ExecutionContext = ecProvider.get()
 
   /**
    * Returns true if [[DeadboltHandler.getSubject()]] results in Some
@@ -53,7 +55,7 @@ class ViewSupport @Inject() (config: Configuration,
           false
         }
       }
-    }), timeoutInMillis)
+    })(ec), timeoutInMillis)
   }
 
   /**
@@ -76,7 +78,7 @@ class ViewSupport @Inject() (config: Configuration,
           false
         }
       }
-    }), timeoutInMillis)
+    })(ec), timeoutInMillis)
   }
 
   /**
@@ -102,7 +104,7 @@ class ViewSupport @Inject() (config: Configuration,
         case Some(subject) => check(new DeadboltAnalyzer(), Optional.ofNullable(subject), roles.head, roles.tail)
         case None => false
       }
-    }), timeoutInMillis)
+    })(ec), timeoutInMillis)
   }
 
   /**
@@ -122,7 +124,7 @@ class ViewSupport @Inject() (config: Configuration,
         case Some(drh) => drh.isAllowed(name, meta, deadboltHandler, request)
         case None => throw new RuntimeException("A dynamic resource is specified but no dynamic resource handler is provided")
       }
-    }), timeoutInMillis)
+    })(ec), timeoutInMillis)
   }
 
   /**
@@ -154,12 +156,12 @@ class ViewSupport @Inject() (config: Configuration,
                   logger.error("A custom pattern is specified but no dynamic resource handler is provided")
                   throw new scala.RuntimeException("A custom pattern is specified but no dynamic resource handler is provided")
               }
-            })
+            })(ec)
             Await.result(future, timeoutInMillis milliseconds)
           case _ => false
         }
       }
-    }), timeoutInMillis)
+    })(ec), timeoutInMillis)
   }
 
   /**

@@ -14,6 +14,7 @@ class DeadboltModule extends Module {
     bind[DeadboltActions].toSelf,
     bind[ViewSupport].toSelf,
     bind[ActionBuilders].toSelf,
-    bind[TemplateFailureListenerProvider].toSelf
+    bind[TemplateFailureListenerProvider].toSelf,
+    bind[ExecutionContextProvider].toSelf
   )
 }
