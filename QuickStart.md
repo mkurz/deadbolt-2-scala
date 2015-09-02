@@ -3,7 +3,7 @@ DeadBolt 2 Scala - Quick start
 
 Add the dependency to your build
 
-    "be.objectify" %% "deadbolt-scala" % "2.4.0.2"
+    "be.objectify" %% "deadbolt-scala" % "2.4.1"
 
 Add the Deadbolt module to your Play application
 
