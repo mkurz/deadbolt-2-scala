@@ -9,6 +9,7 @@ script:
 - sbt ++$TRAVIS_SCALA_VERSION +publish-local
 after_success:
 - ! '[[ $TRAVIS_BRANCH == "master" ]] && { sbt +publish; };'
+sudo: false
 env:
   global:
   - secure: Dkhil6/4bUBfOq915zjsnX4bzAFRod8ObsZmh/BZaz0pNxA2IZfrHYj8ce403ma6/ppzgMnWHGgL007djGhkKPg6fhzthO7IwGhirZuuYCU1yc/YTy3OZDtmqryfA90G9N0KDlV3Be4FfJcYVtuMSOln5creSNnCy513x7gNfCs=
