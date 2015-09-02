@@ -49,18 +49,18 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
   object PatternAction {
 
-    def apply(value: String, patternType: PatternType): PatternAction.PatternActionBuilder = PatternActionBuilder(value, patternType)
+    def apply(value: String, patternType: PatternType, invert: Boolean = false): PatternAction.PatternActionBuilder = PatternActionBuilder(value, patternType)
 
-    case class PatternActionBuilder(value: String, patternType: PatternType) extends DeadboltActionBuilder {
+    case class PatternActionBuilder(value: String, patternType: PatternType, invert: Boolean = false) extends DeadboltActionBuilder {
 
       def apply(block: => Result)(implicit handler: DeadboltHandler): Action[AnyContent] =
-        deadboltActions.Pattern(value, patternType, handler) { Action { block } }
+        deadboltActions.Pattern(value, patternType, handler, invert) { Action { block } }
 
       def apply(block: Request[AnyContent] => Result)(implicit handler: DeadboltHandler) : Action[AnyContent] =
-        deadboltActions.Pattern(value, patternType, handler) { Action { request => block(request) } }
+        deadboltActions.Pattern(value, patternType, handler, invert) { Action { request => block(request) } }
 
       def apply[A](bodyParser: BodyParser[A])(block: Request[A] => Result)(implicit handler: DeadboltHandler) : Action[A] =
-        deadboltActions.Pattern(value, patternType, handler) { Action(bodyParser) { request:Request[A]  => block(request) } }
+        deadboltActions.Pattern(value, patternType, handler, invert) { Action(bodyParser) { request:Request[A]  => block(request) } }
     }
   }
 
