@@ -2,7 +2,7 @@ name := "deadbolt-scala"
 
 organization := "be.objectify"
 
-version := "2.4.1-SNAPSHOT"
+version := "2.4.1"
 
 lazy val root = (project in file(".")).enablePlugins(play.PlayScala)
 
@@ -15,8 +15,6 @@ libraryDependencies ++= Seq(
   specs2 % Test,
   "be.objectify" %% "deadbolt-core" % "2.4.2"
 )
-
-resolvers += Resolver.sonatypeRepo("snapshots")
 
 parallelExecution in Test := false
 
