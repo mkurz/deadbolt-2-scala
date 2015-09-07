@@ -49,7 +49,7 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
   object PatternAction {
 
-    def apply(value: String, patternType: PatternType, invert: Boolean = false): PatternAction.PatternActionBuilder = PatternActionBuilder(value, patternType)
+    def apply(value: String, patternType: PatternType, invert: Boolean = false): PatternAction.PatternActionBuilder = PatternActionBuilder(value, patternType, invert)
 
     case class PatternActionBuilder(value: String, patternType: PatternType, invert: Boolean = false) extends DeadboltActionBuilder {
 
