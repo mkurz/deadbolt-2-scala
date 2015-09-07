@@ -1,0 +1,38 @@
+GET        /builder/dynamic/niceName                          be.objectify.deadbolt.scala.test.controllers.builder.Dynamic.index()
+
+GET        /builder/pattern/custom                            be.objectify.deadbolt.scala.test.controllers.builder.Pattern.custom()
+GET        /builder/pattern/custom/invert                     be.objectify.deadbolt.scala.test.controllers.builder.Pattern.invertedCustom()
+GET        /builder/pattern/equality                          be.objectify.deadbolt.scala.test.controllers.builder.Pattern.equality()
+GET        /builder/pattern/equality/invert                   be.objectify.deadbolt.scala.test.controllers.builder.Pattern.invertedEquality()
+GET        /builder/pattern/regex/zombieKillers               be.objectify.deadbolt.scala.test.controllers.builder.Pattern.regex_zombieKillersOnly()
+GET        /builder/pattern/regex/zombieKillers/invert        be.objectify.deadbolt.scala.test.controllers.builder.Pattern.invertedRegex_zombieKillersOnly()
+GET        /builder/pattern/regex/undeadKillers               be.objectify.deadbolt.scala.test.controllers.builder.Pattern.regex_anyKillersOfTheUndeadWelcome()
+GET        /builder/pattern/regex/undeadKillers/invert        be.objectify.deadbolt.scala.test.controllers.builder.Pattern.invertedRegex_anyKillersOfTheUndeadWelcome()
+
+GET        /builder/restrict/fooAndBar                        be.objectify.deadbolt.scala.test.controllers.builder.Restrict.restrictedToFooAndBar()
+GET        /builder/restrict/fooOrBar                         be.objectify.deadbolt.scala.test.controllers.builder.Restrict.restrictedToFooOrBar()
+GET        /builder/restrict/fooAndNotBar                     be.objectify.deadbolt.scala.test.controllers.builder.Restrict.restrictedToFooAndNotBar()
+GET        /builder/restrict/fooOrNotBar                      be.objectify.deadbolt.scala.test.controllers.builder.Restrict.restrictedToFooOrNotBar()
+
+GET        /builder/subject/mustBePresent                     be.objectify.deadbolt.scala.test.controllers.builder.Subject.subjectMustBePresent()
+GET        /builder/subject/mustNotBePresent                  be.objectify.deadbolt.scala.test.controllers.builder.Subject.subjectMustNotBePresent()
+
+
+GET        /composed/dynamic/niceName                         be.objectify.deadbolt.scala.test.controllers.composed.Dynamic.index()
+
+GET        /composed/pattern/custom                           be.objectify.deadbolt.scala.test.controllers.composed.Pattern.custom()
+GET        /composed/pattern/custom/invert                    be.objectify.deadbolt.scala.test.controllers.composed.Pattern.invertedCustom()
+GET        /composed/pattern/equality                         be.objectify.deadbolt.scala.test.controllers.composed.Pattern.equality()
+GET        /composed/pattern/equality/invert                  be.objectify.deadbolt.scala.test.controllers.composed.Pattern.invertedEquality()
+GET        /composed/pattern/regex/zombieKillers              be.objectify.deadbolt.scala.test.controllers.composed.Pattern.regex_zombieKillersOnly()
+GET        /composed/pattern/regex/zombieKillers/invert       be.objectify.deadbolt.scala.test.controllers.composed.Pattern.invertedRegex_zombieKillersOnly()
+GET        /composed/pattern/regex/undeadKillers              be.objectify.deadbolt.scala.test.controllers.composed.Pattern.regex_anyKillersOfTheUndeadWelcome()
+GET        /composed/pattern/regex/undeadKillers/invert       be.objectify.deadbolt.scala.test.controllers.composed.Pattern.invertedRegex_anyKillersOfTheUndeadWelcome()
+
+GET        /composed/restrict/fooAndBar                       be.objectify.deadbolt.scala.test.controllers.composed.Restrict.restrictedToFooAndBar()
+GET        /composed/restrict/fooOrBar                        be.objectify.deadbolt.scala.test.controllers.composed.Restrict.restrictedToFooOrBar()
+GET        /composed/restrict/fooAndNotBar                    be.objectify.deadbolt.scala.test.controllers.composed.Restrict.restrictedToFooAndNotBar()
+GET        /composed/restrict/fooOrNotBar                     be.objectify.deadbolt.scala.test.controllers.composed.Restrict.restrictedToFooOrNotBar()
+
+GET        /composed/subject/mustBePresent                    be.objectify.deadbolt.scala.test.controllers.composed.Subject.subjectMustBePresent()
+GET        /composed/subject/mustNotBePresent                 be.objectify.deadbolt.scala.test.controllers.composed.Subject.subjectMustNotBePresent()
