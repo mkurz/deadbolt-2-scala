@@ -5,12 +5,12 @@ scala:
 - 2.11.6
 script:
 - cd code
-- sbt ++$TRAVIS_SCALA_VERSION +test
-- sbt ++$TRAVIS_SCALA_VERSION +publishLocal
+- sbt --warn ++$TRAVIS_SCALA_VERSION +test
+- sbt --warn ++$TRAVIS_SCALA_VERSION +publishLocal
 - cd ../test-app
-- sbt ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.4.0 +test
-- sbt ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.4.1 +test
-- sbt ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.4.2 +test
+- sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.4.0 +test
+- sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.4.1 +test
+- sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.4.2 +test
 - cd ../code
 after_success:
 - ! '[[ $TRAVIS_BRANCH == "master" ]] && { sbt +publish; };'
