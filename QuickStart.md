@@ -91,7 +91,7 @@ You now have builders for all the constraint types, which we'll take a quick loo
 
 **SubjectPresent** and **SubjectNotPresent**
 
-Sometimes, you don't need fine-grained checked - you just need to see if there is a user present (or not present)
+Sometimes, you don't need fine-grained checks - you just need to see if there is a user present (or not present).
 
     // DeadboltHandler#getSubject must result in a Some for access to be granted
     def someFunctionA = actionBuilder.SubjectPresentAction().defaultHandler() { Ok(accessOk()) }
@@ -210,7 +210,11 @@ You now have functions equivalent to those of the builders mentioned above.  In 
 
 The most flexible constraint - this is a completely user-defined constraint that uses `DynamicResourceHandler#isAllowed` to determine access.  
 
-    def foo = actionBuilder.DynamicAction(name = "someClassifier").defaultHandler() { Ok(accessOk()) }
+    def foo = deadbolt.Dynamic(name = "someClassifier") {
+    	Action {
+    		Ok(accessOk())
+    	}
+    }
 
 
 Template constraints
