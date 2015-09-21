@@ -236,6 +236,8 @@ Each constraint has a variant which allows you to define fallback content.  This
 
 **SubjectPresent**
 
+    @import be.objectify.deadbolt.scala.views.html.{subjectPresent, subjectPresentOr}
+    
     @subjectPresent() {
         This content will be present if handler#getSubject results in a Some 
     }
@@ -248,6 +250,8 @@ Each constraint has a variant which allows you to define fallback content.  This
 
 **SubjectNotPresent**
 
+    @import be.objectify.deadbolt.scala.views.html.{subjectNotPresent, subjectNotPresentOr}
+    
     @subjectNotPresent() {
         This content will be present if handler#getSubject results in a None 
     }
@@ -260,6 +264,8 @@ Each constraint has a variant which allows you to define fallback content.  This
 
 **Restrict**
 
+    @import be.objectify.deadbolt.scala.views.html.{restrict, restrictOr}
+    
     @restrict(roles = List(Array("foo", "bar"))) {
         Subject requires the foo role for this to be visible
     }
@@ -283,6 +289,8 @@ Each constraint has a variant which allows you to define fallback content.  This
 
  The default pattern type is `PatternType.EQUALITY`.
 
+    @import be.objectify.deadbolt.scala.views.html.{pattern, patternOr}
+    
     @pattern("admin.printer") {
         Subject must have a permission with the exact value "admin.printer" for this to be visible
     }
@@ -303,6 +311,8 @@ Each constraint has a variant which allows you to define fallback content.  This
 
 **Dynamic**
 
+    @import be.objectify.deadbolt.scala.views.html.{dynamic, dynamicOr}
+    
     @dynamic("someName") {
         DynamicResourceHandler#isAllowed must result in true for this to be visible
     }
