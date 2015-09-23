@@ -117,7 +117,7 @@ class DeadboltActions @Inject()(analyzer: ScalaAnalyzer,
    * @return
    */
   def Pattern[A](value: String,
-                 patternType: PatternType,
+                 patternType: PatternType = PatternType.EQUALITY,
                  handler: DeadboltHandler = handlers(),
                  invert: Boolean = false)(action: Action[A]): Action[A] = {
 
