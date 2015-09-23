@@ -51,7 +51,7 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
     def apply(value: String, patternType: PatternType, invert: Boolean = false): PatternAction.PatternActionBuilder = PatternActionBuilder(value, patternType, invert)
 
-    case class PatternActionBuilder(value: String, patternType: PatternType, invert: Boolean = false) extends DeadboltActionBuilder {
+    case class PatternActionBuilder(value: String, patternType: PatternType = PatternType.EQUALITY, invert: Boolean = false) extends DeadboltActionBuilder {
 
       def apply(block: => Result)(implicit handler: DeadboltHandler): Action[AnyContent] =
         deadboltActions.Pattern(value, patternType, handler, invert) { Action { block } }
