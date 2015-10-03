@@ -22,10 +22,18 @@ import play.api.{Logger, Play}
 import scala.util.{Failure, Success, Try}
 
 /**
+ * Provides an instance of [[TemplateFailureListener]] for cases where template rendering fails.
+ *
  * @author Steve Chaloner (steve@objectify.be)
  */
+trait TemplateFailureListenerProvider extends Provider[TemplateFailureListener]
+
+/**
+ * A default implementation of [[TemplateFailureListenerProvider]] that checks the injector
+ * for a [[TemplateFailureListener]] instance.
+ */
 @Singleton
-class TemplateFailureListenerProvider extends Provider[TemplateFailureListener] {
+class DefaultTemplateFailureListenerProvider extends TemplateFailureListenerProvider {
 
   val logger: Logger = Logger("deadbolt.template")
 

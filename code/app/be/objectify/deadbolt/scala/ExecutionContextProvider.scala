@@ -23,13 +23,19 @@ import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success, Try}
 
 /**
- * Specifies the execution context used by Deadbolt.  Falls back to [[scala.concurrent.ExecutionContext.global]] if
- * nothing is specified.
+ * Specifies the execution context used by Deadbolt.
  *
  * @author Steve Chaloner (steve@objectify.be)
  */
+trait ExecutionContextProvider extends Provider[ExecutionContext]
+
+/**
+ * An implementation of [[ExecutionContextProvider]] that checks the injector for an instance of
+ * [[DeadboltExecutionContextProvider]].  Falls back to [[scala.concurrent.ExecutionContext.global]] if
+ * nothing is specified.
+ */
 @Singleton
-class ExecutionContextProvider extends Provider[ExecutionContext] {
+class DefaultExecutionContextProvider extends ExecutionContextProvider {
 
   val logger: Logger = Logger("deadbolt.execution-context")
 
