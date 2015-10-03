@@ -18,6 +18,8 @@ package be.objectify.deadbolt.scala
 import be.objectify.deadbolt.scala.cache.{HandlerCache, PatternCache}
 import play.api.Configuration
 
+import scala.concurrent.ExecutionContext
+
 /**
  *
  * @author Steve Chaloner (steve@objectify.be)
@@ -27,12 +29,15 @@ trait DeadboltComponents {
   def patternCache: PatternCache
   def handlers: HandlerCache
   def configuration: Configuration
-  def ecContextProvider: ExecutionContextProvider
+
+  lazy val defaultEcContextProvider: ExecutionContextProvider = new ExecutionContextProvider {
+    override val get: ExecutionContext = scala.concurrent.ExecutionContext.global
+  }
+  def ecContextProvider: ExecutionContextProvider = defaultEcContextProvider
 
   lazy val defaultTemplateFailureListenerProvider: TemplateFailureListenerProvider = new TemplateFailureListenerProvider {
     override def get(): TemplateFailureListener = new NoOpTemplateFailureListener
   }
-
   def templateFailureListenerProvider: TemplateFailureListenerProvider = defaultTemplateFailureListenerProvider
 
   lazy val scalaAnalyzer: ScalaAnalyzer = new ScalaAnalyzer(patternCache)
