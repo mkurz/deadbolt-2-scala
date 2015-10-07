@@ -78,7 +78,64 @@ Finally, expose your handlers to Deadbolt.  To do this, you will need to create 
         }
     }
 
-You're now ready to secure access to controller functions and templates in your Play 2 application.
+### Using compile-time dependency injection
+
+If you prefer to wire everything together with compile-time dependency, you don't need to create a custom module or add `DeadboltModule` to `play.modules`. 
+
+Instead, dependencies are handled using a custom `ApplicationLoader`.  To make things easier, various Deadbolt components are made available via the `be.objectify.deadbolt.scala.DeadboltComponents` trait.  You will still need to provide a couple of things, such as your `HandlerCache` implementation, and you'll then have access to all the usual pieces of Deadbolt.  
+
+Here's an example ApplicationLoader for compile-time DI.
+
+~~~~~~~
+class CompileTimeDiApplicationLoader extends ApplicationLoader  {
+  override def load(context: Context): Application 
+             = new ApplicationComponents(context).application
+}
+
+class ApplicationComponents(context: Context) 
+                            extends BuiltInComponentsFromContext(context) 
+                            with DeadboltComponents
+                            with EhCacheComponents {
+
+  // Define a pattern cache implementation
+  // defaultCacheApi is a component from EhCacheComponents
+  override lazy val patternCache: PatternCache = new DefaultPatternCache(defaultCacheApi)
+
+  // Declare something required by MyHandlerCache
+  lazy val subjectDao: SubjectDao = new TestSubjectDao
+
+  // Specify the DeadboltHandler implementation to use
+  override lazy val handlers: HandlerCache = new MyHandlerCache(subjectDao) 
+
+  // everything from here down is application-level
+  // configuration, unrelated to Deadbolt, such as controllers, routers, etc
+  // ...
+}
+~~~~~~~
+
+The components provided by Deadbolt are
+
+* `scalaAnalyzer` - constraint logic
+* `deadboltActions` - for composing actions
+* `actionBuilders` - for building actions
+* `viewSupport` - for template constraints
+* `patternCache` - for caching regular expressions.  You need to define this yourself in the application loader, but as in the example above it's easy to use the default implementation
+* `handlers` - the implementation of `HandlerCache` that you provide
+* `configuration` - the application configuration
+* `ecContextProvider` - the execution context for concurrent operations.  Defaults to `scala.concurrent.ExecutionContext.global`
+* `templateFailureListenerProvider` - for listening to Deadbolt-related errors that occur when rendering templates.  Defaults to a no-operation implementation
+
+Once you've defined your `ApplicationLoader`, you need to add it to your `application.conf`.
+
+~~~~~~~
+play {
+  application {
+    loader=com.example.myapp.CompileTimeDiApplicationLoader
+  }
+}
+~~~~~~~
+
+Whichever injection approach you take, you're now ready to secure access to controller functions and templates in your Play 2 application.
 
 Controller constraints with the action builder
 ==============================================
