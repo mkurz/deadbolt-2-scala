@@ -2,22 +2,23 @@ name := "deadbolt-scala"
 
 organization := "be.objectify"
 
-version := "2.4.3-SNAPSHOT"
+version := "2.5.0-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(play.PlayScala)
 
-scalaVersion := "2.11.6"
-
-crossScalaVersions := Seq("2.11.6", "2.10.5")
+scalaVersion := "2.11.7"
 
 libraryDependencies ++= Seq(
   cache,
   specs2 % Test,
-  "be.objectify" %% "deadbolt-core" % "2.4.2"
+  "be.objectify" %% "deadbolt-core" % "2.5.0-SNAPSHOT"
 )
 
 parallelExecution in Test := false
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
+
+resolvers += Resolver.sonatypeRepo("snapshots")
+
 
 fork in Test := true
