@@ -2,6 +2,7 @@ package be.objectify.deadbolt.scala.test.controllers
 
 import java.io.File
 
+import akka.stream.Materializer
 import be.objectify.deadbolt.scala.test.CompileTimeDiApplicationLoader
 import play.api.inject.{DefaultApplicationLifecycle, ApplicationLifecycle}
 import play.api.libs.ws.ning.NingWSComponents
@@ -22,4 +23,5 @@ abstract class AbstractControllerSpec extends PlaySpecification with PathSegment
 
   override def applicationLifecycle: ApplicationLifecycle = new DefaultApplicationLifecycle()
 
+  override def materializer: Materializer = Play.current.materializer
 }
