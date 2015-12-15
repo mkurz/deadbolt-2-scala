@@ -55,4 +55,11 @@ trait DeadboltHandler {
    * @return an option containing the handler for restricted resources
    */
   def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]]
+  
+  /**
+   * Gets the canonical name of the handler.  Defaults to the class name.
+   *
+   * @return whatever the implementor considers the canonical name of the handler to be
+   */
+  def handlerName = getClass.getName
 }
