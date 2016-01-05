@@ -13,12 +13,14 @@ script:
 - sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.4.2 +test
 - sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.4.3 +test
 - sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.4.4 +test
+- sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.4.6 +test
 - cd ../test-app-compile-time-di
 - sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.4.0 +test
 - sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.4.1 +test
 - sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.4.2 +test
 - sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.4.3 +test
 - sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.4.4 +test
+- sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.4.6 +test
 - cd ../code
 after_success:
 - ! '[[ $TRAVIS_BRANCH == "master" ]] && { sbt +publish; };'
