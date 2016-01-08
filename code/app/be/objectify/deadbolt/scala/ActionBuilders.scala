@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 Steve Chaloner
+ * Copyright 2012-2015 Steve Chaloner
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
     case class RestrictActionBuilder(roles: List[Array[String]]) extends DeadboltActionBuilder {
 
-      override def async[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
+      override def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
         deadboltActions.Restrict(roles, handler)(bodyParser)(block)
     }
   }
@@ -47,7 +47,7 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
     case class DynamicActionBuilder(name: String, meta: String = "") extends DeadboltActionBuilder {
 
-      override def async[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
+      override def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
         deadboltActions.Dynamic(name, meta, handler)(bodyParser)(block)
     }
   }
@@ -58,7 +58,7 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
     case class PatternActionBuilder(value: String, patternType: PatternType = PatternType.EQUALITY, invert: Boolean = false) extends DeadboltActionBuilder {
 
-      override def async[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
+      override def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
         deadboltActions.Pattern(value, patternType, handler, invert)(bodyParser)(block)
     }
   }
@@ -69,7 +69,7 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
     case class SubjectPresentActionBuilder() extends DeadboltActionBuilder {
 
-      override def async[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
+      override def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
         deadboltActions.SubjectPresent(handler)(bodyParser)(block)
     }
   }
@@ -80,33 +80,25 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
     case class SubjectNotPresentActionBuilder() extends DeadboltActionBuilder {
 
-      override def async[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
+      override def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
         deadboltActions.SubjectNotPresent(handler)(bodyParser)(block)
     }
   }
 
   trait DeadboltActionBuilder {
 
-    def apply(block: => Result)(implicit deadboltHandler: DeadboltHandler): Action[AnyContent] =
-      apply( _ => block)(deadboltHandler)
-    def apply(block: AuthenticatedRequest[AnyContent] => Result)(implicit deadboltHandler: DeadboltHandler) : Action[AnyContent] =
-      apply(BodyParsers.parse.anyContent)(block)(deadboltHandler)
-    def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Result)(implicit deadboltHandler: DeadboltHandler): Action[A] =
-      async(bodyParser) { req: AuthenticatedRequest[A] => Future.successful(block(req))
-                                                                                                                                                                }
-
-    def async(block: => Future[Result])(implicit deadbloltHandler: DeadboltHandler): Action[AnyContent] = async( _ => block)(deadbloltHandler)
-    def async(block: AuthenticatedRequest[AnyContent] => Future[Result])(implicit deadboltHandler: DeadboltHandler): Action[AnyContent] = async(BodyParsers.parse.anyContent)(block)(deadboltHandler)
-    def async[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit deadboltHandler: DeadboltHandler): Action[A]
+    def apply(block: => Future[Result])(implicit deadbloltHandler: DeadboltHandler): Action[AnyContent] = apply( _ => block)(deadbloltHandler)
+    def apply(block: AuthenticatedRequest[AnyContent] => Future[Result])(implicit deadboltHandler: DeadboltHandler): Action[AnyContent] = apply(BodyParsers.parse.anyContent)(block)(deadboltHandler)
+    def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler): Action[A]
 
     def withHandler(deadboltHandler: DeadboltHandler) = new {
-      def apply(block: => Result): Action[AnyContent] =
+      def apply(block: => Future[Result]): Action[AnyContent] =
         DeadboltActionBuilder.this.apply(block)(deadboltHandler)
 
-      def apply(block: AuthenticatedRequest[AnyContent] => Result): Action[AnyContent] =
+      def apply(block: AuthenticatedRequest[AnyContent] => Future[Result]): Action[AnyContent] =
         DeadboltActionBuilder.this.apply(block)(deadboltHandler)
 
-      def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Result)  : Action[A] =
+      def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])  : Action[A] =
         DeadboltActionBuilder.this.apply(bodyParser)(block)(deadboltHandler)
     }
 
