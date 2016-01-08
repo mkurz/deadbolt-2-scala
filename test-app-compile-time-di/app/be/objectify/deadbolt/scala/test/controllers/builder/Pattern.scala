@@ -12,7 +12,7 @@ class Pattern(actionBuilder: ActionBuilders) extends Controller {
   def custom =
     actionBuilder.PatternAction(value = "i-do-not-like-ice-cream",
                                  patternType = PatternType.CUSTOM)
-    .defaultHandler() {
+    .defaultHandler() { authRequest =>
       Ok("Content accessible")
     }
 
@@ -20,14 +20,14 @@ class Pattern(actionBuilder: ActionBuilders) extends Controller {
     actionBuilder.PatternAction(value = "i-do-not-like-ice-cream",
                                  patternType = PatternType.CUSTOM,
                                  invert = true)
-    .defaultHandler() {
+    .defaultHandler() { authRequest =>
       Ok("Content accessible")
     }
 
   def equality =
     actionBuilder.PatternAction(value = "killer.undead.zombie",
                                  patternType = PatternType.EQUALITY)
-    .defaultHandler() {
+    .defaultHandler() { authRequest =>
       Ok("Content accessible")
     }
 
@@ -35,14 +35,14 @@ class Pattern(actionBuilder: ActionBuilders) extends Controller {
     actionBuilder.PatternAction(value = "killer.undead.zombie",
                                  patternType = PatternType.EQUALITY,
                                  invert = true)
-    .defaultHandler() {
+    .defaultHandler() { authRequest =>
       Ok("Content accessible")
     }
 
   def regex_zombieKillersOnly =
     actionBuilder.PatternAction(value = "killer.undead.zombie",
                                  patternType = PatternType.REGEX)
-    .defaultHandler() {
+    .defaultHandler() { authRequest =>
       Ok("Content accessible")
     }
 
@@ -50,14 +50,14 @@ class Pattern(actionBuilder: ActionBuilders) extends Controller {
     actionBuilder.PatternAction(value = "killer.undead.zombie",
                                  patternType = PatternType.REGEX,
                                  invert = true)
-    .defaultHandler() {
+    .defaultHandler() { authRequest =>
       Ok("Content accessible")
     }
 
   def regex_anyKillersOfTheUndeadWelcome =
     actionBuilder.PatternAction(value = "killer.undead.*",
                                  patternType = PatternType.REGEX)
-    .defaultHandler() {
+    .defaultHandler() { authRequest =>
       Ok("Content accessible")
     }
 
@@ -65,7 +65,7 @@ class Pattern(actionBuilder: ActionBuilders) extends Controller {
     actionBuilder.PatternAction(value = "killer.undead.*",
                                  patternType = PatternType.REGEX,
                                  invert = true)
-    .defaultHandler() {
+    .defaultHandler() { authRequest =>
       Ok("Content accessible")
     }
 }

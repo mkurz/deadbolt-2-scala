@@ -40,14 +40,14 @@ trait DeadboltHandler {
    *
    * @return a future for an option containing the current subject
    */
-  def getSubject[A](request: Request[A]): Future[Option[Subject]]
+  def getSubject[A](request: AuthenticatedRequest[A]): Future[Option[Subject]]
 
   /**
    * Invoked when an authorisation failure is detected for the request.
    *
    * @return the action
    */
-  def onAuthFailure[A](request: Request[A]): Future[Result]
+  def onAuthFailure[A](request: AuthenticatedRequest[A]): Future[Result]
 
   /**
    * Gets the handler used for dealing with resources restricted to specific users/groups.

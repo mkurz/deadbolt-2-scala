@@ -15,6 +15,7 @@
  */
 package be.objectify.deadbolt.scala.views.subjectTest
 
+import be.objectify.deadbolt.scala.AuthenticatedRequest
 import be.objectify.deadbolt.scala.testhelpers.User
 import be.objectify.deadbolt.scala.views.AbstractViewTest
 import be.objectify.deadbolt.scala.views.html.subjectTest.subjectNotPresentOrContent
@@ -27,7 +28,7 @@ import play.libs.Scala
 class SubjectNotPresentOrTest extends AbstractViewTest {
 
   "show constrained content and hide fallback content when subject is not present" in new WithApplication(testApp(handler())) {
-    val html = subjectNotPresentOrContent(FakeRequest())
+    val html = subjectNotPresentOrContent(AuthenticatedRequest(FakeRequest(), None))
 
     private val content: String = Helpers.contentAsString(html)
     content must contain("This is before the constraint.")
@@ -38,7 +39,7 @@ class SubjectNotPresentOrTest extends AbstractViewTest {
 
   "hide constrained content and show fallback content when subject is present" in new WithApplication(testApp(handler(subject = Some(user())))) {
     val user = new User("foo", Scala.asJava(List.empty), Scala.asJava(List.empty))
-    val html = subjectNotPresentOrContent(FakeRequest())
+    val html = subjectNotPresentOrContent(AuthenticatedRequest(FakeRequest(), Some(user)))
 
     private val content: String = Helpers.contentAsString(html)
     content must contain("This is before the constraint.")

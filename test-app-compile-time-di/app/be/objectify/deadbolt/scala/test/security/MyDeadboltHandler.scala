@@ -2,7 +2,7 @@ package be.objectify.deadbolt.scala.test.security
 
 import be.objectify.deadbolt.core.models.Subject
 import be.objectify.deadbolt.scala.test.dao.SubjectDao
-import be.objectify.deadbolt.scala.{DeadboltHandler, DynamicResourceHandler}
+import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltHandler, DynamicResourceHandler}
 import play.api.mvc.{Request, Result, Results}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -19,13 +19,15 @@ class MyDeadboltHandler(subjectDao: SubjectDao) extends DeadboltHandler {
 
   override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = Future(dynamicHandler)
 
-  override def getSubject[A](request: Request[A]): Future[Option[Subject]] =
-    Future {
-      request.headers.get("x-deadbolt-test-user") match {
-        case Some(userName) => subjectDao.user(userName)
-        case None => None
-      }
+  override def getSubject[A](request: AuthenticatedRequest[A]): Future[Option[Subject]] =
+    request.subject match {
+      case Some(subject) => Future.successful(request.subject)
+      case _ =>
+        request.headers.get("x-deadbolt-test-user") match {
+          case Some(userName) => Future {subjectDao.user(userName)}
+          case None => Future.successful(None)
+        }
     }
 
-  override def onAuthFailure[A](request: Request[A]): Future[Result] = Future(Results.Unauthorized)
+  override def onAuthFailure[A](request: AuthenticatedRequest[A]): Future[Result] = Future(Results.Unauthorized)
 }

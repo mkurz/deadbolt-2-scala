@@ -21,7 +21,6 @@ import javax.inject.{Inject, Singleton}
 import be.objectify.deadbolt.core.models.Subject
 import be.objectify.deadbolt.core.{DeadboltAnalyzer, PatternType}
 import be.objectify.deadbolt.scala.cache.PatternCache
-import play.api.mvc.Request
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.duration._
@@ -58,17 +57,15 @@ class ViewSupport @Inject() (config: Configuration,
    */
   def subjectPresent(deadboltHandler: DeadboltHandler,
                      timeoutInMillis: Long,
-                     request: Request[Any]): Boolean = {
+                     request: AuthenticatedRequest[Any]): Boolean = {
     tryToComplete(deadboltHandler.getSubject(request).map((subjectOption: Option[Subject]) => {
       subjectOption match {
-        case Some(subject) => {
+        case Some(subject) =>
           Logger.logger.debug(s"handler [$deadboltHandler] :: subject is present - allowing")
           true
-        }
-        case None => {
+        case None =>
           Logger.logger.debug(s"handler [$deadboltHandler] :: subject is not present - denying")
           false
-        }
       }
     })(ec), timeoutInMillis)
   }
@@ -81,17 +78,15 @@ class ViewSupport @Inject() (config: Configuration,
    */
   def subjectNotPresent(deadboltHandler: DeadboltHandler,
                         timeoutInMillis: Long,
-                        request: Request[Any]): Boolean = {
+                        request: AuthenticatedRequest[Any]): Boolean = {
     tryToComplete(deadboltHandler.getSubject(request).map((subjectOption: Option[Subject]) => {
       subjectOption match {
-        case None => {
+        case None =>
           Logger.logger.debug(s"handler [$deadboltHandler] :: subject is not present - allowing")
           true
-        }
-        case Some(subject) => {
+        case Some(subject) =>
           Logger.logger.debug(s"handler [$deadboltHandler] :: subject is present - denying")
           false
-        }
       }
     })(ec), timeoutInMillis)
   }
@@ -107,7 +102,7 @@ class ViewSupport @Inject() (config: Configuration,
   def restrict(roles: List[Array[String]],
                deadboltHandler: DeadboltHandler,
                timeoutInMillis: Long,
-               request: Request[Any]): Boolean = {
+               request: AuthenticatedRequest[Any]): Boolean = {
     def check(analyzer: DeadboltAnalyzer, subject: Optional[Subject], current: Array[String], remaining: List[Array[String]]): Boolean = {
         if (analyzer.checkRole(subject, current)) true
         else if (remaining.isEmpty) false
@@ -133,7 +128,7 @@ class ViewSupport @Inject() (config: Configuration,
               meta: String,
               deadboltHandler: DeadboltHandler,
               timeoutInMillis: Long,
-              request: Request[Any]): Boolean = {
+              request: AuthenticatedRequest[Any]): Boolean = {
     tryToComplete(deadboltHandler.getDynamicResourceHandler(request).flatMap((drhOption: Option[DynamicResourceHandler]) => {
       drhOption match {
         case Some(drh) => drh.isAllowed(name, meta, deadboltHandler, request)
@@ -154,7 +149,7 @@ class ViewSupport @Inject() (config: Configuration,
               patternType: PatternType,
               deadboltHandler: DeadboltHandler,
               timeoutInMillis: Long,
-              request: Request[Any]): Boolean = {
+              request: AuthenticatedRequest[Any]): Boolean = {
 
     tryToComplete(deadboltHandler.getSubject(request).map((subjectOption: Option[Subject]) => {
       subjectOption match {

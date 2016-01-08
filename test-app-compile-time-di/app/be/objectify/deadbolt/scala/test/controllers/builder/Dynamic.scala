@@ -10,7 +10,7 @@ class Dynamic(actionBuilder: ActionBuilders) extends Controller {
 
   def index =
     actionBuilder.DynamicAction(name = "niceName")
-    .defaultHandler() {
+    .defaultHandler() { authRequest =>
       Ok("Content accessible")
     }
 }

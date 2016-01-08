@@ -10,25 +10,25 @@ class Restrict(actionBuilder: ActionBuilders) extends Controller {
 
   def restrictedToFooAndBar =
     actionBuilder.RestrictAction("foo", "bar")
-    .defaultHandler() {
+    .defaultHandler() { authRequest =>
       Ok("Content accessible")
     }
 
   def restrictedToFooOrBar =
     actionBuilder.RestrictAction(roles = List(Array("foo"), Array("bar")))
-    .defaultHandler() {
+    .defaultHandler() { authRequest =>
       Ok("Content accessible")
     }
 
   def restrictedToFooAndNotBar =
     actionBuilder.RestrictAction("foo", "!bar")
-    .defaultHandler() {
+    .defaultHandler() { authRequest =>
       Ok("Content accessible")
     }
 
   def restrictedToFooOrNotBar =
     actionBuilder.RestrictAction(roles = List(Array("foo"), Array("!bar")))
-    .defaultHandler() {
+    .defaultHandler() { authRequest =>
       Ok("Content accessible")
     }
 }

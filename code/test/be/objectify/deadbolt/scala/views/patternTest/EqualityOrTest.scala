@@ -16,10 +16,11 @@
 package be.objectify.deadbolt.scala.views.patternTest
 
 import be.objectify.deadbolt.core.PatternType
+import be.objectify.deadbolt.core.models.Subject
 import be.objectify.deadbolt.scala.testhelpers.{SecurityPermission, User}
 import be.objectify.deadbolt.scala.views.{drh, AbstractViewTest}
 import be.objectify.deadbolt.scala.views.html.patternTest.patternOrContent
-import be.objectify.deadbolt.scala.{DeadboltHandler, DynamicResourceHandler}
+import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltHandler, DynamicResourceHandler}
 import play.api.mvc.Request
 import play.api.test.{FakeRequest, Helpers, WithApplication}
 import play.libs.Scala
@@ -32,9 +33,14 @@ import scala.concurrent.Future
   */
 class EqualityOrTest extends AbstractViewTest {
 
-   "when the subject has a permission that is equal to the pattern, the view" should {
-     "show constrained content and hide fallback content" in new WithApplication(testApp(handler(subject = Some(user(permissions = List(SecurityPermission("killer.undead.zombie")))), drh = Some(drh(allowed = true, check = true))))) {
-       val html = patternOrContent(value = "killer.undead.zombie", patternType = PatternType.EQUALITY)(FakeRequest())
+  val userZombie: Option[Subject] = Some(user(permissions = List(SecurityPermission("killer.undead.zombie"))))
+  val userVampire: Option[Subject] = Some(user(permissions = List(SecurityPermission("killer.undead.vampire"))))
+  val drHandler: Option[DynamicResourceHandler] = Some(drh(allowed = true, check = true))
+
+
+  "when the subject has a permission that is equal to the pattern, the view" should {
+     "show constrained content and hide fallback content" in new WithApplication(testApp(handler(subject = userZombie, drh = drHandler))) {
+       val html = patternOrContent(value = "killer.undead.zombie", patternType = PatternType.EQUALITY)(AuthenticatedRequest(FakeRequest(), userZombie))
 
        private val content: String = Helpers.contentAsString(html)
        content must contain("This is before the constraint.")
@@ -45,8 +51,8 @@ class EqualityOrTest extends AbstractViewTest {
    }
 
   "when the subject has no permissions that are equal to the pattern, the view" should {
-    "hide constrained content and show fallback content" in new WithApplication(testApp(handler(subject = Some(user(permissions = List(SecurityPermission("killer.undead.vampire")))),  drh = Some(drh(allowed = true, check = true))))) {
-      val html = patternOrContent(value = "killer.undead.zombie", patternType = PatternType.EQUALITY)(FakeRequest())
+    "hide constrained content and show fallback content" in new WithApplication(testApp(handler(subject = userVampire,  drh = drHandler))) {
+      val html = patternOrContent(value = "killer.undead.zombie", patternType = PatternType.EQUALITY)(AuthenticatedRequest(FakeRequest(), userVampire))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")

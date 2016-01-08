@@ -10,12 +10,12 @@ import play.api.mvc.Controller
 class Subject @Inject()(actionBuilder: ActionBuilders) extends Controller {
 
   def subjectMustBePresent =
-    actionBuilder.SubjectPresentAction().defaultHandler() {
+    actionBuilder.SubjectPresentAction().defaultHandler() { authRequest =>
       Ok("Content accessible")
     }
 
   def subjectMustNotBePresent =
-    actionBuilder.SubjectNotPresentAction().defaultHandler() {
+    actionBuilder.SubjectNotPresentAction().defaultHandler() { authRequest =>
       Ok("Content accessible")
     }
 }

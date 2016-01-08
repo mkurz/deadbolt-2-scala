@@ -38,7 +38,7 @@ trait DynamicResourceHandler
   def isAllowed[A](name: String,
                    meta: String,
                    deadboltHandler: DeadboltHandler,
-                   request: Request[A]): Future[Boolean]
+                   request: AuthenticatedRequest[A]): Future[Boolean]
 
   /**
    * Invoked when a pattern constraint with a [[be.objectify.deadbolt.core.PatternType#CUSTOM]] type is used.
@@ -50,5 +50,5 @@ trait DynamicResourceHandler
    */
   def checkPermission[A](permissionValue: String,
                          deadboltHandler: DeadboltHandler,
-                         request: Request[A]): Future[Boolean]
+                         request: AuthenticatedRequest[A]): Future[Boolean]
 }

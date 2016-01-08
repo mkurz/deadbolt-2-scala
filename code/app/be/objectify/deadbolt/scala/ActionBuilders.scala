@@ -21,6 +21,8 @@ import be.objectify.deadbolt.scala.cache.HandlerCache
 import play.api.mvc._
 import be.objectify.deadbolt.core.PatternType
 
+import scala.concurrent.Future
+
 /**
  * Provides helpers for creating Play Actions wrapped by DeadboltActions.
  */
@@ -34,14 +36,8 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
     case class RestrictActionBuilder(roles: List[Array[String]]) extends DeadboltActionBuilder {
 
-      def apply(block: => Result)(implicit handler: DeadboltHandler): Action[AnyContent] =
-        deadboltActions.Restrict(roles, handler) { Action { block } }
-
-      def apply(block: Request[AnyContent] => Result)(implicit handler: DeadboltHandler) : Action[AnyContent] =
-        deadboltActions.Restrict(roles, handler) { Action { request => block(request) } }
-
-      def apply[A](bodyParser: BodyParser[A])(block: Request[A] => Result)(implicit handler: DeadboltHandler) : Action[A] =
-        deadboltActions.Restrict(roles, handler) { Action(bodyParser) { request:Request[A]  => block(request) } }
+      override def async[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
+        deadboltActions.Restrict(roles, handler)(bodyParser)(block)
     }
   }
 
@@ -51,14 +47,8 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
     case class DynamicActionBuilder(name: String, meta: String = "") extends DeadboltActionBuilder {
 
-      def apply(block: => Result)(implicit handler: DeadboltHandler): Action[AnyContent] =
-        deadboltActions.Dynamic(name, meta, handler) { Action { block } }
-
-      def apply(block: Request[AnyContent] => Result)(implicit handler: DeadboltHandler) : Action[AnyContent] =
-        deadboltActions.Dynamic(name, meta, handler) { Action { request => block(request) } }
-
-      def apply[A](bodyParser: BodyParser[A])(block: Request[A] => Result)(implicit handler: DeadboltHandler) : Action[A] =
-        deadboltActions.Dynamic(name, meta, handler) { Action(bodyParser) { request:Request[A]  => block(request) } }
+      override def async[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
+        deadboltActions.Dynamic(name, meta, handler)(bodyParser)(block)
     }
   }
 
@@ -68,14 +58,8 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
     case class PatternActionBuilder(value: String, patternType: PatternType = PatternType.EQUALITY, invert: Boolean = false) extends DeadboltActionBuilder {
 
-      def apply(block: => Result)(implicit handler: DeadboltHandler): Action[AnyContent] =
-        deadboltActions.Pattern(value, patternType, handler, invert) { Action { block } }
-
-      def apply(block: Request[AnyContent] => Result)(implicit handler: DeadboltHandler) : Action[AnyContent] =
-        deadboltActions.Pattern(value, patternType, handler, invert) { Action { request => block(request) } }
-
-      def apply[A](bodyParser: BodyParser[A])(block: Request[A] => Result)(implicit handler: DeadboltHandler) : Action[A] =
-        deadboltActions.Pattern(value, patternType, handler, invert) { Action(bodyParser) { request:Request[A]  => block(request) } }
+      override def async[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
+        deadboltActions.Pattern(value, patternType, handler, invert)(bodyParser)(block)
     }
   }
 
@@ -85,14 +69,8 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
     case class SubjectPresentActionBuilder() extends DeadboltActionBuilder {
 
-      def apply(block: => Result)(implicit handler: DeadboltHandler): Action[AnyContent] =
-        deadboltActions.SubjectPresent(handler) { Action { block } }
-
-      def apply(block: Request[AnyContent] => Result)(implicit handler: DeadboltHandler) : Action[AnyContent] =
-        deadboltActions.SubjectPresent(handler) { Action { request => block(request) } }
-
-      def apply[A](bodyParser: BodyParser[A])(block: Request[A] => Result)(implicit handler: DeadboltHandler) : Action[A] =
-        deadboltActions.SubjectPresent(handler) { Action(bodyParser) { request:Request[A]  => block(request) } }
+      override def async[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
+        deadboltActions.SubjectPresent(handler)(bodyParser)(block)
     }
   }
 
@@ -101,32 +79,35 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
     def apply(): SubjectNotPresentAction.SubjectNotPresentActionBuilder = SubjectNotPresentActionBuilder()
 
     case class SubjectNotPresentActionBuilder() extends DeadboltActionBuilder {
-      def apply(block: => Result)(implicit handler: DeadboltHandler): Action[AnyContent] =
-        deadboltActions.SubjectNotPresent(handler) { Action { block } }
 
-      def apply(block: Request[AnyContent] => Result)(implicit handler: DeadboltHandler) : Action[AnyContent] =
-        deadboltActions.SubjectNotPresent(handler) { Action { request => block(request) } }
-
-      def apply[A](bodyParser: BodyParser[A])(block: Request[A] => Result)(implicit handler: DeadboltHandler) : Action[A] =
-        deadboltActions.SubjectNotPresent(handler) { Action(bodyParser) { request:Request[A]  => block(request) } }
+      override def async[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
+        deadboltActions.SubjectNotPresent(handler)(bodyParser)(block)
     }
   }
 
   trait DeadboltActionBuilder {
 
-    def apply(block: => Result)(implicit handler: DeadboltHandler): Action[AnyContent]
-    def apply(block: Request[AnyContent] => Result)(implicit handler: DeadboltHandler) : Action[AnyContent]
-    def apply[A](bodyParser: BodyParser[A])(block: Request[A] => Result)(implicit handler: DeadboltHandler) : Action[A]
+    def apply(block: => Result)(implicit deadboltHandler: DeadboltHandler): Action[AnyContent] =
+      apply( _ => block)(deadboltHandler)
+    def apply(block: AuthenticatedRequest[AnyContent] => Result)(implicit deadboltHandler: DeadboltHandler) : Action[AnyContent] =
+      apply(BodyParsers.parse.anyContent)(block)(deadboltHandler)
+    def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Result)(implicit deadboltHandler: DeadboltHandler): Action[A] =
+      async(bodyParser) { req: AuthenticatedRequest[A] => Future.successful(block(req))
+                                                                                                                                                                }
 
-    def withHandler(handler: DeadboltHandler) = new {
+    def async(block: => Future[Result])(implicit deadbloltHandler: DeadboltHandler): Action[AnyContent] = async( _ => block)(deadbloltHandler)
+    def async(block: AuthenticatedRequest[AnyContent] => Future[Result])(implicit deadboltHandler: DeadboltHandler): Action[AnyContent] = async(BodyParsers.parse.anyContent)(block)(deadboltHandler)
+    def async[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit deadboltHandler: DeadboltHandler): Action[A]
+
+    def withHandler(deadboltHandler: DeadboltHandler) = new {
       def apply(block: => Result): Action[AnyContent] =
-        DeadboltActionBuilder.this.apply(block)(handler)
+        DeadboltActionBuilder.this.apply(block)(deadboltHandler)
 
-      def apply(block: Request[AnyContent] => Result): Action[AnyContent] =
-        DeadboltActionBuilder.this.apply(block)(handler)
+      def apply(block: AuthenticatedRequest[AnyContent] => Result): Action[AnyContent] =
+        DeadboltActionBuilder.this.apply(block)(deadboltHandler)
 
-      def apply[A](bodyParser: BodyParser[A])(block: Request[A] => Result)  : Action[A] =
-        DeadboltActionBuilder.this.apply(bodyParser)(block)(handler)
+      def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Result)  : Action[A] =
+        DeadboltActionBuilder.this.apply(bodyParser)(block)(deadboltHandler)
     }
 
     def key(handlerKey: HandlerKey) = withHandler(handlers(handlerKey))
