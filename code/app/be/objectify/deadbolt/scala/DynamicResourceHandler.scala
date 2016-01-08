@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2015 Steve Chaloner
+ * Copyright 2012-2016 Steve Chaloner
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
