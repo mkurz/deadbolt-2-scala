@@ -4,7 +4,7 @@ organization := "be.objectify"
 
 version := "2.5.0-SNAPSHOT"
 
-lazy val root = (project in file(".")).enablePlugins(play.PlayScala)
+lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.11.7"
 
