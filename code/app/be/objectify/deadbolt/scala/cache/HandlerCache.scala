@@ -16,7 +16,7 @@
 package be.objectify.deadbolt.scala.cache
 
 import be.objectify.deadbolt.core.models.Subject
-import be.objectify.deadbolt.scala.{HandlerKey, DynamicResourceHandler, DeadboltHandler}
+import be.objectify.deadbolt.scala.{AuthenticatedRequest, HandlerKey, DynamicResourceHandler, DeadboltHandler}
 import play.api.mvc.{Result, Request}
 
 import scala.concurrent.Future
@@ -47,14 +47,13 @@ trait HandlerCache extends Function[HandlerKey, DeadboltHandler] with Function0[
     override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = delegate.beforeAuthCheck(request)
 
     // there must be a better way to do this
-    override def getSubject[A](request: Request[A]): Future[Option[Subject]] =
-      if (subject.isDefined) subject.get
-      else {
-        subject = Option(delegate.getSubject(request))
-        subject.get
+    override def getSubject[A](request: AuthenticatedRequest[A]): Future[Option[Subject]] =
+      request.subject match {
+        case Some(subject) => Future.successful(request.subject)
+        case _ => delegate.getSubject(request)
       }
 
-    override def onAuthFailure[A](request: Request[A]): Future[Result] = delegate.onAuthFailure(request)
+    override def onAuthFailure[A](request: AuthenticatedRequest[A]): Future[Result] = delegate.onAuthFailure(request)
 
     override def getDynamicResourceHandler[A](request: Request[A]): Future[Option[DynamicResourceHandler]] = delegate.getDynamicResourceHandler(request)
   }

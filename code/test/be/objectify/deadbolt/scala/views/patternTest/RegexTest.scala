@@ -16,6 +16,8 @@
 package be.objectify.deadbolt.scala.views.patternTest
 
 import be.objectify.deadbolt.core.PatternType
+import be.objectify.deadbolt.core.models.Subject
+import be.objectify.deadbolt.scala.{DynamicResourceHandler, AuthenticatedRequest}
 import be.objectify.deadbolt.scala.testhelpers.SecurityPermission
 import be.objectify.deadbolt.scala.views.{drh, AbstractViewTest}
 import be.objectify.deadbolt.scala.views.html.patternTest.patternContent
@@ -26,9 +28,13 @@ import play.api.test.{FakeRequest, Helpers, WithApplication}
   */
 class RegexTest extends AbstractViewTest {
 
-   "when the subject has a permission that matches the pattern, the view" should {
-     "show constrained content" in new WithApplication(testApp(handler(subject = Some(user(permissions = List(SecurityPermission("killer.undead.zombie")))), drh = Some(drh(allowed = true, check = true))))) {
-       val html = patternContent(value = "killer.undead.*", patternType = PatternType.REGEX)(FakeRequest())
+  val userZombie: Option[Subject] = Some(user(permissions = List(SecurityPermission("killer.undead.zombie"))))
+  val userFooBar: Option[Subject] = Some(user(permissions = List(SecurityPermission("killer.foo.bar"))))
+  val drHandler: Option[DynamicResourceHandler] = Some(drh(allowed = true, check = true))
+
+  "when the subject has a permission that matches the pattern, the view" should {
+     "show constrained content" in new WithApplication(testApp(handler(subject = userZombie, drh = drHandler))) {
+       val html = patternContent(value = "killer.undead.*", patternType = PatternType.REGEX)(AuthenticatedRequest(FakeRequest(), userZombie))
 
        private val content: String = Helpers.contentAsString(html)
        content must contain("This is before the constraint.")
@@ -38,8 +44,8 @@ class RegexTest extends AbstractViewTest {
    }
 
   "when the subject has no permissions that match the pattern, the view" should {
-    "hide constrained content" in new WithApplication(testApp(handler(subject = Some(user(permissions = List(SecurityPermission("killer.foo.bar")))), drh = Some(drh(allowed = true, check = true))))) {
-      val html = patternContent(value = "killer.undead.*", patternType = PatternType.REGEX)(FakeRequest())
+    "hide constrained content" in new WithApplication(testApp(handler(subject = userFooBar, drh = drHandler))) {
+      val html = patternContent(value = "killer.undead.*", patternType = PatternType.REGEX)(AuthenticatedRequest(FakeRequest(), userFooBar))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")

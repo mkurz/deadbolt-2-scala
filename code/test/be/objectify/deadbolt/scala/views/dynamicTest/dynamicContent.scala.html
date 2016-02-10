@@ -1,4 +1,5 @@
-@(name: String, meta: String)(implicit request: Request[Any])
+@import be.objectify.deadbolt.scala.AuthenticatedRequest
+@(name: String, meta: String)(implicit request: AuthenticatedRequest[Any])
 
 This is before the constraint.
 

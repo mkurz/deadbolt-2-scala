@@ -16,6 +16,8 @@
 package be.objectify.deadbolt.scala.views.patternTest
 
 import be.objectify.deadbolt.core.PatternType
+import be.objectify.deadbolt.core.models.Subject
+import be.objectify.deadbolt.scala.{AuthenticatedRequest, DynamicResourceHandler}
 import be.objectify.deadbolt.scala.testhelpers.SecurityPermission
 import be.objectify.deadbolt.scala.views.{drh, AbstractViewTest}
 import be.objectify.deadbolt.scala.views.html.patternTest.patternContent
@@ -26,9 +28,13 @@ import play.api.test.{FakeRequest, Helpers, WithApplication}
   */
 class CustomTest extends AbstractViewTest {
 
-   "when a custom permission allows it, the view" should {
-     "show constrained content" in new WithApplication(testApp(handler(subject = Some(user(permissions = List(SecurityPermission("killer.undead.zombie")))), drh = Some(drh(allowed = true, check = true))))) {
-       val html = patternContent(value = "something arbitrary", patternType = PatternType.CUSTOM)(FakeRequest())
+  val user: Option[Subject] = Some(user(permissions = List(SecurityPermission("killer.undead.zombie"))))
+  val drhAllow: Option[DynamicResourceHandler] = Some(drh(allowed = true, check = true))
+  val drhDeny: Option[DynamicResourceHandler] = Some(drh(allowed = true, check = false))
+
+  "when a custom permission allows it, the view" should {
+     "show constrained content" in new WithApplication(testApp(handler(subject = user, drh = drhAllow))) {
+       val html = patternContent(value = "something arbitrary", patternType = PatternType.CUSTOM)(AuthenticatedRequest(FakeRequest(), user))
 
        private val content: String = Helpers.contentAsString(html)
        content must contain("This is before the constraint.")
@@ -38,8 +44,8 @@ class CustomTest extends AbstractViewTest {
    }
 
   "when a custom permission denies it, the view" should {
-    "hide constrained content" in new WithApplication(testApp(handler(subject = Some(user(permissions = List(SecurityPermission("killer.undead.zombie")))),  drh = Some(drh(allowed = true, check = false))))) {
-      val html = patternContent(value = "something arbitrary", patternType = PatternType.CUSTOM)(FakeRequest())
+    "hide constrained content" in new WithApplication(testApp(handler(subject = user,  drh = drhDeny))) {
+      val html = patternContent(value = "something arbitrary", patternType = PatternType.CUSTOM)(AuthenticatedRequest(FakeRequest(), user))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
