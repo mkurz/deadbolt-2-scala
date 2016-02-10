@@ -42,11 +42,9 @@ trait HandlerCache extends Function[HandlerKey, DeadboltHandler] with Function0[
   def withCaching(handlerKey: HandlerKey): DeadboltHandler = new SubjectCachingHandler(apply(handlerKey))
 
   private class SubjectCachingHandler(delegate: DeadboltHandler) extends DeadboltHandler {
-    private[this] var subject: Option[Future[Option[Subject]]] = None
 
     override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = delegate.beforeAuthCheck(request)
 
-    // there must be a better way to do this
     override def getSubject[A](request: AuthenticatedRequest[A]): Future[Option[Subject]] =
       request.subject match {
         case Some(subject) => Future.successful(request.subject)
