@@ -15,12 +15,10 @@
  */
 package be.objectify.deadbolt.scala
 
-import java.util.Optional
 import javax.inject.{Inject, Singleton}
 
-import be.objectify.deadbolt.core.models.Subject
-import be.objectify.deadbolt.core.{DeadboltAnalyzer, PatternType}
 import be.objectify.deadbolt.scala.cache.PatternCache
+import be.objectify.deadbolt.scala.models.{PatternType, Subject}
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.duration._
@@ -33,7 +31,7 @@ import scala.util.{Failure, Success, Try}
  */
 @Singleton
 class ViewSupport @Inject() (config: Configuration,
-                             analyzer: ScalaAnalyzer,
+                             analyzer: StaticConstraintAnalyzer,
                              patternCache: PatternCache,
                              listenerProvider: TemplateFailureListenerProvider,
                              ecProvider: ExecutionContextProvider) {
@@ -103,15 +101,15 @@ class ViewSupport @Inject() (config: Configuration,
                deadboltHandler: DeadboltHandler,
                timeoutInMillis: Long,
                request: AuthenticatedRequest[Any]): Boolean = {
-    def check(analyzer: DeadboltAnalyzer, subject: Optional[Subject], current: Array[String], remaining: List[Array[String]]): Boolean = {
-        if (analyzer.checkRole(subject, current)) true
+    def check(analyzer: StaticConstraintAnalyzer, subject: Option[Subject], current: Array[String], remaining: List[Array[String]]): Boolean = {
+        if (analyzer.hasAllRoles(subject, current)) true
         else if (remaining.isEmpty) false
         else check(analyzer, subject, remaining.head, remaining.tail)
     }
 
     tryToComplete(deadboltHandler.getSubject(request).map((subjectOption: Option[Subject]) => {
       subjectOption match {
-        case Some(subject) => check(new DeadboltAnalyzer(), Optional.ofNullable(subject), roles.head, roles.tail)
+        case Some(subject) => check(analyzer, subjectOption, roles.head, roles.tail)
         case None => false
       }
     })(ec), timeoutInMillis)
@@ -155,8 +153,8 @@ class ViewSupport @Inject() (config: Configuration,
       subjectOption match {
         case None => false
         case Some(subject) => patternType match {
-          case PatternType.EQUALITY => new DeadboltAnalyzer().checkPatternEquality(Optional.ofNullable(subject), Optional.ofNullable(value))
-          case PatternType.REGEX => new DeadboltAnalyzer().checkRegexPattern(Optional.ofNullable(subject), Optional.ofNullable(patternCache(value).orNull))
+          case PatternType.EQUALITY => analyzer.checkPatternEquality(subjectOption, Option(value))
+          case PatternType.REGEX => analyzer.checkRegexPattern(subjectOption, Option(value))
           case PatternType.CUSTOM =>
             val future: Future[Boolean] = deadboltHandler.getDynamicResourceHandler(request).map((drhOption: Option[DynamicResourceHandler]) => {
               drhOption match {

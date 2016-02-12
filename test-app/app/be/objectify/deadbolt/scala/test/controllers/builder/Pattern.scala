@@ -1,7 +1,7 @@
 package be.objectify.deadbolt.scala.test.controllers.builder
 
-import be.objectify.deadbolt.core.PatternType
 import be.objectify.deadbolt.scala.ActionBuilders
+import be.objectify.deadbolt.scala.models.PatternType
 import com.google.inject.Inject
 import play.api.mvc.Controller
 

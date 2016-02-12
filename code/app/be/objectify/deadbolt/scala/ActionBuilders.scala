@@ -18,8 +18,8 @@ package be.objectify.deadbolt.scala
 import javax.inject.{Inject, Singleton}
 
 import be.objectify.deadbolt.scala.cache.HandlerCache
+import be.objectify.deadbolt.scala.models.PatternType
 import play.api.mvc._
-import be.objectify.deadbolt.core.PatternType
 
 import scala.concurrent.Future
 

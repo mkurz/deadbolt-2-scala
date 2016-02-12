@@ -15,8 +15,8 @@
  */
 package be.objectify.deadbolt.scala.views
 
-import be.objectify.deadbolt.core.models.{Permission, Role, Subject}
 import be.objectify.deadbolt.scala.cache.HandlerCache
+import be.objectify.deadbolt.scala.models.{Subject, Permission, Role}
 import be.objectify.deadbolt.scala.testhelpers.{FakeCache, User}
 import be.objectify.deadbolt.scala._
 import play.api.cache.CacheApi
@@ -25,7 +25,6 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{Request, Result, Results}
 import play.api.test.PlaySpecification
 import play.api.{Application, Mode}
-import play.libs.Scala
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -44,7 +43,7 @@ class AbstractViewTest extends PlaySpecification {
 
   def user(name: String = "foo",
            roles: List[_ <: Role] = List.empty,
-           permissions: List[_ <: Permission] = List.empty): User =  User("foo", Scala.asJava(roles), Scala.asJava(permissions))
+           permissions: List[_ <: Permission] = List.empty): User =  User("foo", roles, permissions)
 
   def handler(beforeAuthCheck: Option[Result] = None,
               subject: Option[Subject] = None,

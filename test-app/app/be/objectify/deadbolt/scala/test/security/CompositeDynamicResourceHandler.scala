@@ -3,7 +3,6 @@ package be.objectify.deadbolt.scala.test.security
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltHandler, DynamicResourceHandler}
 import play.api.Logger
 
-import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -20,7 +19,7 @@ class CompositeDynamicResourceHandler(delegates: Map[String, DynamicResourceHand
     deadboltHandler.getSubject(request)
     .map {
       case Some(subject) =>
-        subject.getPermissions.toList.exists(p => p.getValue.contains("zombie"))
+        subject.permissions.exists(p => p.value.contains("zombie"))
       case None => false
     }
   }

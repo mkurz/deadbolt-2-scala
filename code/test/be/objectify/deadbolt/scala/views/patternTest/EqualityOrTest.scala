@@ -15,15 +15,12 @@
  */
 package be.objectify.deadbolt.scala.views.patternTest
 
-import be.objectify.deadbolt.core.PatternType
-import be.objectify.deadbolt.core.models.Subject
+import be.objectify.deadbolt.scala.models.{PatternType, Subject}
 import be.objectify.deadbolt.scala.testhelpers.{SecurityPermission, User}
 import be.objectify.deadbolt.scala.views.{drh, AbstractViewTest}
 import be.objectify.deadbolt.scala.views.html.patternTest.patternOrContent
-import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltHandler, DynamicResourceHandler}
-import play.api.mvc.Request
+import be.objectify.deadbolt.scala.{AuthenticatedRequest, DynamicResourceHandler}
 import play.api.test.{FakeRequest, Helpers, WithApplication}
-import play.libs.Scala
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

@@ -17,9 +17,8 @@ package be.objectify.deadbolt.scala
 
 import javax.inject.{Inject, Singleton}
 
-import be.objectify.deadbolt.core.PatternType
-import be.objectify.deadbolt.core.models.Subject
 import be.objectify.deadbolt.scala.cache.HandlerCache
+import be.objectify.deadbolt.scala.models.{PatternType, Subject}
 import play.api.mvc._
 
 import scala.concurrent.Future
@@ -30,7 +29,7 @@ import scala.concurrent.Future
   * @author Steve Chaloner
   */
 @Singleton
-class DeadboltActions @Inject()(analyzer: ScalaAnalyzer,
+class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
                                 handlers: HandlerCache,
                                 ecProvider: ExecutionContextProvider) extends Results with BodyParsers {
 
@@ -69,7 +68,7 @@ class DeadboltActions @Inject()(analyzer: ScalaAnalyzer,
     SubjectActionBuilder(None).async(bodyParser) { authRequest =>
 
       def check(subject: Option[Subject], current: Array[String], remaining: List[Array[String]]): Boolean = {
-        if (analyzer.checkRole(subject, current)) true
+        if (analyzer.hasAllRoles(subject, current)) true
         else if (remaining.isEmpty) false
         else check(subject, remaining.head, remaining.tail)
       }
@@ -163,7 +162,7 @@ class DeadboltActions @Inject()(analyzer: ScalaAnalyzer,
                     if (if (invert) !equal else equal) block(withSubject)
                     else handler.onAuthFailure(withSubject)
                   case PatternType.REGEX =>
-                    val patternMatch: Boolean = analyzer.checkRegexPattern(subjectOption, value)
+                    val patternMatch: Boolean = analyzer.checkRegexPattern(subjectOption, Option(value))
                     if (if (invert) !patternMatch else patternMatch) block(withSubject)
                     else handler.onAuthFailure(withSubject)
                   case PatternType.CUSTOM =>
@@ -216,7 +215,6 @@ class DeadboltActions @Inject()(analyzer: ScalaAnalyzer,
     *
     * @param handler the handler to use for constraint testing
     * @param bodyParser a body parser
-    * @tparam A
     * @return
     */
   def SubjectNotPresent[A](handler: DeadboltHandler = handlers())

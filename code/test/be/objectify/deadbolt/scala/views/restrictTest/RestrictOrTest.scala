@@ -15,8 +15,8 @@
  */
 package be.objectify.deadbolt.scala.views.restrictTest
 
-import be.objectify.deadbolt.core.models.Subject
 import be.objectify.deadbolt.scala.AuthenticatedRequest
+import be.objectify.deadbolt.scala.models.Subject
 import be.objectify.deadbolt.scala.testhelpers.SecurityRole
 import be.objectify.deadbolt.scala.views.AbstractViewTest
 import be.objectify.deadbolt.scala.views.html.restrictTest.restrictOrContent

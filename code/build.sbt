@@ -10,8 +10,7 @@ scalaVersion := "2.11.7"
 
 libraryDependencies ++= Seq(
   cache,
-  specs2 % Test,
-  "be.objectify" %% "deadbolt-core" % "2.5.0-SNAPSHOT"
+  specs2 % Test
 )
 
 parallelExecution in Test := false

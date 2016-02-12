@@ -39,7 +39,7 @@ trait DynamicResourceHandler
                    request: AuthenticatedRequest[A]): Future[Boolean]
 
   /**
-   * Invoked when a pattern constraint with a [[be.objectify.deadbolt.core.PatternType#CUSTOM]] type is used.
+   * Invoked when a pattern constraint with a [[be.objectify.deadbolt.scala.models.PatternType.CUSTOM]] type is used.
    *
    * @param permissionValue the permission value
    * @param deadboltHandler the current { @link DeadboltHandler}

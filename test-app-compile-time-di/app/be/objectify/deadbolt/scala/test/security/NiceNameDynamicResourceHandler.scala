@@ -22,7 +22,7 @@ class NiceNameDynamicResourceHandler extends DynamicResourceHandler {
                             deadboltHandler: DeadboltHandler,
                             request: AuthenticatedRequest[A]): Future[Boolean] =
     deadboltHandler.getSubject(request).map {
-      case Some(subject) => subject.getIdentifier.contains("greet")
+      case Some(subject) => subject.identifier.contains("greet")
       case None => false
     }
 }

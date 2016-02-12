@@ -1,30 +1,28 @@
 package be.objectify.deadbolt.scala.test.dao
 
-import be.objectify.deadbolt.core.models.Subject
+import be.objectify.deadbolt.scala.models.Subject
 import be.objectify.deadbolt.scala.test.models.{SecurityPermission, SecurityRole, SecuritySubject}
-
-import scala.collection.JavaConversions._
 
 class TestSubjectDao extends SubjectDao {
 
   val subjects: Map[String, Subject] = Map("greet" -> new SecuritySubject("greet",
                                                                            List(SecurityRole("foo"),
-                                                                                 SecurityRole("bar")).toList,
-                                                                           List(SecurityPermission("killer.undead.zombie")).toList),
+                                                                                 SecurityRole("bar")),
+                                                                           List(SecurityPermission("killer.undead.zombie"))),
                                             "lotte" -> new SecuritySubject("lotte",
-                                                                            List(SecurityRole("hurdy")).toList,
-                                                                            List(SecurityPermission("killer.undead.vampire")).toList),
+                                                                            List(SecurityRole("hurdy")),
+                                                                            List(SecurityPermission("killer.undead.vampire"))),
                                             "steve" -> new SecuritySubject("steve",
-                                                                            List(SecurityRole("bar")).toList,
-                                                                            List(SecurityPermission("curator.museum.insects")).toList),
+                                                                            List(SecurityRole("bar")),
+                                                                            List(SecurityPermission("curator.museum.insects"))),
                                             "mani" -> new SecuritySubject("mani",
                                                                            List(SecurityRole("bar"),
-                                                                                 SecurityRole("hurdy")).toList,
-                                                                           List(SecurityPermission("zombie.movie.enthusiast")).toList),
+                                                                                 SecurityRole("hurdy")),
+                                                                           List(SecurityPermission("zombie.movie.enthusiast"))),
                                             "trippel" -> new SecuritySubject("trippel",
                                                                            List(SecurityRole("foo"),
-                                                                                 SecurityRole("hurdy")).toList,
-                                                                           List[SecurityPermission]().toList))
+                                                                                 SecurityRole("hurdy")),
+                                                                           List[SecurityPermission]()))
 
   override def user(userName: String): Option[Subject] = subjects.get(userName)
 }

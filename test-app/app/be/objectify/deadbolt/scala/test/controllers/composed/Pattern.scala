@@ -1,6 +1,6 @@
 package be.objectify.deadbolt.scala.test.controllers.composed
 
-import be.objectify.deadbolt.core.PatternType
+import be.objectify.deadbolt.scala.models.PatternType
 import be.objectify.deadbolt.scala.DeadboltActions
 import com.google.inject.Inject
 import play.api.mvc.Controller

@@ -25,7 +25,7 @@ import play.api.{Configuration, Environment}
 class DeadboltModule extends Module {
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = Seq(
     bind[PatternCache].to[DefaultPatternCache],
-    bind[ScalaAnalyzer].toSelf,
+    bind[StaticConstraintAnalyzer].toSelf,
     bind[DeadboltActions].toSelf,
     bind[ViewSupport].toSelf,
     bind[ActionBuilders].toSelf,

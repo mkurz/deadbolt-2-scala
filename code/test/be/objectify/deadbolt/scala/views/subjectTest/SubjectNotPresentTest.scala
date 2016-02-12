@@ -20,7 +20,6 @@ import be.objectify.deadbolt.scala.testhelpers.User
 import be.objectify.deadbolt.scala.views.AbstractViewTest
 import be.objectify.deadbolt.scala.views.html.subjectTest.subjectNotPresentContent
 import play.api.test.{FakeRequest, Helpers, WithApplication}
-import play.libs.Scala
 
 /**
  * @author Steve Chaloner (steve@objectify.be)
@@ -37,7 +36,7 @@ class SubjectNotPresentTest extends AbstractViewTest {
   }
 
   "hide constrained content when subject is present" in new WithApplication(testApp(handler(subject = Some(user())))) {
-    val user = new User("foo", Scala.asJava(List.empty), Scala.asJava(List.empty))
+    val user = new User("foo", List.empty, List.empty)
     val html = subjectNotPresentContent(AuthenticatedRequest(FakeRequest(), Some(user)))
 
     private val content: String = Helpers.contentAsString(html)

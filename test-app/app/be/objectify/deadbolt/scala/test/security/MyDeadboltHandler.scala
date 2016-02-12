@@ -1,6 +1,6 @@
 package be.objectify.deadbolt.scala.test.security
 
-import be.objectify.deadbolt.core.models.Subject
+import be.objectify.deadbolt.scala.models.Subject
 import be.objectify.deadbolt.scala.test.dao.SubjectDao
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltHandler, DynamicResourceHandler}
 import play.api.mvc.{Request, Result, Results}

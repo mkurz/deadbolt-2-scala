@@ -3,11 +3,10 @@ package be.objectify.deadbolt.scala.test
 import java.util.regex.Pattern
 
 import _root_.controllers.Assets
-import be.objectify.deadbolt.scala.{ExecutionContextProvider, TemplateFailureListener, TemplateFailureListenerProvider, DeadboltComponents}
+import be.objectify.deadbolt.scala.{ExecutionContextProvider, DeadboltComponents}
 import be.objectify.deadbolt.scala.cache.{PatternCache, HandlerCache}
 import be.objectify.deadbolt.scala.test.dao.{TestSubjectDao, SubjectDao}
-import be.objectify.deadbolt.scala.test.security.{MyCustomTemplateFailureListener, MyHandlerCache}
-import play.api.libs.ws.ning.NingWSComponents
+import be.objectify.deadbolt.scala.test.security.MyHandlerCache
 import play.api.{BuiltInComponentsFromContext, Application, ApplicationLoader}
 import play.api.ApplicationLoader.Context
 import play.api.routing.Router
@@ -24,7 +23,7 @@ class CompileTimeDiApplicationLoader extends ApplicationLoader  {
   override def load(context: Context): Application = new ApplicationComponents(context).application
 }
 
-class ApplicationComponents(context: Context) extends BuiltInComponentsFromContext(context) with DeadboltComponents with NingWSComponents {
+class ApplicationComponents(context: Context) extends BuiltInComponentsFromContext(context) with DeadboltComponents {
 
   lazy val subjectDao: SubjectDao = new TestSubjectDao
   

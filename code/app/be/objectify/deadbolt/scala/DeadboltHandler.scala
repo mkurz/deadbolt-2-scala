@@ -15,8 +15,8 @@
  */
 package be.objectify.deadbolt.scala
 
+import be.objectify.deadbolt.scala.models.Subject
 import play.api.mvc.{Request, Result}
-import be.objectify.deadbolt.core.models.Subject
 import scala.concurrent.Future
 
 /**

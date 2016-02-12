@@ -1,9 +1,6 @@
 package be.objectify.deadbolt.scala.test.dao
 
-import java.util.Collections
-
-import be.objectify.deadbolt.core.models.Subject
-import be.objectify.deadbolt.scala.test.models.SecuritySubject
+import be.objectify.deadbolt.scala.models.Subject
 
 /**
  * @author Steve Chaloner (steve@objectify.be)

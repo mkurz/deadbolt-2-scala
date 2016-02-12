@@ -15,7 +15,7 @@
  */
 package be.objectify.deadbolt.scala.cache
 
-import be.objectify.deadbolt.core.models.Subject
+import be.objectify.deadbolt.scala.models.Subject
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, HandlerKey, DynamicResourceHandler, DeadboltHandler}
 import play.api.mvc.{Result, Request}
 

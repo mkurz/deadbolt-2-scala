@@ -15,8 +15,7 @@
  */
 package be.objectify.deadbolt.scala.views.patternTest
 
-import be.objectify.deadbolt.core.PatternType
-import be.objectify.deadbolt.core.models.Subject
+import be.objectify.deadbolt.scala.models.{PatternType, Subject}
 import be.objectify.deadbolt.scala.{DynamicResourceHandler, AuthenticatedRequest}
 import be.objectify.deadbolt.scala.testhelpers.SecurityPermission
 import be.objectify.deadbolt.scala.views.{drh, AbstractViewTest}
