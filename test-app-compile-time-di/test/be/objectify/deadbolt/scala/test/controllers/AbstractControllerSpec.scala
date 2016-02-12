@@ -5,11 +5,11 @@ import java.io.File
 import akka.stream.Materializer
 import be.objectify.deadbolt.scala.test.CompileTimeDiApplicationLoader
 import play.api.inject.{DefaultApplicationLifecycle, ApplicationLifecycle}
-import play.api.libs.ws.ning.NingWSComponents
 import play.api._
+import play.api.libs.ws.ahc.AhcWSComponents
 import play.api.test.PlaySpecification
 
-abstract class AbstractControllerSpec extends PlaySpecification with PathSegmentProvider with NingWSComponents {
+abstract class AbstractControllerSpec extends PlaySpecification with PathSegmentProvider with AhcWSComponents {
   sequential
   isolated
 
