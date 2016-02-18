@@ -8,9 +8,9 @@ script:
 - sbt --warn ++$TRAVIS_SCALA_VERSION test
 - sbt --warn ++$TRAVIS_SCALA_VERSION publishLocal
 - cd ../test-app
-- sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.5.0-M2 test
+- sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.5.0-RC1 test
 - cd ../test-app-compile-time-di
-- sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.5.0-M2 test
+- sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.5.0-RC1 test
 - cd ../code
 after_success:
 - ! '[[ $TRAVIS_BRANCH == "master" ]] && { sbt publish; };'
