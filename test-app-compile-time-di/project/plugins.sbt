@@ -1,2 +1,2 @@
 // The Play plugin
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % System.getProperty("playTestVersion", "2.5.0-RC1"))
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % System.getProperty("playTestVersion", "2.5.0-RC2"))
