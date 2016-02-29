@@ -9,6 +9,53 @@ Deadbolt 2 comprises of several modules - a common core, and language-specific i
 
 All modules related to Deadbolt 2, including the user guide, are grouped together in the [Deadbolt 2](https://github.com/schaloner/deadbolt-2) Github super-module.  Installation information, including Deadbolt/Play compatibility, can also be found here.
 
+## An important note about Deadbolt 2.4.4
+
+One persistent question that keeps coming up is "how do I get the subject in an authorized action?".  As of Deadbolt 2.5, the request passed into an action has been replaced with an `AuthenticatedRequest` which contains an `Option[Subject]`.  As users of 2.4 also want this feature, it has been included in 2.4.4 as a breaking change.
+
+The following examples use `SubjectPresent` as an example, but the same change applies to all authorization constraints.
+
+#### Action builders
+In place of 
+
+    def index = actionBuilder.SubjectPresentAction().defaultHandler() { implicit request
+      Ok(accessOk()) 
+    }
+
+we now have
+
+    def index = actionBuilder.SubjectPresentAction().defaultHandler() { authRequest =>
+      Future {
+        Ok(accessOk()) 
+      }
+    }
+
+#### Action composition
+In place of 
+
+    def index = deadbolt.SubjectPresent() { implicit request
+        Action {
+            Ok(accessOk())
+        }
+    }
+
+we now have
+
+    def someFunctionA = deadbolt.SubjectPresent()() { authRequest =>
+      Future {
+        Ok("Content accessible")
+      }
+    }
+
+#### DeadboltHandler.getSubject()
+The `getSubject()` function of the `DeadboltHandler` trait now takes an `AuthenticatedRequest` instead of a `Request`.
+
+    override def getSubject[A](request: AuthenticatedRequest[A]): Future[Option[Subject]] = 
+      request.subject match {
+        case Some(user) => request.subject
+        case None => // get from database, identity platform, cache, whatever
+      }
+
 # Quickstart
 
 Deadbolt 2 is an authorization library for Play 2, and features APIs for both Java- and Scala-based applications.  It allows you to apply constraints to controller actions, and to customize template rendering based on the current user.
