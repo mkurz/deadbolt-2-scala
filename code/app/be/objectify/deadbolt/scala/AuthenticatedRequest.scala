@@ -36,6 +36,7 @@ object AuthenticatedRequest {
     def queryString = r.queryString
     def headers = r.headers
     def secure = r.secure
+    def clientCertificateChain = r.clientCertificateChain
     lazy val remoteAddress = r.remoteAddress
     val body = r.body
     val subject = s
