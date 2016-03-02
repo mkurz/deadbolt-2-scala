@@ -21,7 +21,9 @@ import play.api.Configuration
 import scala.concurrent.ExecutionContext
 
 /**
- *
+ * Individual components of Deadbolt.  Use this trait if your 
+ * application uses compile-time dependency injection.
+ * 
  * @author Steve Chaloner (steve@objectify.be)
  */
 trait DeadboltComponents {
