@@ -18,6 +18,7 @@ package be.objectify.deadbolt.scala
 import javax.inject.{Inject, Singleton}
 
 import be.objectify.deadbolt.scala.cache.HandlerCache
+import be.objectify.deadbolt.scala.composite.Constraint
 import be.objectify.deadbolt.scala.models.PatternType
 import play.api.mvc._
 
@@ -31,10 +32,10 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
   object RestrictAction {
 
-    def apply(roles: List[Array[String]]): RestrictAction.RestrictActionBuilder = RestrictActionBuilder(roles)
+    def apply(roles: RoleGroups): RestrictAction.RestrictActionBuilder = RestrictActionBuilder(roles)
     def apply(roles: String*): RestrictAction.RestrictActionBuilder = RestrictActionBuilder(List(roles.toArray))
 
-    case class RestrictActionBuilder(roles: List[Array[String]]) extends DeadboltActionBuilder {
+    case class RestrictActionBuilder(roles: RoleGroups) extends DeadboltActionBuilder {
 
       override def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
         deadboltActions.Restrict(roles, handler)(bodyParser)(block)
@@ -82,6 +83,17 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
       override def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
         deadboltActions.SubjectNotPresent(handler)(bodyParser)(block)
+    }
+  }
+
+  object CompositeAction {
+
+    def apply[A](constraint: Constraint[A]): CompositeAction.CompositeActionBuilder[A] = CompositeActionBuilder[A](constraint)
+
+    case class CompositeActionBuilder[A](constraint: Constraint[A]) extends DeadboltActionBuilder {
+
+      override def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
+        deadboltActions.Composite(handler, constraint)(bodyParser)(block)
     }
   }
 

@@ -18,7 +18,8 @@ package be.objectify.deadbolt.scala
 import javax.inject.{Inject, Singleton}
 
 import be.objectify.deadbolt.scala.cache.HandlerCache
-import be.objectify.deadbolt.scala.models.{PatternType, Subject}
+import be.objectify.deadbolt.scala.composite.Constraint
+import be.objectify.deadbolt.scala.models.PatternType
 import play.api.mvc._
 
 import scala.concurrent.Future
@@ -31,7 +32,8 @@ import scala.concurrent.Future
 @Singleton
 class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
                                 handlers: HandlerCache,
-                                ecProvider: ExecutionContextProvider) extends Results with BodyParsers {
+                                ecProvider: ExecutionContextProvider,
+                                logic: ConstraintLogic) extends Results with BodyParsers {
 
   val ec = ecProvider.get()
 
@@ -43,7 +45,7 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
     * @param bodyParser a body parser
     * @return
     */
-  def Restrict[A](roleNames: Array[String],
+  def Restrict[A](roleNames: RoleGroup,
                   handler: DeadboltHandler)
                  (bodyParser: BodyParser[A])
                  (block: AuthenticatedRequest[A] => Future[Result]): Action[A] = {
@@ -52,8 +54,8 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
   }
 
   /**
-    * Restrict access to an action to users that have all the specified roles within a given group.  Each group, which is
-    * an array of strings, is checked in turn.
+    * Restrict access to an action to users that have all the specified roles within a given group.
+    * Each group is checked in turn.
     *
     * @param roleGroups the constraints
     * @param handler the handler to use for constraint testing
@@ -61,32 +63,19 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
     * @param block the action functionality
     * @return
     */
-  def Restrict[A](roleGroups: List[Array[String]],
+  def Restrict[A](roleGroups: RoleGroups,
                   handler: DeadboltHandler = handlers())
                  (bodyParser: BodyParser[A] = parse.anyContent)
-                 (block: AuthenticatedRequest[A] => Future[Result]): Action[A] = {
-    def check(subject: Option[Subject], current: Array[String], remaining: List[Array[String]]): Boolean = {
-      if (analyzer.hasAllRoles(subject, current)) true
-      else if (remaining.isEmpty) false
-      else check(subject, remaining.head, remaining.tail)
-    }
-
+                 (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
     execute(handler,
-            bodyParser,
-            (authRequest: AuthenticatedRequest[A]) =>
-              if (roleGroups.isEmpty) handler.onAuthFailure(authRequest)
-              else {
-                handler.getSubject(authRequest).flatMap((subjectOption: Option[Subject]) =>
-                                                          subjectOption match {
-                                                            case Some(subject) =>
-                                                              val withSubject = AuthenticatedRequest(authRequest, subjectOption)
-                                                              if (check(subjectOption, roleGroups.head, roleGroups.tail)) block(withSubject)
-                                                              else handler.onAuthFailure(withSubject)
-                                                            case _ => handler.onAuthFailure(authRequest)
-                                                          })(ec)
-              })
+             bodyParser,
+             authRequest =>
+               logic.restrict(authRequest,
+                               handler,
+                               roleGroups,
+                               (ar: AuthenticatedRequest[A]) => block(ar),
+                               (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
 
-  }
 
   /**
     * Apply a dynamic constraint to a controller action.
@@ -103,23 +92,14 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
                  handler: DeadboltHandler = handlers())
                 (bodyParser: BodyParser[A] = parse.anyContent)
                 (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
-    execute(handler,
-            bodyParser,
-            (authRequest: AuthenticatedRequest[A]) =>
-              handler.getDynamicResourceHandler(authRequest).flatMap((drhOption: Option[DynamicResourceHandler]) => {
-                drhOption match {
-                  case Some(dynamicHandler) =>
-                    handler.getSubject(authRequest).flatMap(subjectOption => {
-                      val maybeWithSubject = AuthenticatedRequest(authRequest, subjectOption)
-                      dynamicHandler.isAllowed(name, meta, handler, maybeWithSubject).flatMap((allowed: Boolean) => allowed match {
-                        case true => block(maybeWithSubject)
-                        case false => handler.onAuthFailure(maybeWithSubject)
-                      })(ec)
-                    })(ec)
-                  case None =>
-                    throw new RuntimeException("A dynamic resource is specified but no dynamic resource handler is provided")
-                }
-              })(ec))
+  execute(handler,
+           bodyParser,
+           authRequest => logic.dynamic(authRequest,
+                                       handler,
+                                       name,
+                                       meta,
+                                       (ar: AuthenticatedRequest[A]) => block(ar),
+                                       (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
 
   /**
     *
@@ -137,38 +117,15 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
                  invert: Boolean = false)
                 (bodyParser: BodyParser[A] = parse.anyContent)
                 (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
-    execute(handler,
-            bodyParser,
-            (authRequest: AuthenticatedRequest[A]) =>
-              handler.getSubject(authRequest).flatMap((subjectOption: Option[Subject]) => subjectOption match {
-                case None => handler.onAuthFailure(authRequest)
-                case Some(subject) =>
-                  val withSubject = AuthenticatedRequest(authRequest, subjectOption)
-                  patternType match {
-                    case PatternType.EQUALITY =>
-                      val equal: Boolean = analyzer.checkPatternEquality(subjectOption, Option(value))
-                      if (if (invert) !equal else equal) block(withSubject)
-                      else handler.onAuthFailure(withSubject)
-                    case PatternType.REGEX =>
-                      val patternMatch: Boolean = analyzer.checkRegexPattern(subjectOption, Option(value))
-                      if (if (invert) !patternMatch else patternMatch) block(withSubject)
-                      else handler.onAuthFailure(withSubject)
-                    case PatternType.CUSTOM =>
-                      handler.getDynamicResourceHandler(authRequest).flatMap((drhOption: Option[DynamicResourceHandler]) => {
-                        drhOption match {
-                          case Some(dynamicHandler) =>
-                            dynamicHandler.checkPermission(value, handler, authRequest).flatMap((allowed: Boolean) => {
-                              (if (invert) !allowed else allowed) match {
-                                case true => block(withSubject)
-                                case false => handler.onAuthFailure(withSubject)
-                              }
-                            })(ec)
-                          case None =>
-                            throw new RuntimeException("A custom pattern is specified but no dynamic resource handler is provided")
-                        }
-                      })(ec)
-                  }
-              })(ec))
+  execute(handler,
+         bodyParser,
+           authRequest => logic.pattern(authRequest,
+                                       handler,
+                                       value,
+                                       patternType,
+                                       invert,
+                                       (ar: AuthenticatedRequest[A]) => block(ar),
+                                       (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
 
   /**
     * Allows access to the action if there is a subject present.
@@ -182,12 +139,11 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
                        (bodyParser: BodyParser[A] = parse.anyContent)
                        (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
     execute(handler,
-            bodyParser,
-            (authRequest: AuthenticatedRequest[A]) =>
-              handler.getSubject(authRequest).flatMap((subjectOption: Option[Subject]) => subjectOption match {
-                case Some(subject) => block(AuthenticatedRequest(authRequest, subjectOption))
-                case None => handler.onAuthFailure(AuthenticatedRequest(authRequest, subjectOption))
-              })(ec))
+             bodyParser,
+             authRequest => logic.subjectPresent(authRequest,
+                                                handler,
+                                                (ar: AuthenticatedRequest[A]) => block(ar),
+                                                (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
 
   /**
     * Denies access to the action if there is a subject present.
@@ -200,12 +156,31 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
                           (bodyParser: BodyParser[A] = parse.anyContent)
                           (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
     execute(handler,
+             bodyParser,
+             authRequest => logic.subjectPresent(authRequest,
+                                                  handler,
+                                                  (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar),
+                                                  (ar: AuthenticatedRequest[A]) => block(ar)))
+
+  /**
+    * Allows access if the composite constraint resolves to true..
+    *
+    * @param handler the handler to use for constraint testing
+    * @param bodyParser a body parser
+    * @return the action to take
+    */
+  def Composite[A](handler: DeadboltHandler = handlers(),
+                   constraint: Constraint[A])
+                  (bodyParser: BodyParser[A] = parse.anyContent)
+                  (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
+    execute(handler,
             bodyParser,
-            (authRequest: AuthenticatedRequest[A]) =>
-              handler.getSubject(authRequest).flatMap((subjectOption: Option[Subject]) => subjectOption match {
-                case Some(subject) => handler.onAuthFailure(AuthenticatedRequest(authRequest, subjectOption))
-                case None => block(AuthenticatedRequest(authRequest, subjectOption))
-              })(ec))
+            authRequest => constraint(authRequest,
+                                      handler)
+                           .flatMap(passed =>
+                                  if (passed) block(authRequest)
+                                  else handler.onAuthFailure(authRequest)
+                           )(ec))
 
   /**
     *
@@ -221,8 +196,7 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
       handler.beforeAuthCheck(authRequest).flatMap((beforeAuthOption: Option[Result]) =>
                                                      beforeAuthOption match {
                                                        case Some(result) => Future(result)(ec)
-                                                       case None =>
-                                                         block(authRequest)
+                                                       case None => block(authRequest)
                                                      })(ec)
                                                  }
 }

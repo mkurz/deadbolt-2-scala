@@ -92,16 +92,16 @@ class ViewSupport @Inject() (config: Configuration,
   /**
    * Used for restrict tags in the template.
    *
-   * @param roles a list of String arrays.  Within an array, the roles are ANDed.  The arrays in the list are OR'd, so
+   * @param roles a List of String arrays.  Within an array, the roles are ANDed.  The arrays in the list are OR'd, so
    *              the first positive hit will allow access.
    * @param deadboltHandler application hook
    * @return true if the view can be accessed, otherwise false
    */
-  def restrict(roles: List[Array[String]],
+  def restrict(roles: RoleGroups,
                deadboltHandler: DeadboltHandler,
                timeoutInMillis: Long,
                request: AuthenticatedRequest[Any]): Boolean = {
-    def check(analyzer: StaticConstraintAnalyzer, subject: Option[Subject], current: Array[String], remaining: List[Array[String]]): Boolean = {
+    def check(analyzer: StaticConstraintAnalyzer, subject: Option[Subject], current: RoleGroup, remaining: RoleGroups): Boolean = {
         if (analyzer.hasAllRoles(subject, current)) true
         else if (remaining.isEmpty) false
         else check(analyzer, subject, remaining.head, remaining.tail)

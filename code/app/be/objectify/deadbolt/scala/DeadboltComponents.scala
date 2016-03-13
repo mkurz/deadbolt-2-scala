@@ -43,9 +43,12 @@ trait DeadboltComponents {
   def templateFailureListenerProvider: TemplateFailureListenerProvider = defaultTemplateFailureListenerProvider
 
   lazy val scalaAnalyzer: StaticConstraintAnalyzer = new StaticConstraintAnalyzer(patternCache)
+  lazy val constraintLogic: ConstraintLogic = new ConstraintLogic(scalaAnalyzer,
+                                                                   defaultEcContextProvider)
   lazy val deadboltActions: DeadboltActions = new DeadboltActions(scalaAnalyzer,
                                                                   handlers,
-                                                                  ecContextProvider)
+                                                                  ecContextProvider,
+                                                                   constraintLogic)
   lazy val actionBuilders: ActionBuilders = new ActionBuilders(deadboltActions,
                                                                handlers)
   lazy val viewSupport: ViewSupport = new ViewSupport(configuration,
