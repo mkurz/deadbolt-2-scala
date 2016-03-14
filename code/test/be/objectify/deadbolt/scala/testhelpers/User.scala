@@ -20,4 +20,4 @@ import be.objectify.deadbolt.scala.models.{Subject, Permission, Role}
 /**
  * @author Steve Chaloner (steve@objectify.be)
  */
-case class User(identifier: String, roles: List[_ <: Role], permissions: List[_ <: Permission]) extends Subject
+case class User(identifier: String = "foo", roles: List[_ <: Role] = List.empty, permissions: List[_ <: Permission] = List.empty) extends Subject

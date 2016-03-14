@@ -31,10 +31,10 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
   object RestrictAction {
 
-    def apply(roles: List[Array[String]]): RestrictAction.RestrictActionBuilder = RestrictActionBuilder(roles)
+    def apply(roles: RoleGroups): RestrictAction.RestrictActionBuilder = RestrictActionBuilder(roles)
     def apply(roles: String*): RestrictAction.RestrictActionBuilder = RestrictActionBuilder(List(roles.toArray))
 
-    case class RestrictActionBuilder(roles: List[Array[String]]) extends DeadboltActionBuilder {
+    case class RestrictActionBuilder(roles: RoleGroups) extends DeadboltActionBuilder {
 
       override def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
         deadboltActions.Restrict(roles, handler)(bodyParser)(block)

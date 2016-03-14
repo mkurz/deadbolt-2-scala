@@ -58,7 +58,7 @@ class StaticConstraintAnalyzer @Inject()(patternCache: PatternCache) {
     * @return true iff the subject has all roles
     */
   def hasAllRoles(maybeSubject: Option[Subject],
-                  requiredRoleNames: Array[String]): Boolean = {
+                  requiredRoleNames: RoleGroup): Boolean = {
     def roleMatch(requiredRoleName: String,
                   subjectRoles: List[String]) = {
       val invert = requiredRoleName.startsWith("!")
