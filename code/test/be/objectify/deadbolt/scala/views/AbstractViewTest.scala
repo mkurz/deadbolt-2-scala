@@ -48,15 +48,15 @@ class AbstractViewTest extends PlaySpecification {
   def handler(beforeAuthCheck: Option[Result] = None,
               subject: Option[Subject] = None,
               onAuthFailure: Result = Results.Forbidden,
-              drh: Option[DynamicResourceHandler] = None): DeadboltHandler = new LightweightHandler(Future(beforeAuthCheck),
-                                                                                                    Future(subject),
-                                                                                                    Future(onAuthFailure),
-                                                                                                    Future(drh))
+              drh: Option[DynamicResourceHandler] = None): DeadboltHandler = new LightweightHandler(Future.successful(beforeAuthCheck),
+                                                                                                    Future.successful(subject),
+                                                                                                    Future.successful(onAuthFailure),
+                                                                                                    Future.successful(drh))
 }
 
 case class drh(allowed: Boolean, check: Boolean) extends DynamicResourceHandler {
-  override def isAllowed[A](name: String, meta: String, deadboltHandler: DeadboltHandler, request: AuthenticatedRequest[A]): Future[Boolean] = Future(allowed)
-  override def checkPermission[A](permissionValue: String, deadboltHandler: DeadboltHandler, request: AuthenticatedRequest[A]): Future[Boolean] = Future(check)
+  override def isAllowed[A](name: String, meta: String, deadboltHandler: DeadboltHandler, request: AuthenticatedRequest[A]): Future[Boolean] = Future.successful(allowed)
+  override def checkPermission[A](permissionValue: String, deadboltHandler: DeadboltHandler, request: AuthenticatedRequest[A]): Future[Boolean] = Future.successful(check)
 }
 
 case class BasicHandlerKey(name: String) extends HandlerKey

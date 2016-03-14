@@ -46,8 +46,8 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
         val result: Future[Boolean] = logic.restrict(request(None),
                                                       handler(None),
                                                       List(Array("foo")),
-                                                      pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                      fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                      pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                      fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
         await(result) should beFalse
       }
       "the subject has no roles" >> {
@@ -55,8 +55,8 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
         val result: Future[Boolean] = logic.restrict(request(subject),
                                                       handler(subject),
                                                       List(Array("foo")),
-                                                      pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                      fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                      pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                      fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
         await(result) should beFalse
       }
       "the subject has all required roles but one required role is negated" >> {
@@ -64,8 +64,8 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
         val result: Future[Boolean] = logic.restrict(request(subject),
                                                       handler(subject),
                                                       List(Array("admin", "!editor")),
-                                                      pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                      fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                      pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                      fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
         await(result) should beFalse
       }
       "the subject has all but one of the required roles" >> {
@@ -73,8 +73,8 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
         val result: Future[Boolean] = logic.restrict(request(subject),
                                                       handler(subject),
                                                       List(Array("admin", "editor", "foo")),
-                                                      pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                      fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                      pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                      fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
         await(result) should beFalse
       }
       "there are no required roles" >> {
@@ -82,8 +82,8 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
         val result: Future[Boolean] = logic.restrict(request(subject),
                                                       handler(subject),
                                                       List(Array()),
-                                                      pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                      fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                      pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                      fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
         await(result) should beFalse
       }
       "there are no role matches" >> {
@@ -91,8 +91,8 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
         val result: Future[Boolean] = logic.restrict(request(subject),
                                                       handler(subject),
                                                       List(Array("foo", "bar")),
-                                                      pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                      fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                      pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                      fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
         await(result) should beFalse
       }
     }
@@ -102,8 +102,8 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
         val result: Future[Boolean] = logic.restrict(request(subject),
                                                       handler(subject),
                                                       List(Array("admin", "editor")),
-                                                      pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                      fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                      pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                      fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
         await(result) should beTrue
       }
       "the subject has all required roles plus others" >> {
@@ -111,8 +111,8 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
         val result: Future[Boolean] = logic.restrict(request(subject),
                                                       handler(subject),
                                                       List(Array("admin", "editor")),
-                                                      pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                      fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                      pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                      fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
         await(result) should beTrue
       }
     }
@@ -127,8 +127,8 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
                                                        "[ABC]",
                                                        PatternType.REGEX,
                                                        invert = false,
-                                                       pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                       fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                       pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                       fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
           await(result) should beFalse
         }
         "none of the permissions match the regular expression" >> {
@@ -138,8 +138,8 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
                                                        "[ABC]",
                                                        PatternType.REGEX,
                                                        invert = false,
-                                                       pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                       fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                       pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                       fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
           await(result) should beFalse
         }
         "the subject has no permissions" >> {
@@ -149,8 +149,8 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
                                                        "[ABC]",
                                                        PatternType.REGEX,
                                                        invert = false,
-                                                       pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                       fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                       pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                       fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
           await(result) should beFalse
         }
       }
@@ -162,8 +162,8 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
                                                        "[ABC]",
                                                        PatternType.REGEX,
                                                        invert = false,
-                                                       pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                       fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                       pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                       fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
           await(result) should beTrue
         }
         "the subject has one permission that matches the regular expression, plus others" >> {
@@ -173,8 +173,8 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
                                                        "[ABC]",
                                                        PatternType.REGEX,
                                                        invert = false,
-                                                       pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                       fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                       pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                       fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
           await(result) should beTrue
         }
       }
@@ -188,8 +188,8 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
                                                        "foo",
                                                        PatternType.EQUALITY,
                                                        invert = false,
-                                                       pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                       fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                       pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                       fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
           await(result) should beFalse
         }
         "none of the permissions equal the pattern value" >> {
@@ -199,8 +199,8 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
                                                        "foo",
                                                        PatternType.EQUALITY,
                                                        invert = false,
-                                                       pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                       fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                       pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                       fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
           await(result) should beFalse
         }
         "the subject has no permissions" >> {
@@ -210,8 +210,8 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
                                                        "foo",
                                                        PatternType.EQUALITY,
                                                        invert = false,
-                                                       pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                       fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                       pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                       fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
           await(result) should beFalse
         }
       }
@@ -223,8 +223,8 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
                                                        "foo",
                                                        PatternType.EQUALITY,
                                                        invert = false,
-                                                       pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                       fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                       pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                       fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
           await(result) should beTrue
         }
         "the subject has one permission that equals the pattern value, plus others" >> {
@@ -234,8 +234,8 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
                                                        "foo",
                                                        PatternType.EQUALITY,
                                                        invert = false,
-                                                       pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                       fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                       pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                       fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
           await(result) should beTrue
         }
       }
@@ -251,22 +251,22 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
                          "foo",
                          PatternType.CUSTOM,
                          invert = false,
-                         pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                         fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                         pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                         fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
           await(result) must throwA(new RuntimeException("A custom pattern is specified but no dynamic resource handler is provided"))
         }
         "checkPermission returns false" >> {
           val subject = Some(User())
           val drh = mock[DynamicResourceHandler]
           val dh = handler(subject, Some(drh))
-          drh.checkPermission(Matchers.eq("foo"), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future {false}(ec)
+          drh.checkPermission(Matchers.eq("foo"), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future.successful(false)
           val result: Future[Boolean] = logic.pattern(request(subject),
                                                        dh,
                                                        "foo",
                                                        PatternType.CUSTOM,
                                                        invert = false,
-                                                       pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                       fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                       pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                       fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
           await(result) should beFalse
         }
       }
@@ -275,14 +275,14 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
           val subject = Some(User())
           val drh = mock[DynamicResourceHandler]
           val dh = handler(subject, Some(drh))
-          drh.checkPermission(Matchers.eq("foo"), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future {true}(ec)
+          drh.checkPermission(Matchers.eq("foo"), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future.successful(true)
           val result: Future[Boolean] = logic.pattern(request(subject),
                                                        dh,
                                                        "foo",
                                                        PatternType.CUSTOM,
                                                        invert = false,
-                                                       pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                       fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                       pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                       fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
           await(result) should beTrue
 
         }
@@ -298,21 +298,21 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
                                                      handler(subject, None),
                                                      "foo",
                                                      "bar",
-                                                     pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                     fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                     pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                     fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
         await(result) must throwA(new RuntimeException("A dynamic resource is specified but no dynamic resource handler is provided"))
       }
       "isAllowed returns false" >> {
         val subject = Some(User())
         val drh = mock[DynamicResourceHandler]
         val dh = handler(subject, Some(drh))
-        drh.isAllowed(Matchers.eq("foo"), Matchers.eq("bar"), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future {false}(ec)
+        drh.isAllowed(Matchers.eq("foo"), Matchers.eq("bar"), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future.successful(false)
         val result: Future[Boolean] = logic.dynamic(request(subject),
                                                      dh,
                                                      "foo",
                                                      "bar",
-                                                     pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                     fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                     pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                     fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
         await(result) should beFalse
       }
     }
@@ -326,8 +326,8 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
                                                      dh,
                                                      "foo",
                                                      "bar",
-                                                     pass = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                     fail = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                     pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                     fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
         await(result) should beTrue
 
       }
@@ -339,15 +339,15 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
       val subject = Some(User())
       val result: Future[Boolean] = logic.subjectPresent(request(subject),
                                                           handler(subject),
-                                                          present = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                          notPresent = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                          present = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                          notPresent = (ar: AuthenticatedRequest[_]) => Future.successful(false))
       await(result) should beTrue
     }
     "invoke the notPresent function when a subject is not present" >> {
       val result: Future[Boolean] = logic.subjectPresent(request(None),
                                                           handler(None),
-                                                          present = (ar: AuthenticatedRequest[_]) => Future(true)(ec),
-                                                          notPresent = (ar: AuthenticatedRequest[_]) => Future(false)(ec))
+                                                          present = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                          notPresent = (ar: AuthenticatedRequest[_]) => Future.successful(false))
       await(result) should beFalse
     }
   }
