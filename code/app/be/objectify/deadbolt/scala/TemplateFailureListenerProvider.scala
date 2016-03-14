@@ -15,9 +15,9 @@
  */
 package be.objectify.deadbolt.scala
 
-import javax.inject.{Singleton, Provider}
+import javax.inject.{Inject, Provider, Singleton}
 
-import play.api.{Logger, Play}
+import play.api.{Application, Logger}
 
 import scala.util.{Failure, Success, Try}
 
@@ -33,11 +33,11 @@ trait TemplateFailureListenerProvider extends Provider[TemplateFailureListener]
  * for a [[TemplateFailureListener]] instance.
  */
 @Singleton
-class DefaultTemplateFailureListenerProvider extends TemplateFailureListenerProvider {
+class DefaultTemplateFailureListenerProvider @Inject() (appProvider: Provider[Application]) extends TemplateFailureListenerProvider {
 
   val logger: Logger = Logger("deadbolt.template")
 
-  override def get(): TemplateFailureListener = Try(Play.current.injector.instanceOf[TemplateFailureListener]) match {
+  override def get(): TemplateFailureListener = Try(appProvider.get().injector.instanceOf[TemplateFailureListener]) match {
     case Success(listener) =>
       logger.info(s"Custom TemplateFailureListener found: $listener")
       listener
