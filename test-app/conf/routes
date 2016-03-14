@@ -36,3 +36,10 @@ GET        /composed/restrict/fooOrNotBar                     be.objectify.deadb
 
 GET        /composed/subject/mustBePresent                    be.objectify.deadbolt.scala.test.controllers.composed.Subject.subjectMustBePresent()
 GET        /composed/subject/mustNotBePresent                 be.objectify.deadbolt.scala.test.controllers.composed.Subject.subjectMustNotBePresent()
+
+GET        /composed/composite/subjectNotPresent              be.objectify.deadbolt.scala.test.controllers.composed.Composite.subjectNotPresent()
+GET        /composed/composite/subjectHasPermission           be.objectify.deadbolt.scala.test.controllers.composed.Composite.subjectHasPermission()
+GET        /composed/composite/subjectDoesNotHavePermission   be.objectify.deadbolt.scala.test.controllers.composed.Composite.subjectDoesNotHavePermission()
+GET        /composed/composite/roleButNotDynamic              be.objectify.deadbolt.scala.test.controllers.composed.Composite.hasRoleFooAndDoesNotPassDynamic(meta = "failDyn")
+GET        /composed/composite/noRoleButPassesDynamic         be.objectify.deadbolt.scala.test.controllers.composed.Composite.doesNothaveRoleFooAndPassesDynamic(meta = "passDyn")
+GET        /composed/composite/hasRoleAndPassesDynamic        be.objectify.deadbolt.scala.test.controllers.composed.Composite.hasRoleFooAndPassesDynamic(meta = "passDyn")

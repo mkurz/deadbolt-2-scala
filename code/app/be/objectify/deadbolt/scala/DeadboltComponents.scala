@@ -16,6 +16,7 @@
 package be.objectify.deadbolt.scala
 
 import be.objectify.deadbolt.scala.cache.{HandlerCache, PatternCache}
+import be.objectify.deadbolt.scala.composite.CompositeConstraints
 import play.api.Configuration
 
 import scala.concurrent.ExecutionContext
@@ -56,4 +57,6 @@ trait DeadboltComponents {
                                                       patternCache,
                                                       templateFailureListenerProvider,
                                                       ecContextProvider)
+  lazy val compositeConstraints: CompositeConstraints = new CompositeConstraints(constraintLogic,
+                                                                                 ecContextProvider)
 }
