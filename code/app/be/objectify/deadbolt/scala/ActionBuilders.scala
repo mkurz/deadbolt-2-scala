@@ -43,9 +43,9 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
   object DynamicAction {
 
-    def apply(name: String, meta: String = ""): DynamicAction.DynamicActionBuilder = DynamicActionBuilder(name, meta)
+    def apply(name: String, meta: Option[Any] = None): DynamicAction.DynamicActionBuilder = DynamicActionBuilder(name, meta)
 
-    case class DynamicActionBuilder(name: String, meta: String = "") extends DeadboltActionBuilder {
+    case class DynamicActionBuilder(name: String, meta: Option[Any] = None) extends DeadboltActionBuilder {
 
       override def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
         deadboltActions.Dynamic(name, meta, handler)(bodyParser)(block)
@@ -54,12 +54,12 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
   object PatternAction {
 
-    def apply(value: String, patternType: PatternType, invert: Boolean = false): PatternAction.PatternActionBuilder = PatternActionBuilder(value, patternType, invert)
+    def apply(value: String, patternType: PatternType, meta: Option[Any] = None, invert: Boolean = false): PatternAction.PatternActionBuilder = PatternActionBuilder(value, patternType, meta, invert)
 
-    case class PatternActionBuilder(value: String, patternType: PatternType = PatternType.EQUALITY, invert: Boolean = false) extends DeadboltActionBuilder {
+    case class PatternActionBuilder(value: String, patternType: PatternType = PatternType.EQUALITY, meta: Option[Any] = None, invert: Boolean = false) extends DeadboltActionBuilder {
 
       override def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
-        deadboltActions.Pattern(value, patternType, handler, invert)(bodyParser)(block)
+        deadboltActions.Pattern(value, patternType, meta, handler, invert)(bodyParser)(block)
     }
   }
 

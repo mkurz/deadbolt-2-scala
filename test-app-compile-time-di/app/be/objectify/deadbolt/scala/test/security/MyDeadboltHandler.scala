@@ -13,7 +13,8 @@ import scala.concurrent.Future
  */
 class MyDeadboltHandler(subjectDao: SubjectDao) extends DeadboltHandler {
 
-  val dynamicHandler: Option[DynamicResourceHandler] = Some(new CompositeDynamicResourceHandler(Map("niceName" -> new NiceNameDynamicResourceHandler)))
+  val dynamicHandler: Option[DynamicResourceHandler] = Some(new CompositeDynamicResourceHandler(Map("niceName" -> new NiceNameDynamicResourceHandler,
+                                                                                                    "useMetaInfo" -> new UseMetaHintDynamicResourceHandler)))
 
   override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = Future(None)
 

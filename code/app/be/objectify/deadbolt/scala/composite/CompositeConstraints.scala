@@ -13,13 +13,9 @@ class CompositeConstraints @Inject()(logic: ConstraintLogic, ecProvider: Executi
 
   val ec = ecProvider.get()
 
-  private def allow[A](request: AuthenticatedRequest[A]): Future[Boolean] = Future {
-                                                                                     true
-                                                                                   }(ec)
+  private def allow[A](request: AuthenticatedRequest[A]): Future[Boolean] = Future.successful(true)
 
-  private def deny[A](request: AuthenticatedRequest[A]): Future[Boolean] = Future {
-                                                                                    false
-                                                                                  }(ec)
+  private def deny[A](request: AuthenticatedRequest[A]): Future[Boolean] = Future.successful(false)
 
   case class Restrict[A](roleGroups: RoleGroups) extends Constraint[A] {
     override def apply(authRequest: AuthenticatedRequest[A],
@@ -32,7 +28,7 @@ class CompositeConstraints @Inject()(logic: ConstraintLogic, ecProvider: Executi
   }
 
   case class Dynamic[A](name: String,
-                        meta: String) extends Constraint[A] {
+                        meta: Option[Any] = None) extends Constraint[A] {
     override def apply(authRequest: AuthenticatedRequest[A],
                        handler: DeadboltHandler): Future[Boolean] = {
       logic.dynamic(authRequest,
@@ -46,6 +42,7 @@ class CompositeConstraints @Inject()(logic: ConstraintLogic, ecProvider: Executi
 
   case class Pattern[A](value: String,
                         patternType: PatternType,
+                        meta: Option[Any] = None,
                         invert: Boolean = false) extends Constraint[A] {
     override def apply(authRequest: AuthenticatedRequest[A],
                        handler: DeadboltHandler): Future[Boolean] =
@@ -53,6 +50,7 @@ class CompositeConstraints @Inject()(logic: ConstraintLogic, ecProvider: Executi
                     handler,
                     value,
                     patternType,
+                    meta,
                     invert,
                     (ar: AuthenticatedRequest[A]) => allow(ar),
                     (ar: AuthenticatedRequest[A]) => deny(ar))
@@ -78,9 +76,7 @@ class CompositeConstraints @Inject()(logic: ConstraintLogic, ecProvider: Executi
 
   private case class Deny[A]() extends Constraint[A] {
     override def apply(authRequest: AuthenticatedRequest[A],
-                       handler: DeadboltHandler): Future[Boolean] = Future {
-                                                                             false
-                                                                           }(ec)
+                       handler: DeadboltHandler): Future[Boolean] = Future.successful(false)
   }
 
   case class ConstraintTree[A](operator: Operator[A],

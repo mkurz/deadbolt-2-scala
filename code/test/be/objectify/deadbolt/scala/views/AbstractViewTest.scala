@@ -55,8 +55,8 @@ class AbstractViewTest extends PlaySpecification {
 }
 
 case class drh(allowed: Boolean, check: Boolean) extends DynamicResourceHandler {
-  override def isAllowed[A](name: String, meta: String, deadboltHandler: DeadboltHandler, request: AuthenticatedRequest[A]): Future[Boolean] = Future.successful(allowed)
-  override def checkPermission[A](permissionValue: String, deadboltHandler: DeadboltHandler, request: AuthenticatedRequest[A]): Future[Boolean] = Future.successful(check)
+  override def isAllowed[A](name: String, meta: Option[Any], deadboltHandler: DeadboltHandler, request: AuthenticatedRequest[A]): Future[Boolean] = Future.successful(allowed)
+  override def checkPermission[A](permissionValue: String, meta: Option[Any], deadboltHandler: DeadboltHandler, request: AuthenticatedRequest[A]): Future[Boolean] = Future.successful(check)
 }
 
 case class BasicHandlerKey(name: String) extends HandlerKey

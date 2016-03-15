@@ -63,6 +63,7 @@ class Pattern @Inject()(actionBuilder: ActionBuilders) extends Controller {
   def invertedRegex_zombieKillersOnly =
     actionBuilder.PatternAction(value = "killer.undead.zombie",
                                 patternType = PatternType.REGEX,
+                                meta = None,
                                 invert = true)
     .defaultHandler() { authRequest =>
       Future {
@@ -82,6 +83,7 @@ class Pattern @Inject()(actionBuilder: ActionBuilders) extends Controller {
   def invertedRegex_anyKillersOfTheUndeadWelcome =
     actionBuilder.PatternAction(value = "killer.undead.*",
                                 patternType = PatternType.REGEX,
+                                meta = None,
                                 invert = true)
     .defaultHandler() { authRequest =>
       Future {

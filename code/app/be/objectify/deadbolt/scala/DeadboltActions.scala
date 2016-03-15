@@ -88,7 +88,7 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
     * @return the action to take
     */
   def Dynamic[A](name: String,
-                 meta: String = "",
+                 meta: Option[Any] = None,
                  handler: DeadboltHandler = handlers())
                 (bodyParser: BodyParser[A] = parse.anyContent)
                 (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
@@ -113,6 +113,7 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
     */
   def Pattern[A](value: String,
                  patternType: PatternType = PatternType.EQUALITY,
+                 meta: Option[Any] = None,
                  handler: DeadboltHandler = handlers(),
                  invert: Boolean = false)
                 (bodyParser: BodyParser[A] = parse.anyContent)
@@ -123,6 +124,7 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
                                          handler,
                                          value,
                                          patternType,
+                                         meta,
                                          invert,
                                          (ar: AuthenticatedRequest[A]) => block(ar),
                                          (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))

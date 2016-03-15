@@ -39,7 +39,7 @@ class ConstraintLogic @Inject()(analyzer: StaticConstraintAnalyzer,
   def dynamic[A, B](authRequest: AuthenticatedRequest[A],
                     handler: DeadboltHandler,
                     name: String,
-                    meta: String,
+                    meta: Option[Any] = None,
                     pass: AuthenticatedRequest[A] => Future[B],
                     fail: AuthenticatedRequest[A] => Future[B]): Future[B] =
     handler.getDynamicResourceHandler(authRequest).flatMap((drhOption: Option[DynamicResourceHandler]) => {
@@ -61,6 +61,7 @@ class ConstraintLogic @Inject()(analyzer: StaticConstraintAnalyzer,
                     handler: DeadboltHandler,
                     value: String,
                     patternType: PatternType,
+                    meta: Option[Any] = None,
                     invert: Boolean,
                     pass: AuthenticatedRequest[A] => Future[B],
                     fail: AuthenticatedRequest[A] => Future[B]): Future[B] =
@@ -81,7 +82,7 @@ class ConstraintLogic @Inject()(analyzer: StaticConstraintAnalyzer,
             handler.getDynamicResourceHandler(authRequest).flatMap((drhOption: Option[DynamicResourceHandler]) => {
               drhOption match {
                 case Some(dynamicHandler) =>
-                  dynamicHandler.checkPermission(value, handler, authRequest).flatMap((allowed: Boolean) => {
+                  dynamicHandler.checkPermission(value, meta, handler, authRequest).flatMap((allowed: Boolean) => {
                     (if (invert) !allowed else allowed) match {
                       case true => pass(withSubject)
                       case false => fail(withSubject)

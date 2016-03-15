@@ -14,6 +14,7 @@ class CompositeDynamicResourceHandler(delegates: Map[String, DynamicResourceHand
   val logger: Logger = Logger(this.getClass)
 
   override def checkPermission[A](permissionValue: String,
+                                  meta: Option[Any],
                                   deadboltHandler: DeadboltHandler,
                                   request: AuthenticatedRequest[A]): Future[Boolean] = {
     deadboltHandler.getSubject(request)
@@ -25,7 +26,7 @@ class CompositeDynamicResourceHandler(delegates: Map[String, DynamicResourceHand
   }
 
   override def isAllowed[A](name: String,
-                            meta: String,
+                            meta: Option[Any],
                             deadboltHandler: DeadboltHandler,
                             request: AuthenticatedRequest[A]): Future[Boolean] =
     delegates.get(name) match {

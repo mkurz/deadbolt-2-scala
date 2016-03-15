@@ -38,8 +38,8 @@ class MyCompositeConstraints @Inject()(constraints: CompositeConstraints,
                                                                                               constraints.Pattern("killer.undead.zombie",
                                                                                                                   PatternType.REGEX,
                                                                                                                   invert = false)))
-  def hasRoleFooAndPassesDynamic[A](meta: String = ""): Constraint[A] = constraints.ConstraintTree[A](&&(ec),
-                                                                                                      List(constraints.Restrict(List(Array("foo"))),
-                                                                                                           constraints.Dynamic(name = "bar",
-                                                                                                                               meta = meta)))
+  def hasRoleFooAndPassesDynamic[A](meta: Option[Any] = None): Constraint[A] = constraints.ConstraintTree[A](&&(ec),
+                                                                                                             List(constraints.Restrict(List(Array("foo"))),
+                                                                                                                  constraints.Dynamic(name = "useMetaInfo",
+                                                                                                                                      meta = meta)))
 }

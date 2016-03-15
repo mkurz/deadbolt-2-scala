@@ -34,7 +34,7 @@ trait DynamicResourceHandler
    * @return true if access to the resource is allowed, otherwise false
    */
   def isAllowed[A](name: String,
-                   meta: String,
+                   meta: Option[Any] = None,
                    deadboltHandler: DeadboltHandler,
                    request: AuthenticatedRequest[A]): Future[Boolean]
 
@@ -42,11 +42,13 @@ trait DynamicResourceHandler
    * Invoked when a pattern constraint with a [[be.objectify.deadbolt.scala.models.PatternType.CUSTOM]] type is used.
    *
    * @param permissionValue the permission value
+   * @param meta additional information on the resource
    * @param deadboltHandler the current { @link DeadboltHandler}
    * @param request the current request
    * @return true if access based on the permission is  allowed, otherwise false
    */
   def checkPermission[A](permissionValue: String,
+                         meta: Option[Any] = None,
                          deadboltHandler: DeadboltHandler,
                          request: AuthenticatedRequest[A]): Future[Boolean]
 }

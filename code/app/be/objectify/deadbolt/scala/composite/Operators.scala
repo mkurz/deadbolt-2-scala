@@ -13,7 +13,7 @@ object Operators {
       (request: AuthenticatedRequest[A],
        handler: DeadboltHandler) =>
         c1(request, handler).flatMap((passed: Boolean) =>
-          if (passed) c2(request, handler) else Future {false}(ec))(ec)
+          if (passed) c2(request, handler) else Future.successful(false))(ec)
   }
 
   case class ||[A](ec: ExecutionContext) extends Operator[A] {

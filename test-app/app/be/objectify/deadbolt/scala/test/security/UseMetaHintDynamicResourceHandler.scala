@@ -2,28 +2,27 @@ package be.objectify.deadbolt.scala.test.security
 
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltHandler, DynamicResourceHandler}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /**
- * Dedicated handler to look for people with the same name as my wife.
+ * Uses the meta parameter to determine if access is allowed.
  *
  * @author Steve Chaloner (steve@objectify.be)
  */
-class NiceNameDynamicResourceHandler extends DynamicResourceHandler {
+class UseMetaHintDynamicResourceHandler extends DynamicResourceHandler {
 
   // the composite handler doesn't delegate checkPermission, so we can just return false here
   override def checkPermission[A](permissionValue: String,
                                   meta: Option[Any],
                                   deadboltHandler: DeadboltHandler,
-                                  request: AuthenticatedRequest[A]): Future[Boolean] = Future(false)
+                                  request: AuthenticatedRequest[A]): Future[Boolean] = Future.successful{false}
 
   override def isAllowed[A](name: String,
                             meta: Option[Any],
                             deadboltHandler: DeadboltHandler,
                             request: AuthenticatedRequest[A]): Future[Boolean] =
-    deadboltHandler.getSubject(request).map {
-      case Some(subject) => subject.identifier.contains("greet")
-      case None => false
-    }
+  meta match {
+    case metaInf: Some[String] => Future.successful{meta.exists(m => "passDyn".equals(m))}
+    case _ => Future.successful{false}
+  }
 }

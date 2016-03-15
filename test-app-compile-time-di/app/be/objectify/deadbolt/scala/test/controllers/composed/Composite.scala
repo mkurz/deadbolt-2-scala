@@ -37,24 +37,24 @@ class Composite @Inject()(deadbolt: DeadboltActions,
              }
                                                                                              }
 
-  def hasRoleFooAndDoesNotPassDynamic(meta: String) = deadbolt.Composite(constraint = compositeConstraints.hasRoleFooAndPassesDynamic(meta))() { authRequest =>
+  def hasRoleFooAndDoesNotPassDynamic(meta: String) = deadbolt.Composite(constraint = compositeConstraints.hasRoleFooAndPassesDynamic(Some(meta)))() { authRequest =>
     Future {
              Ok(
                "Content accessible")
            }
-                                                                                                                                               }
+                                                                                                                                                     }
 
-  def doesNothaveRoleFooAndPassesDynamic(meta: String) = deadbolt.Composite(constraint = compositeConstraints.hasRoleFooAndPassesDynamic(meta))() { authRequest =>
+  def doesNothaveRoleFooAndPassesDynamic(meta: String) = deadbolt.Composite(constraint = compositeConstraints.hasRoleFooAndPassesDynamic(Some(meta)))() { authRequest =>
     Future {
              Ok(
                "Content accessible")
            }
-                                                                                                                                                  }
+                                                                                                                                                        }
 
-  def hasRoleFooAndPassesDynamic(meta: String) = deadbolt.Composite(constraint = compositeConstraints.hasRoleFooAndPassesDynamic(meta))() { authRequest =>
+  def hasRoleFooAndPassesDynamic(meta: String) = deadbolt.Composite(constraint = compositeConstraints.hasRoleFooAndPassesDynamic(Some(meta)))() { authRequest =>
     Future {
              Ok(
                "Content accessible")
            }
-                                                                                                                                          }
+                                                                                                                                                }
 }

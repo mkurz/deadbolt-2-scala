@@ -16,7 +16,7 @@ class DynamicOrTest extends AbstractViewTest {
   "When using the DynamicOr constraint" should {
     "when allowed by the dynamic handler, the view" should {
       "show constrained content and hide fallback content" in new WithApplication(testApp(handler(drh = drhAllow))) {
-        val html = dynamicOrContent(name = "the name of this constraint", meta = "some additional info")(AuthenticatedRequest(FakeRequest(), None))
+        val html = dynamicOrContent(name = "the name of this constraint", meta = Some("some additional info"))(AuthenticatedRequest(FakeRequest(), None))
 
         private val content: String = Helpers.contentAsString(html)
         content must contain("This is before the constraint.")
@@ -28,7 +28,7 @@ class DynamicOrTest extends AbstractViewTest {
 
     "when denied by the dynamic handler, the view" should {
       "hide constrained content and show fallback content" in new WithApplication(testApp(handler(drh = drhDeny))) {
-        val html = dynamicOrContent(name = "the name of this constraint", meta = "some additional info")(AuthenticatedRequest(FakeRequest(), None))
+        val html = dynamicOrContent(name = "the name of this constraint", meta = Some("some additional info"))(AuthenticatedRequest(FakeRequest(), None))
 
         private val content: String = Helpers.contentAsString(html)
         content must contain("This is before the constraint.")

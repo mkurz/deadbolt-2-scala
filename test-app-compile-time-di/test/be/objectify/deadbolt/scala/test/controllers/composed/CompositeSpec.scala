@@ -44,7 +44,7 @@ class CompositeSpec extends AbstractControllerSpec with CompositionBased {
       "the required role is held and the dynamic check passes" in new WithServer(app = app, port = 3333) {
         await(wsApi.url(s"http://localhost:3333/$pathSegment/composite/hasRoleAndPassesDynamic")
               .withHeaders(("x-deadbolt-test-user", "trippel"))
-              .get()).status must equalTo(UNAUTHORIZED)
+              .get()).status must equalTo(OK)
       }
     }
   }

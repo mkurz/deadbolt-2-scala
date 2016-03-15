@@ -104,22 +104,25 @@ object CompositeConstraintsTest extends PlaySpecification with Mockito {
       "return false when " >> {
         "maybeSubject is None" >> {
           val result = constraints.Pattern("[ABC]",
-                                            PatternType.REGEX,
-                                            invert = false)(request(None), handler(None))
+                                           PatternType.REGEX,
+                                           meta = None,
+                                           invert = false)(request(None), handler(None))
           await(result) should beFalse
         }
         "none of the permissions match the regular expression" >> {
           val subject = Some(User(permissions = List(SecurityPermission("D"))))
           val result = constraints.Pattern("[ABC]",
-                                            PatternType.REGEX,
-                                            invert = false)(request(subject), handler(subject))
+                                           PatternType.REGEX,
+                                           meta = None,
+                                           invert = false)(request(subject), handler(subject))
           await(result) should beFalse
         }
         "the subject has no permissions" >> {
           val subject = Some(User())
           val result = constraints.Pattern("[ABC]",
-                                            PatternType.REGEX,
-                                            invert = false)(request(subject), handler(subject))
+                                           PatternType.REGEX,
+                                           meta = None,
+                                           invert = false)(request(subject), handler(subject))
           await(result) should beFalse
         }
       }
@@ -127,15 +130,17 @@ object CompositeConstraintsTest extends PlaySpecification with Mockito {
         "the subject has one permission that matches the regular expression" >> {
           val subject = Some(User(permissions = List(SecurityPermission("B"))))
           val result = constraints.Pattern("[ABC]",
-                                            PatternType.REGEX,
-                                            invert = false)(request(subject), handler(subject))
+                                           PatternType.REGEX,
+                                           meta = None,
+                                           invert = false)(request(subject), handler(subject))
           await(result) should beTrue
         }
         "the subject has one permission that matches the regular expression, plus others" >> {
           val subject = Some(User(permissions = List(SecurityPermission("B"), SecurityPermission("D"))))
           val result = constraints.Pattern("[ABC]",
-                                            PatternType.REGEX,
-                                            invert = false)(request(subject), handler(subject))
+                                           PatternType.REGEX,
+                                           meta = None,
+                                           invert = false)(request(subject), handler(subject))
           await(result) should beTrue
         }
       }
@@ -145,22 +150,25 @@ object CompositeConstraintsTest extends PlaySpecification with Mockito {
       "return false when" should {
         "maybeSubject is None" >> {
           val result: Future[Boolean] = constraints.Pattern("foo",
-                                                             PatternType.EQUALITY,
-                                                             invert = false)(request(None), handler(None))
+                                                            PatternType.EQUALITY,
+                                                            meta = None,
+                                                            invert = false)(request(None), handler(None))
           await(result) should beFalse
         }
         "none of the permissions equal the pattern value" >> {
           val subject = Some(User(permissions = List(SecurityPermission("bar"))))
           val result: Future[Boolean] = constraints.Pattern("foo",
-                                                             PatternType.EQUALITY,
-                                                             invert = false)(request(subject), handler(subject))
+                                                            PatternType.EQUALITY,
+                                                            meta = None,
+                                                            invert = false)(request(subject), handler(subject))
           await(result) should beFalse
         }
         "the subject has no permissions" >> {
           val subject = Some(User())
           val result: Future[Boolean] = constraints.Pattern("foo",
-                                                             PatternType.EQUALITY,
-                                                             invert = false)(request(subject), handler(subject))
+                                                            PatternType.EQUALITY,
+                                                            meta = None,
+                                                            invert = false)(request(subject), handler(subject))
           await(result) should beFalse
         }
       }
@@ -168,15 +176,17 @@ object CompositeConstraintsTest extends PlaySpecification with Mockito {
         "the subject has one permission that equals the pattern value" >> {
           val subject = Some(User(permissions = List(SecurityPermission("foo"))))
           val result: Future[Boolean] = constraints.Pattern("foo",
-                                                             PatternType.EQUALITY,
-                                                             invert = false)(request(subject), handler(subject))
+                                                            PatternType.EQUALITY,
+                                                            meta = None,
+                                                            invert = false)(request(subject), handler(subject))
           await(result) should beTrue
         }
         "the subject has one permission that equals the pattern value, plus others" >> {
           val subject = Some(User(permissions = List(SecurityPermission("foo"), SecurityPermission("bar"))))
           val result: Future[Boolean] = constraints.Pattern("foo",
-                                                             PatternType.EQUALITY,
-                                                             invert = false)(request(subject), handler(subject))
+                                                            PatternType.EQUALITY,
+                                                            meta = None,
+                                                            invert = false)(request(subject), handler(subject))
           await(result) should beTrue
         }
       }
@@ -187,18 +197,20 @@ object CompositeConstraintsTest extends PlaySpecification with Mockito {
         "dynamicResourceHandler is None" >> {
           val subject = Some(User())
           val result: Future[Boolean] = constraints.Pattern("foo",
-                                                             PatternType.CUSTOM,
-                                                             invert = false)(request(subject), handler(subject, None))
+                                                            PatternType.CUSTOM,
+                                                            meta = None,
+                                                            invert = false)(request(subject), handler(subject, None))
           await(result) must throwA(new RuntimeException("A custom pattern is specified but no dynamic resource handler is provided"))
         }
         "checkPermission returns false" >> {
           val subject = Some(User())
           val drh = mock[DynamicResourceHandler]
           val dh = handler(subject, Some(drh))
-          drh.checkPermission(Matchers.eq("foo"), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future {false}(ec)
+          drh.checkPermission(Matchers.eq("foo"), Matchers.eq(None), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future {false}(ec)
           val result: Future[Boolean] = constraints.Pattern("foo",
-                                                             PatternType.CUSTOM,
-                                                             invert = false)(request(subject), dh)
+                                                            PatternType.CUSTOM,
+                                                            meta = None,
+                                                            invert = false)(request(subject), dh)
           await(result) should beFalse
         }
       }
@@ -207,10 +219,11 @@ object CompositeConstraintsTest extends PlaySpecification with Mockito {
           val subject = Some(User())
           val drh = mock[DynamicResourceHandler]
           val dh = handler(subject, Some(drh))
-          drh.checkPermission(Matchers.eq("foo"), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future {true}(ec)
+          drh.checkPermission(Matchers.eq("foo"), Matchers.eq(None), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future {true}(ec)
           val result: Future[Boolean] = constraints.Pattern("foo",
-                                                             PatternType.CUSTOM,
-                                                             invert = false)(request(subject), dh)
+                                                            PatternType.CUSTOM,
+                                                            meta = None,
+                                                            invert = false)(request(subject), dh)
           await(result) should beTrue
         }
       }
@@ -222,16 +235,16 @@ object CompositeConstraintsTest extends PlaySpecification with Mockito {
       "dynamicResourceHandler is None" >> {
         val subject = Some(User())
         val result: Future[Boolean] = constraints.Dynamic("foo",
-                                                           "bar")(request(subject), handler(subject, None))
+                                                           Some("bar"))(request(subject), handler(subject, None))
         await(result) must throwA(new RuntimeException("A dynamic resource is specified but no dynamic resource handler is provided"))
       }
       "isAllowed returns false" >> {
         val subject = Some(User())
         val drh = mock[DynamicResourceHandler]
         val dh = handler(subject, Some(drh))
-        drh.isAllowed(Matchers.eq("foo"), Matchers.eq("bar"), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future {false}(ec)
+        drh.isAllowed(Matchers.eq("foo"), Matchers.eq(Some("bar")), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future {false}(ec)
         val result: Future[Boolean] = constraints.Dynamic("foo",
-                                                           "bar")(request(subject), dh)
+                                                           Some("bar"))(request(subject), dh)
         await(result) should beFalse
       }
     }
@@ -240,9 +253,9 @@ object CompositeConstraintsTest extends PlaySpecification with Mockito {
         val subject = Some(User())
         val drh = mock[DynamicResourceHandler]
         val dh = handler(subject, Some(drh))
-        drh.isAllowed(Matchers.eq("foo"), Matchers.eq("bar"), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future {true}(ec)
+        drh.isAllowed(Matchers.eq("foo"), Matchers.eq(Some("bar")), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future {true}(ec)
         val result: Future[Boolean] = constraints.Dynamic("foo",
-                                                           "bar")(request(subject), dh)
+                                                           Some("bar"))(request(subject), dh)
         await(result) should beTrue
 
       }

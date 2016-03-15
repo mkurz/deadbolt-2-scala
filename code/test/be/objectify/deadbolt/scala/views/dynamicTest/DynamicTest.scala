@@ -15,7 +15,7 @@ class DynamicTest extends AbstractViewTest {
 
   "when allowed by the dynamic handler, the view" should {
      "show constrained content" in new WithApplication(testApp(handler(drh = drhAllow))) {
-       val html = dynamicContent(name = "the name of this constraint", meta = "some additional info")(AuthenticatedRequest(FakeRequest(), None))
+       val html = dynamicContent(name = "the name of this constraint", meta = Some("some additional info"))(AuthenticatedRequest(FakeRequest(), None))
 
        private val content: String = Helpers.contentAsString(html)
        content must contain("This is before the constraint.")
@@ -26,7 +26,7 @@ class DynamicTest extends AbstractViewTest {
 
    "when denied by the dynamic handler, the view" should {
      "hide constrained content" in new WithApplication(testApp(handler(drh = drhDeny))) {
-       val html = dynamicContent(name = "the name of this constraint", meta = "some additional info")(AuthenticatedRequest(FakeRequest(), None))
+       val html = dynamicContent(name = "the name of this constraint", meta = Some("some additional info"))(AuthenticatedRequest(FakeRequest(), None))
 
        private val content: String = Helpers.contentAsString(html)
        content must contain("This is before the constraint.")

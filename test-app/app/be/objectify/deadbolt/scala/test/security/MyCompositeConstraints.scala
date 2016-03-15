@@ -21,7 +21,6 @@ import be.objectify.deadbolt.scala.ExecutionContextProvider
 import be.objectify.deadbolt.scala.composite.Operators.{&&, ||}
 import be.objectify.deadbolt.scala.composite.{Constraint, CompositeConstraints}
 import be.objectify.deadbolt.scala.models.PatternType
-import play.api.mvc.Request
 
 import scala.concurrent.ExecutionContext
 
@@ -30,7 +29,7 @@ import scala.concurrent.ExecutionContext
   */
 @Singleton
 class MyCompositeConstraints @Inject() (constraints: CompositeConstraints,
-                                       ecProvider: ExecutionContextProvider){
+                                        ecProvider: ExecutionContextProvider){
 
   val ec: ExecutionContext = ecProvider.get()
 
@@ -39,8 +38,8 @@ class MyCompositeConstraints @Inject() (constraints: CompositeConstraints,
                                                                                               constraints.Pattern("killer.undead.zombie",
                                                                                                                   PatternType.REGEX,
                                                                                                                   invert = false)))
-  def hasRoleFooAndPassesDynamic[A](meta: String = ""): Constraint[A] = constraints.ConstraintTree[A](&&(ec),
-                                                                                                      List(constraints.Restrict(List(Array("foo"))),
-                                                                                                           constraints.Dynamic(name = "bar",
-                                                                                                                               meta = meta)))
+  def hasRoleFooAndPassesDynamic[A](meta: Option[Any] = None): Constraint[A] = constraints.ConstraintTree[A](&&(ec),
+                                                                                                             List(constraints.Restrict(List(Array("foo"))),
+                                                                                                                  constraints.Dynamic(name = "useMetaInfo",
+                                                                                                                                      meta = meta)))
 }

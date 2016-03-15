@@ -100,13 +100,9 @@ object OperatorTest extends PlaySpecification with Mockito {
 
   private def composite[A](op: Operator[A], c1Result: Boolean, c2Result: Boolean) = {
     val c1 = mock[Constraint[A]]
-    c1(req, dh) returns Future {
-      c1Result
-    }(ec)
+    c1(req, dh) returns Future.successful(c1Result)
     val c2 = mock[Constraint[A]]
-    c2(req, dh) returns Future {
-      c2Result
-    }(ec)
+    c2(req, dh) returns Future.successful(c2Result)
     op(c1, c2)
   }
 

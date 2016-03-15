@@ -123,7 +123,7 @@ class ViewSupport @Inject() (config: Configuration,
    * @return true if the view can be accessed, otherwise false
    */
   def dynamic(name: String,
-              meta: String,
+              meta: Option[Any] = None,
               deadboltHandler: DeadboltHandler,
               timeoutInMillis: Long,
               request: AuthenticatedRequest[Any]): Boolean = {
@@ -138,6 +138,7 @@ class ViewSupport @Inject() (config: Configuration,
   /**
    *
    * @param value the value of the pattern, e.g. the regex
+   * @param meta meta information on the resource
    * @param patternType the type of pattern
    * @param deadboltHandler the handler to use for this request
    * @param request the request
@@ -145,6 +146,7 @@ class ViewSupport @Inject() (config: Configuration,
    */
   def pattern(value: String,
               patternType: PatternType,
+              meta: Option[Any] = None,
               deadboltHandler: DeadboltHandler,
               timeoutInMillis: Long,
               request: AuthenticatedRequest[Any]): Boolean = {
@@ -159,7 +161,7 @@ class ViewSupport @Inject() (config: Configuration,
             val future: Future[Boolean] = deadboltHandler.getDynamicResourceHandler(request).map((drhOption: Option[DynamicResourceHandler]) => {
               drhOption match {
                 case Some(drh) =>
-                  Await.result(drh.checkPermission(value, deadboltHandler, request), timeoutInMillis milliseconds)
+                  Await.result(drh.checkPermission(value, meta, deadboltHandler, request), timeoutInMillis milliseconds)
                 case None =>
                   logger.error("A custom pattern is specified but no dynamic resource handler is provided")
                   throw new scala.RuntimeException("A custom pattern is specified but no dynamic resource handler is provided")

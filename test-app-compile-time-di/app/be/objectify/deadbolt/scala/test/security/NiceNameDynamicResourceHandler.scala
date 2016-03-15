@@ -14,11 +14,12 @@ class NiceNameDynamicResourceHandler extends DynamicResourceHandler {
 
   // the composite handler doesn't delegate checkPermission, so we can just return false here
   override def checkPermission[A](permissionValue: String,
+                                  meta: Option[Any] = None,
                                   deadboltHandler: DeadboltHandler,
                                   request: AuthenticatedRequest[A]): Future[Boolean] = Future(false)
 
   override def isAllowed[A](name: String,
-                            meta: String,
+                            meta: Option[Any] = None,
                             deadboltHandler: DeadboltHandler,
                             request: AuthenticatedRequest[A]): Future[Boolean] =
     deadboltHandler.getSubject(request).map {
