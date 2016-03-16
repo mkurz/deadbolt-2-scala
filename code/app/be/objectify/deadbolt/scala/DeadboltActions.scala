@@ -184,6 +184,13 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
                                       else handler.onAuthFailure(authRequest)
                            )(ec))
 
+  def WithAuthRequest[A](handler: DeadboltHandler = handlers())
+                        (bodyParser: BodyParser[A] = parse.anyContent)
+                        (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
+    SubjectActionBuilder(None).async(bodyParser) { authRequest =>
+      block(authRequest)
+    }
+
   /**
     *
     * @param handler the handler to use for constraint testing

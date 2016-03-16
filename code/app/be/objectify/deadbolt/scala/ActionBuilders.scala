@@ -85,6 +85,17 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
     }
   }
 
+  object WithAuthRequestAction {
+
+    def apply(): WithAuthRequestAction.WithAuthRequestActionBuilder = WithAuthRequestActionBuilder()
+
+    case class WithAuthRequestActionBuilder() extends DeadboltActionBuilder {
+
+      override def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
+        deadboltActions.WithAuthRequest(handler)(bodyParser)(block)
+    }
+  }
+
   trait DeadboltActionBuilder {
 
     def apply(block: => Future[Result])(implicit deadbloltHandler: DeadboltHandler): Action[AnyContent] = apply( _ => block)(deadbloltHandler)
