@@ -53,10 +53,8 @@ trait DeadboltComponents {
   lazy val actionBuilders: ActionBuilders = new ActionBuilders(deadboltActions,
                                                                handlers)
   lazy val viewSupport: ViewSupport = new ViewSupport(configuration,
-                                                      scalaAnalyzer,
-                                                      patternCache,
-                                                      templateFailureListenerProvider,
-                                                      ecContextProvider)
+                                                       templateFailureListenerProvider,
+                                                       constraintLogic)
   lazy val compositeConstraints: CompositeConstraints = new CompositeConstraints(constraintLogic,
                                                                                  ecContextProvider)
 }

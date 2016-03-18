@@ -17,24 +17,21 @@ package be.objectify.deadbolt.scala
 
 import javax.inject.{Inject, Singleton}
 
-import be.objectify.deadbolt.scala.cache.PatternCache
-import be.objectify.deadbolt.scala.models.{PatternType, Subject}
+import be.objectify.deadbolt.scala.models.PatternType
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Await, Future}
+import scala.concurrent.{Await, Future}
 import scala.util.{Failure, Success, Try}
 
 /**
- *
- * @author Steve Chaloner (steve@objectify.be)
- */
+  *
+  * @author Steve Chaloner (steve@objectify.be)
+  */
 @Singleton
-class ViewSupport @Inject() (config: Configuration,
-                             analyzer: StaticConstraintAnalyzer,
-                             patternCache: PatternCache,
-                             listenerProvider: TemplateFailureListenerProvider,
-                             ecProvider: ExecutionContextProvider) {
+class ViewSupport @Inject()(config: Configuration,
+                            listenerProvider: TemplateFailureListenerProvider,
+                            logic: ConstraintLogic) {
 
   val logger: Logger = Logger("deadbolt.template")
 
@@ -45,149 +42,120 @@ class ViewSupport @Inject() (config: Configuration,
 
   val listener = listenerProvider.get()
 
-  val ec: ExecutionContext = ecProvider.get()
+  private def allow[A](request: AuthenticatedRequest[A]): Future[Boolean] = Future.successful(true)
+
+  private def deny[A](request: AuthenticatedRequest[A]): Future[Boolean] = Future.successful(false)
 
   /**
-   * Returns true if [[DeadboltHandler.getSubject()]] results in Some
-   *
-   * @param deadboltHandler application hook
-   * @return true if the view can be accessed, otherwise false
-   */
-  def subjectPresent(deadboltHandler: DeadboltHandler,
-                     timeoutInMillis: Long,
-                     request: AuthenticatedRequest[Any]): Boolean = {
-    tryToComplete(deadboltHandler.getSubject(request).map((subjectOption: Option[Subject]) => {
-      subjectOption match {
-        case Some(subject) =>
-          Logger.logger.debug(s"handler [$deadboltHandler] :: subject is present - allowing")
-          true
-        case None =>
-          Logger.logger.debug(s"handler [$deadboltHandler] :: subject is not present - denying")
-          false
-      }
-    })(ec), timeoutInMillis)
-  }
-
-  /**
-   * Returns true if [[DeadboltHandler.getSubject()]] results in None
-   *
-   * @param deadboltHandler application hook
-   * @return true if the view can be accessed, otherwise false
-   */
-  def subjectNotPresent(deadboltHandler: DeadboltHandler,
+    * Returns true if [[DeadboltHandler.getSubject()]] results in Some
+    *
+    * @param deadboltHandler application hook
+    * @return true if the view can be accessed, otherwise false
+    */
+  def subjectPresent[A](deadboltHandler: DeadboltHandler,
                         timeoutInMillis: Long,
-                        request: AuthenticatedRequest[Any]): Boolean = {
-    tryToComplete(deadboltHandler.getSubject(request).map((subjectOption: Option[Subject]) => {
-      subjectOption match {
-        case None =>
-          Logger.logger.debug(s"handler [$deadboltHandler] :: subject is not present - allowing")
-          true
-        case Some(subject) =>
-          Logger.logger.debug(s"handler [$deadboltHandler] :: subject is present - denying")
-          false
-      }
-    })(ec), timeoutInMillis)
-  }
+                        request: AuthenticatedRequest[A]): Boolean =
+    tryToComplete(logic.subjectPresent(request,
+                                        deadboltHandler,
+                                        (ar: AuthenticatedRequest[A]) => allow(ar),
+                                        (ar: AuthenticatedRequest[A]) => deny(ar)),
+                   timeoutInMillis)
+
 
   /**
-   * Used for restrict tags in the template.
-   *
-   * @param roles a List of String arrays.  Within an array, the roles are ANDed.  The arrays in the list are OR'd, so
-   *              the first positive hit will allow access.
-   * @param deadboltHandler application hook
-   * @return true if the view can be accessed, otherwise false
-   */
-  def restrict(roles: RoleGroups,
-               deadboltHandler: DeadboltHandler,
-               timeoutInMillis: Long,
-               request: AuthenticatedRequest[Any]): Boolean = {
-    def check(analyzer: StaticConstraintAnalyzer, subject: Option[Subject], current: RoleGroup, remaining: RoleGroups): Boolean = {
-        if (analyzer.hasAllRoles(subject, current)) true
-        else if (remaining.isEmpty) false
-        else check(analyzer, subject, remaining.head, remaining.tail)
-    }
-
-    tryToComplete(deadboltHandler.getSubject(request).map((subjectOption: Option[Subject]) => {
-      subjectOption match {
-        case Some(subject) => check(analyzer, subjectOption, roles.head, roles.tail)
-        case None => false
-      }
-    })(ec), timeoutInMillis)
-  }
+    * Returns true if [[DeadboltHandler.getSubject()]] results in None
+    *
+    * @param deadboltHandler application hook
+    * @return true if the view can be accessed, otherwise false
+    */
+  def subjectNotPresent[A](deadboltHandler: DeadboltHandler,
+                           timeoutInMillis: Long,
+                           request: AuthenticatedRequest[A]): Boolean =
+    tryToComplete(logic.subjectPresent(request,
+                                        deadboltHandler,
+                                        (ar: AuthenticatedRequest[A]) => deny(ar),
+                                        (ar: AuthenticatedRequest[A]) => allow(ar)),
+                   timeoutInMillis)
 
   /**
-   * Used for dynamic tags in the template.
-   *
-   * @param name the name of the resource
-   * @param meta meta information on the resource
-   * @return true if the view can be accessed, otherwise false
-   */
-  def dynamic(name: String,
-              meta: Option[Any] = None,
-              deadboltHandler: DeadboltHandler,
-              timeoutInMillis: Long,
-              request: AuthenticatedRequest[Any]): Boolean = {
-    tryToComplete(deadboltHandler.getDynamicResourceHandler(request).flatMap((drhOption: Option[DynamicResourceHandler]) => {
-      drhOption match {
-        case Some(drh) => drh.isAllowed(name, meta, deadboltHandler, request)
-        case None => throw new RuntimeException("A dynamic resource is specified but no dynamic resource handler is provided")
-      }
-    })(ec), timeoutInMillis)
-  }
+    * Used for restrict tags in the template.
+    *
+    * @param roles a List of String arrays.  Within an array, the roles are ANDed.  The arrays in the list are OR'd, so
+    *              the first positive hit will allow access.
+    * @param deadboltHandler application hook
+    * @return true if the view can be accessed, otherwise false
+    */
+  def restrict[A](roles: RoleGroups,
+                  deadboltHandler: DeadboltHandler,
+                  timeoutInMillis: Long,
+                  request: AuthenticatedRequest[A]): Boolean =
+    tryToComplete(logic.restrict(request,
+                                  deadboltHandler,
+                                  roles,
+                                  (ar: AuthenticatedRequest[A]) => allow(ar),
+                                  (ar: AuthenticatedRequest[A]) => deny(ar)),
+                   timeoutInMillis)
 
   /**
-   *
-   * @param value the value of the pattern, e.g. the regex
-   * @param meta meta information on the resource
-   * @param patternType the type of pattern
-   * @param deadboltHandler the handler to use for this request
-   * @param request the request
-   * @return
-   */
-  def pattern(value: String,
-              patternType: PatternType,
-              meta: Option[Any] = None,
-              deadboltHandler: DeadboltHandler,
-              timeoutInMillis: Long,
-              request: AuthenticatedRequest[Any]): Boolean = {
-
-    tryToComplete(deadboltHandler.getSubject(request).map((subjectOption: Option[Subject]) => {
-      subjectOption match {
-        case None => false
-        case Some(subject) => patternType match {
-          case PatternType.EQUALITY => analyzer.checkPatternEquality(subjectOption, Option(value))
-          case PatternType.REGEX => analyzer.checkRegexPattern(subjectOption, Option(value))
-          case PatternType.CUSTOM =>
-            val future: Future[Boolean] = deadboltHandler.getDynamicResourceHandler(request).map((drhOption: Option[DynamicResourceHandler]) => {
-              drhOption match {
-                case Some(drh) =>
-                  Await.result(drh.checkPermission(value, meta, deadboltHandler, request), timeoutInMillis milliseconds)
-                case None =>
-                  logger.error("A custom pattern is specified but no dynamic resource handler is provided")
-                  throw new scala.RuntimeException("A custom pattern is specified but no dynamic resource handler is provided")
-              }
-            })(ec)
-            Await.result(future, timeoutInMillis milliseconds)
-          case _ => false
-        }
-      }
-    })(ec), timeoutInMillis)
-  }
+    * Used for dynamic tags in the template.
+    *
+    * @param name the name of the resource
+    * @param meta meta information on the resource
+    * @return true if the view can be accessed, otherwise false
+    */
+  def dynamic[A](name: String,
+                 meta: Option[Any] = None,
+                 deadboltHandler: DeadboltHandler,
+                 timeoutInMillis: Long,
+                 request: AuthenticatedRequest[A]): Boolean =
+    tryToComplete(logic.dynamic(request,
+                                 deadboltHandler,
+                                 name,
+                                 meta,
+                                 (ar: AuthenticatedRequest[A]) => allow(ar),
+                                 (ar: AuthenticatedRequest[A]) => deny(ar)),
+                   timeoutInMillis)
 
   /**
-   * Attempts to complete the future within the given number of milliseconds.
-   *
-   * @param future the future to complete
-   * @param timeoutInMillis the number of milliseconds to wait for a result
-   * @return false if the future times out, otherwise the result of the future
-   */
+    *
+    * @param value the value of the pattern, e.g. the regex
+    * @param meta meta information on the resource
+    * @param patternType the type of pattern
+    * @param deadboltHandler the handler to use for this request
+    * @param request the request
+    * @return
+    */
+  def pattern[A](value: String,
+                 patternType: PatternType,
+                 meta: Option[Any] = None,
+                 invert: Boolean = false,
+                 deadboltHandler: DeadboltHandler,
+                 timeoutInMillis: Long,
+                 request: AuthenticatedRequest[A]): Boolean =
+    tryToComplete(logic.pattern(request,
+                                 deadboltHandler,
+                                 value,
+                                 patternType,
+                                 meta,
+                                 invert,
+                                 (ar: AuthenticatedRequest[A]) => allow(ar),
+                                 (ar: AuthenticatedRequest[A]) => deny(ar)),
+                   timeoutInMillis)
+
+  /**
+    * Attempts to complete the future within the given number of milliseconds.
+    *
+    * @param future the future to complete
+    * @param timeoutInMillis the number of milliseconds to wait for a result
+    * @return false if the future times out, otherwise the result of the future
+    */
   private def tryToComplete(future: Future[Boolean], timeoutInMillis: Long): Boolean =
     Try(Await.result(future, timeoutInMillis milliseconds)) match {
       case Success(allowed) => allowed
       case Failure(ex) =>
         logger.error("Error when checking view constraint", ex)
         listener.failure(s"Error when checking view constraint: [${ex.getMessage}]",
-                         timeout)
+                          timeout)
         false
     }
 }
