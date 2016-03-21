@@ -22,7 +22,7 @@ class UseMetaHintDynamicResourceHandler extends DynamicResourceHandler {
                             deadboltHandler: DeadboltHandler,
                             request: AuthenticatedRequest[A]): Future[Boolean] =
   meta match {
-    case metaInf: Some[String] => Future.successful{meta.exists(m => "passDyn".equals(m))}
+    case metaInf: Some[_] => Future.successful{meta.exists(m => "passDyn".equals(m))}
     case _ => Future.successful{false}
   }
 }

@@ -1,6 +1,6 @@
 package be.objectify.deadbolt.scala.test.controllers.builder
 
-import be.objectify.deadbolt.scala.ActionBuilders
+import be.objectify.deadbolt.scala.{ActionBuilders, anyOf, allOf, allOfGroup}
 import com.google.inject.Inject
 import play.api.mvc.Controller
 
@@ -21,7 +21,7 @@ class Restrict @Inject()(actionBuilder: ActionBuilders) extends Controller {
                       }
 
   def restrictedToFooOrBar =
-    actionBuilder.RestrictAction(roles = List(Array("foo"), Array("bar")))
+    actionBuilder.RestrictAction(roles = anyOf(allOf("foo"), allOf("bar")))
     .defaultHandler() { authRequest =>
       Future {
                Ok("Content accessible")
@@ -37,7 +37,7 @@ class Restrict @Inject()(actionBuilder: ActionBuilders) extends Controller {
                       }
 
   def restrictedToFooOrNotBar =
-    actionBuilder.RestrictAction(roles = List(Array("foo"), Array("!bar")))
+    actionBuilder.RestrictAction(roles = anyOf(allOf("foo"), allOf("!bar")))
     .defaultHandler() { authRequest =>
       Future {
                Ok("Content accessible")

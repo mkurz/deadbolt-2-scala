@@ -1,5 +1,5 @@
-@import be.objectify.deadbolt.scala.AuthenticatedRequest
-@(roles: List[Array[String]])(implicit request: AuthenticatedRequest[Any])
+@import be.objectify.deadbolt.scala.{AuthenticatedRequest, RoleGroups}
+@(roles: RoleGroups)(implicit request: AuthenticatedRequest[Any])
 
 This is before the constraint.
 

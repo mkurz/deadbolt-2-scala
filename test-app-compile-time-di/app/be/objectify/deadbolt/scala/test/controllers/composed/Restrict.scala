@@ -1,6 +1,6 @@
 package be.objectify.deadbolt.scala.test.controllers.composed
 
-import be.objectify.deadbolt.scala.DeadboltActions
+import be.objectify.deadbolt.scala.{DeadboltActions, anyOf, allOf, allOfGroup}
 import play.api.mvc.Controller
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -12,28 +12,28 @@ import scala.concurrent.Future
 class Restrict(deadbolt: DeadboltActions) extends Controller {
 
   def restrictedToFooAndBar =
-    deadbolt.Restrict(roleGroups = List(Array("foo", "bar")))() { authRequest =>
+    deadbolt.Restrict(roleGroups = allOfGroup("foo", "bar"))() { authRequest =>
       Future {
                Ok("Content accessible")
              }
                                                                 }
 
   def restrictedToFooOrBar =
-    deadbolt.Restrict(roleGroups = List(Array("foo"), Array("bar")))() { authRequest =>
+    deadbolt.Restrict(roleGroups = anyOf(allOf("foo"), allOf("bar")))() { authRequest =>
       Future {
                Ok("Content accessible")
              }
                                                                        }
 
   def restrictedToFooAndNotBar =
-    deadbolt.Restrict(roleGroups = List(Array("foo", "!bar")))() { authRequest =>
+    deadbolt.Restrict(roleGroups = allOfGroup("foo", "!bar"))() { authRequest =>
       Future {
                Ok("Content accessible")
              }
                                                                  }
 
   def restrictedToFooOrNotBar =
-    deadbolt.Restrict(roleGroups = List(Array("foo"), Array("!bar")))() { authRequest =>
+    deadbolt.Restrict(roleGroups = anyOf(allOf("foo"), allOf("!bar")))() { authRequest =>
       Future {
                Ok("Content accessible")
              }

@@ -1,9 +1,9 @@
 package be.objectify.deadbolt.scala.test.controllers.builder
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import be.objectify.deadbolt.scala.ActionBuilders
+import be.objectify.deadbolt.scala.{ActionBuilders, allOf, anyOf}
 import play.api.mvc.Controller
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /**
@@ -20,7 +20,7 @@ class Restrict(actionBuilder: ActionBuilders) extends Controller {
     }
 
   def restrictedToFooOrBar =
-    actionBuilder.RestrictAction(roles = List(Array("foo"), Array("bar")))
+    actionBuilder.RestrictAction(roles = anyOf(allOf("foo"), allOf("bar")))
     .defaultHandler() { authRequest =>
       Future {
         Ok("Content accessible")
@@ -36,7 +36,7 @@ class Restrict(actionBuilder: ActionBuilders) extends Controller {
     }
 
   def restrictedToFooOrNotBar =
-    actionBuilder.RestrictAction(roles = List(Array("foo"), Array("!bar")))
+    actionBuilder.RestrictAction(roles = anyOf(allOf("foo"), allOf("!bar")))
     .defaultHandler() { authRequest =>
       Future {
         Ok("Content accessible")

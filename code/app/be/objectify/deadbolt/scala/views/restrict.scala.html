@@ -1,7 +1,7 @@
-@import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltHandler}
+@import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltHandler, RoleGroups}
 @import play.api.Play.current
 @import be.objectify.deadbolt.scala.ViewAccessPoint.Implicits._
-@(handler: DeadboltHandler = handlerCache.apply(), roles: List[Array[String]], timeout: Function0[Long] = viewSupport.defaultTimeout)(body: => play.twirl.api.Html)(implicit request: AuthenticatedRequest[Any])
+@(handler: DeadboltHandler = handlerCache.apply(), roles: RoleGroups, timeout: Function0[Long] = viewSupport.defaultTimeout)(body: => play.twirl.api.Html)(implicit request: AuthenticatedRequest[Any])
 
 @if(viewSupport.restrict(roles, handler, timeout(),request)) {
 @body
