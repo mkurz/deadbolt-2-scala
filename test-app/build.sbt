@@ -1,13 +1,13 @@
 name := """test-app"""
 
-version := "2.5.0"
+version := "2.5.1-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.11.7"
 
 libraryDependencies ++= Seq(
-  "be.objectify" %% "deadbolt-scala" % "2.5.0",
+  "be.objectify" %% "deadbolt-scala" % "2.5.1-SNAPSHOT",
   ws % Test,
   specs2 % Test
 )

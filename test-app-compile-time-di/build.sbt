@@ -1,6 +1,6 @@
 name := """test-app-compile-time-di"""
 
-version := "2.5.0"
+version := "2.5.1-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
@@ -8,7 +8,7 @@ scalaVersion := "2.11.7"
 
 libraryDependencies ++= Seq(
   ws,
-  "be.objectify" %% "deadbolt-scala" % "2.5.0",
+  "be.objectify" %% "deadbolt-scala" % "2.5.1-SNAPSHOT",
   specs2 % Test
 )
 
