@@ -2,7 +2,7 @@ name := "deadbolt-scala"
 
 organization := "be.objectify"
 
-version := "2.5.0-SNAPSHOT"
+version := "2.5.0"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
