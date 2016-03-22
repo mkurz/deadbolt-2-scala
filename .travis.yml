@@ -5,10 +5,10 @@ scala:
 - 2.11.7
 script:
 - cd code
-- sbt --info ++$TRAVIS_SCALA_VERSION test
-- sbt --info ++$TRAVIS_SCALA_VERSION publishLocal
+- sbt --warn ++$TRAVIS_SCALA_VERSION test
+- sbt --warn ++$TRAVIS_SCALA_VERSION publishLocal
 - cd ../test-app
-- sbt --info ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.5.0 test
+- sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.5.0 test
 - cd ../code
 after_success:
 - ! '[[ $TRAVIS_BRANCH == "master" ]] && { sbt publish; };'
