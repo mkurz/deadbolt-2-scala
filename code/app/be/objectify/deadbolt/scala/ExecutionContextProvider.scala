@@ -39,7 +39,7 @@ class DefaultExecutionContextProvider @Inject() (appProvider: Provider[Applicati
 
   val logger: Logger = Logger("deadbolt.execution-context")
 
-  override def get(): ExecutionContext = Try(appProvider.get().injector.instanceOf[DeadboltExecutionContextProvider]) match {
+  private val ecProvider: ExecutionContext = Try(appProvider.get().injector.instanceOf[DeadboltExecutionContextProvider]) match {
     case Success(provider) =>
       logger.info("Custom execution context found")
       provider.get()
@@ -47,6 +47,8 @@ class DefaultExecutionContextProvider @Inject() (appProvider: Provider[Applicati
       logger.info("No custom execution context found, falling back to scala.concurrent.ExecutionContext.global")
       scala.concurrent.ExecutionContext.global
   }
+
+  override def get(): ExecutionContext = ecProvider
 }
 
 trait DeadboltExecutionContextProvider extends Provider[ExecutionContext]
