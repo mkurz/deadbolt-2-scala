@@ -1,6 +1,6 @@
 # Deadbolt 2 for Play 2.5
 
-[![Sonatype](https://img.shields.io/badge/Sonatype%20snapshots-2.5.0--SNAPSHOT-brightgreen.svg)](https://oss.sonatype.org/content/repositories/snapshots/be/objectify/deadbolt-scala_2.11/2.5.0-SNAPSHOT/) [![Build Status](https://travis-ci.org/schaloner/deadbolt-2-scala.svg)](https://travis-ci.org/schaloner/deadbolt-2-scala) [![Join the chat at https://gitter.im/schaloner/deadbolt-2](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/schaloner/deadbolt-2?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/be.objectify/deadbolt-scala_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/be.objectify/deadbolt-scala_2.11) [![Build Status](https://travis-ci.org/schaloner/deadbolt-2-scala.svg?branch=master)](https://travis-ci.org/schaloner/deadbolt-2-scala) [![Join the chat at https://gitter.im/schaloner/deadbolt-2](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/schaloner/deadbolt-2?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
 Deadbolt 2 is an authorization library for Play 2, and features APIs for both Java- and Scala-based applications.  It allows you to apply constraints to controller actions, and to customize template rendering based on the current user.

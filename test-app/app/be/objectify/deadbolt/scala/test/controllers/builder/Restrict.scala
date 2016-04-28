@@ -1,6 +1,7 @@
 package be.objectify.deadbolt.scala.test.controllers.builder
 
-import be.objectify.deadbolt.scala.{ActionBuilders, anyOf, allOf, allOfGroup}
+import be.objectify.deadbolt.scala.test.controllers.AbstractRestrict
+import be.objectify.deadbolt.scala.{ActionBuilders, allOf, allOfGroup, anyOf}
 import com.google.inject.Inject
 import play.api.mvc.Controller
 
@@ -10,7 +11,7 @@ import scala.concurrent.Future
 /**
   * @author Steve Chaloner (steve@objectify.be)
   */
-class Restrict @Inject()(actionBuilder: ActionBuilders) extends Controller {
+class Restrict @Inject()(actionBuilder: ActionBuilders) extends Controller with AbstractRestrict {
 
   def restrictedToFooAndBar =
     actionBuilder.RestrictAction("foo", "bar")
