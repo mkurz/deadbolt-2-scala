@@ -16,7 +16,7 @@
 package be.objectify.deadbolt.scala
 
 import be.objectify.deadbolt.scala.models.Subject
-import play.api.mvc.Request
+import play.api.mvc.{AnyContent, AnyContentAsEmpty, Request, RequestHeader}
 
 /**
   * @author Steve Chaloner (steve@objectify.be)
@@ -39,6 +39,22 @@ object AuthenticatedRequest {
     def clientCertificateChain = r.clientCertificateChain
     lazy val remoteAddress = r.remoteAddress
     val body = r.body
+    val subject = s
+  }
+
+  def apply[_](rh: RequestHeader, s: Option[Subject]) = new AuthenticatedRequest[AnyContent] {
+    def id = rh.id
+    def tags = rh.tags
+    def uri = rh.uri
+    def path = rh.path
+    def method = rh.method
+    def version = rh.version
+    def queryString = rh.queryString
+    def headers = rh.headers
+    def secure = rh.secure
+    def clientCertificateChain = rh.clientCertificateChain
+    lazy val remoteAddress = rh.remoteAddress
+    val body = AnyContentAsEmpty
     val subject = s
   }
 }
