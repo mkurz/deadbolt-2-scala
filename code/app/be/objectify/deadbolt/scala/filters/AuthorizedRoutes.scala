@@ -30,11 +30,10 @@ package be.objectify.deadbolt.scala.filters
   *
   * <pre>bind[AuthorizedRoutes].to[MyAuthorizedRoutes]</pre>
   *
-  * @param filterConstraints used to define constraints.  This is available for injection from either [[DeadboltFilterModule]] or [[DeadboltFilterComponents]], depending on if you're using compile-time or run-time dependency injection.
   * @author Steve Chaloner (steve@objectify.be)
   * @since 2.5.1
   */
-abstract class AuthorizedRoutes(filterConstraints: FilterConstraints) extends ((String, String) => Option[AuthorizedRoute]){
+abstract class AuthorizedRoutes extends ((String, String) => Option[AuthorizedRoute]){
 
   override def apply(method: String, routePattern: String): Option[AuthorizedRoute] =
     routes.find(authRoute => authRoute.method.map(routeMethod => routeMethod.equals(method)
