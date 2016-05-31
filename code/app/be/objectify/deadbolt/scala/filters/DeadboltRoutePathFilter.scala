@@ -36,7 +36,7 @@ import scala.concurrent.Future
   * @author Steve Chaloner (steve@objectify.be)
   * @since 2.5.1
   */
-class DeadboltFilter @Inject()(val materializer: Materializer, handlerCache: HandlerCache, authorizedRoutes: AuthorizedRoutes) extends Filter {
+class DeadboltRoutePathFilter @Inject()(val materializer: Materializer, handlerCache: HandlerCache, authorizedRoutes: AuthorizedRoutes) extends Filter {
 
   val handler = handlerCache()
 

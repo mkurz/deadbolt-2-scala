@@ -20,6 +20,13 @@ object PatternType {
     * Perform some custom matching on the pattern.
     */
   case object CUSTOM extends PatternType
+
+  def byName(name: String): PatternType = name match {
+    case "EQUALITY" => EQUALITY
+    case "REGEX" => REGEX
+    case "CUSTOM" => CUSTOM
+    case _ => throw new IllegalArgumentException(s"Unknown pattern type [$name]")
+  }
 }
 
 

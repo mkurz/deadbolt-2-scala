@@ -30,7 +30,7 @@ trait DeadboltFilterComponents extends DeadboltComponents {
   def authorizedRoutes: AuthorizedRoutes
   implicit def mat: Materializer
 
-  lazy val deadboltFilter: DeadboltFilter = new DeadboltFilter(mat,
+  lazy val deadboltFilter: DeadboltRoutePathFilter = new DeadboltRoutePathFilter(mat,
                                                                handlers,
                                                                authorizedRoutes)
 

@@ -9,4 +9,6 @@ package object filters {
   val Patch = Some("PATCH")
   val Options = Some("OPTIONS")
   val Head = Some("HEAD")
+
+  case class SimpleHandlerKey(name: String) extends HandlerKey
 }

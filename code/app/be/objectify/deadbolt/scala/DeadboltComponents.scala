@@ -15,7 +15,7 @@
  */
 package be.objectify.deadbolt.scala
 
-import be.objectify.deadbolt.scala.cache.{HandlerCache, PatternCache}
+import be.objectify.deadbolt.scala.cache.{DefaultCompositeCache, CompositeCache, HandlerCache, PatternCache}
 import be.objectify.deadbolt.scala.composite.CompositeConstraints
 import play.api.Configuration
 
@@ -30,6 +30,7 @@ import scala.concurrent.ExecutionContext
 trait DeadboltComponents {
 
   def patternCache: PatternCache
+  def compositeCache: CompositeCache
   def handlers: HandlerCache
   def configuration: Configuration
 

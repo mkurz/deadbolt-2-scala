@@ -13,27 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.objectify.deadbolt.scala
+package be.objectify.deadbolt.scala.filters
 
-import be.objectify.deadbolt.scala.cache.{DefaultCompositeCache, CompositeCache, DefaultPatternCache, PatternCache}
-import be.objectify.deadbolt.scala.filters.FilterConstraints
+import be.objectify.deadbolt.scala.cache.{DefaultPatternCache, PatternCache}
 import play.api.inject.{Binding, Module}
 import play.api.{Configuration, Environment}
 
 /**
- * @author Steve Chaloner (steve@objectify.be)
+  * Bindings for run-time dependency injection.  Enable this module in your application.conf to get access to the route path filter components.
+  *
+  * @author Steve Chaloner (steve@objectify.be)
+  * @since 2.5.1
  */
-class DeadboltModule extends Module {
+class DeadboltRoutePathFilterModule extends Module {
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = Seq(
-    bind[PatternCache].to[DefaultPatternCache],
-    bind[StaticConstraintAnalyzer].toSelf,
-    bind[DeadboltActions].toSelf,
-    bind[ViewSupport].toSelf,
-    bind[ActionBuilders].toSelf,
-    bind[TemplateFailureListenerProvider].to[DefaultTemplateFailureListenerProvider],
-    bind[ExecutionContextProvider].to[DefaultExecutionContextProvider],
-    bind[ConstraintLogic].toSelf,
-    bind[FilterConstraints].toSelf,
-    bind[CompositeCache].to[DefaultCompositeCache]
+    bind[DeadboltRoutePathFilter].toSelf
   )
 }
