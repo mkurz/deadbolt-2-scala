@@ -144,8 +144,8 @@ class DeadboltRouteCommentFilter @Inject()(materializer: Materializer,
                                                                                                                  handler),
                                                                                                                next)
         case _ =>
-          logger.error(s"No match found for comment $comment")
-          next(requestHeader)
+          logger.error(s"Unknown Deadbolt route comment [$comment], denying access with default handler")
+          handler.onAuthFailure(authenticatedRequest)
       }
     } else {
       next(requestHeader)
