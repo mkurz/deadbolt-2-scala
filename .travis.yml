@@ -13,6 +13,8 @@ script:
 - sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.5.2 test
 - sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.5.3 test
 - sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.5.4 test
+- sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.5.5 test
+- sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.5.6 test
 - cd ../code
 after_success:
 - ! '[[ $TRAVIS_BRANCH == "master" ]] && { sbt publish; };'
