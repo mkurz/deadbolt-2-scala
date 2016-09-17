@@ -33,7 +33,7 @@ class RegexOrTest extends AbstractViewTest {
 
    "when the subject has a permission that matches the pattern, the view" should {
      "show constrained content and hide fallback content" in new WithApplication(testApp(handler(subject = userZombie, drh = drHandler))) {
-       val html = patternOrContent(value = "killer.undead.*", patternType = PatternType.REGEX)(AuthenticatedRequest(FakeRequest(), userZombie))
+       val html = patternOrContent(value = "killer.undead.*", patternType = PatternType.REGEX)(new AuthenticatedRequest(FakeRequest(), userZombie))
 
        private val content: String = Helpers.contentAsString(html)
        content must contain("This is before the constraint.")
@@ -45,7 +45,7 @@ class RegexOrTest extends AbstractViewTest {
 
   "when the subject has no permissions that match the pattern, the view" should {
     "hide constrained content and show fallback content" in new WithApplication(testApp(handler(subject = userFooBar, drh = drHandler))) {
-      val html = patternOrContent(value = "killer.undead.*", patternType = PatternType.EQUALITY)(AuthenticatedRequest(FakeRequest(), userFooBar))
+      val html = patternOrContent(value = "killer.undead.*", patternType = PatternType.EQUALITY)(new AuthenticatedRequest(FakeRequest(), userFooBar))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")

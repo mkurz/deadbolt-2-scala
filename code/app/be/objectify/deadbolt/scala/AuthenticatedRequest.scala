@@ -16,16 +16,19 @@
 package be.objectify.deadbolt.scala
 
 import be.objectify.deadbolt.scala.models.Subject
-import play.api.mvc.{AnyContent, AnyContentAsEmpty, Request, RequestHeader}
+import play.api.mvc._
 
 /**
   * @author Steve Chaloner (steve@objectify.be)
   */
-trait AuthenticatedRequest[+A] extends Request[A] {
-  val subject: Option[Subject]
-}
+//trait AuthenticatedRequest[+A] extends Request[A] {
+//  val subject: Option[Subject]
+//}
 
-object AuthenticatedRequest {
+class AuthenticatedRequest[+A](request: Request[A], val subject: Option[Subject]) extends WrappedRequest[A](request)
+
+/*
+{
   def apply[A](r: Request[A], s: Option[Subject]) = new AuthenticatedRequest[A] {
     def id = r.id
     def tags = r.tags
@@ -58,3 +61,4 @@ object AuthenticatedRequest {
     val subject = s
   }
 }
+*/

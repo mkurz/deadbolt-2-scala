@@ -43,7 +43,7 @@ class ConstraintLogic @Inject()(analyzer: StaticConstraintAnalyzer,
       handler.getSubject(authRequest).flatMap((subjectOption: Option[Subject]) =>
         subjectOption match {
           case Some(subject) =>
-            val withSubject = AuthenticatedRequest(authRequest, subjectOption)
+            val withSubject = new AuthenticatedRequest(authRequest, subjectOption)
             if (check(subjectOption, roleGroups.head, roleGroups.tail)) pass(withSubject)
             else fail(withSubject)
           case _ => fail(authRequest)
@@ -61,7 +61,7 @@ class ConstraintLogic @Inject()(analyzer: StaticConstraintAnalyzer,
       drhOption match {
         case Some(dynamicHandler) =>
           handler.getSubject(authRequest).flatMap(subjectOption => {
-            val maybeWithSubject = AuthenticatedRequest(authRequest, subjectOption)
+            val maybeWithSubject = new AuthenticatedRequest(authRequest, subjectOption)
             dynamicHandler.isAllowed(name, meta, handler, maybeWithSubject).flatMap((allowed: Boolean) => allowed match {
               case true => pass(maybeWithSubject)
               case false => fail(maybeWithSubject)
@@ -83,7 +83,7 @@ class ConstraintLogic @Inject()(analyzer: StaticConstraintAnalyzer,
     handler.getSubject(authRequest).flatMap((subjectOption: Option[Subject]) => subjectOption match {
       case None => fail(authRequest)
       case Some(subject) =>
-        val withSubject = AuthenticatedRequest(authRequest, subjectOption)
+        val withSubject = new AuthenticatedRequest(authRequest, subjectOption)
         patternType match {
           case PatternType.EQUALITY =>
             val equal: Boolean = analyzer.checkPatternEquality(subjectOption, Option(value))
@@ -116,8 +116,8 @@ class ConstraintLogic @Inject()(analyzer: StaticConstraintAnalyzer,
                            notPresent: AuthenticatedRequest[A] => Future[B]): Future[B] = {
     val subject1: Future[Option[Subject]] = handler.getSubject(authRequest)
     subject1.flatMap((subjectOption: Option[Subject]) => subjectOption match {
-      case Some(subject) => present(AuthenticatedRequest(authRequest, subjectOption))
-      case None => notPresent(AuthenticatedRequest(authRequest, subjectOption))
+      case Some(subject) => present(new AuthenticatedRequest(authRequest, subjectOption))
+      case None => notPresent(new AuthenticatedRequest(authRequest, subjectOption))
     })(ec)
   }
 }

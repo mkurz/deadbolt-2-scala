@@ -27,7 +27,7 @@ import play.api.test.{FakeRequest, Helpers, WithApplication}
 class SubjectNotPresentOrTest extends AbstractViewTest {
 
   "show constrained content and hide fallback content when subject is not present" in new WithApplication(testApp(handler())) {
-    val html = subjectNotPresentOrContent(AuthenticatedRequest(FakeRequest(), None))
+    val html = subjectNotPresentOrContent(new AuthenticatedRequest(FakeRequest(), None))
 
     private val content: String = Helpers.contentAsString(html)
     content must contain("This is before the constraint.")
@@ -38,7 +38,7 @@ class SubjectNotPresentOrTest extends AbstractViewTest {
 
   "hide constrained content and show fallback content when subject is present" in new WithApplication(testApp(handler(subject = Some(user())))) {
     val user = new User("foo", List.empty, List.empty)
-    val html = subjectNotPresentOrContent(AuthenticatedRequest(FakeRequest(), Some(user)))
+    val html = subjectNotPresentOrContent(new AuthenticatedRequest(FakeRequest(), Some(user)))
 
     private val content: String = Helpers.contentAsString(html)
     content must contain("This is before the constraint.")

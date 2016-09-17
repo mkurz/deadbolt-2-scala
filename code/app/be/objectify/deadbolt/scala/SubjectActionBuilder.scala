@@ -35,6 +35,6 @@ trait SubjectActionBuilder extends ActionBuilder[AuthenticatedRequest] with Acti
   def subject: Option[Subject]
 
   def transform[A](request: Request[A]) = Future.successful{
-    AuthenticatedRequest(request, subject)
+    new AuthenticatedRequest(request, subject)
   }
 }

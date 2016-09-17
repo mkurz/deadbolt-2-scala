@@ -46,7 +46,7 @@ class DeadboltRoutePathFilter @Inject()(val materializer: Materializer, handlerC
 
     authorizedRoutes(requestHeader.method, requestHeader.tags(Tags.RoutePattern)) match {
       case Some(authRoute) => authRoute.constraint(requestHeader,
-                                                    AuthenticatedRequest[AnyContent](requestHeader, None),
+                                                    new AuthenticatedRequest[AnyContent](Request[AnyContent](requestHeader, AnyContentAsEmpty), None),
                                                     authRoute.handler.getOrElse(handler),
                                                     next)
       case None => next(requestHeader)

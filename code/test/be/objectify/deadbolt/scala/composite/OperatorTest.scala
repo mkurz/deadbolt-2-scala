@@ -106,7 +106,7 @@ object OperatorTest extends PlaySpecification with Mockito {
     op(c1, c2)
   }
 
-  private def request[A](maybeSubject: Option[Subject]): AuthenticatedRequest[A] = AuthenticatedRequest(mock[Request[A]], maybeSubject)
+  private def request[A](maybeSubject: Option[Subject]): AuthenticatedRequest[A] = new AuthenticatedRequest(mock[Request[A]], maybeSubject)
 
   private def handler(maybeSubject: Option[Subject]): DeadboltHandler = {
     val handler = mock[DeadboltHandler]

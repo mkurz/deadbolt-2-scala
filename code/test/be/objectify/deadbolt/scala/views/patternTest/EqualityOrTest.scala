@@ -37,7 +37,7 @@ class EqualityOrTest extends AbstractViewTest {
 
   "when the subject has a permission that is equal to the pattern, the view" should {
      "show constrained content and hide fallback content" in new WithApplication(testApp(handler(subject = userZombie, drh = drHandler))) {
-       val html = patternOrContent(value = "killer.undead.zombie", patternType = PatternType.EQUALITY)(AuthenticatedRequest(FakeRequest(), userZombie))
+       val html = patternOrContent(value = "killer.undead.zombie", patternType = PatternType.EQUALITY)(new AuthenticatedRequest(FakeRequest(), userZombie))
 
        private val content: String = Helpers.contentAsString(html)
        content must contain("This is before the constraint.")
@@ -49,7 +49,7 @@ class EqualityOrTest extends AbstractViewTest {
 
   "when the subject has no permissions that are equal to the pattern, the view" should {
     "hide constrained content and show fallback content" in new WithApplication(testApp(handler(subject = userVampire,  drh = drHandler))) {
-      val html = patternOrContent(value = "killer.undead.zombie", patternType = PatternType.EQUALITY)(AuthenticatedRequest(FakeRequest(), userVampire))
+      val html = patternOrContent(value = "killer.undead.zombie", patternType = PatternType.EQUALITY)(new AuthenticatedRequest(FakeRequest(), userVampire))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")

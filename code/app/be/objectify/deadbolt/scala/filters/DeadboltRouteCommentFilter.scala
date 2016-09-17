@@ -103,7 +103,7 @@ class DeadboltRouteCommentFilter @Inject()(materializer: Materializer,
   override def apply(next: (RequestHeader) => Future[Result])(requestHeader: RequestHeader): Future[Result] = {
     val comment: String = requestHeader.tags.getOrElse(Tags.RouteComments, "")
     if (comment startsWith "deadbolt:") {
-      val authenticatedRequest = AuthenticatedRequest[AnyContent](requestHeader, None)
+      val authenticatedRequest = new AuthenticatedRequest[AnyContent](Request[AnyContent](requestHeader, AnyContentAsEmpty), None)
       comment match {
         case subjectPresentComment(constraintName, handlerName) => constraints.subjectPresent(requestHeader,
                                                                                               authenticatedRequest,

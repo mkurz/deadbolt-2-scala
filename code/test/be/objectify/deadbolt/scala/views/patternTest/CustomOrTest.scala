@@ -34,7 +34,7 @@ class CustomOrTest extends AbstractViewTest {
 
   "when a custom permission allows it, the view" should {
     "show constrained content and hide fallback content" in new WithApplication(testApp(handler(subject = user, drh = drhAllow))) {
-      val html = patternOrContent(value = "something arbitrary", patternType = PatternType.CUSTOM)(AuthenticatedRequest(FakeRequest(), user))
+      val html = patternOrContent(value = "something arbitrary", patternType = PatternType.CUSTOM)(new AuthenticatedRequest(FakeRequest(), user))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -46,7 +46,7 @@ class CustomOrTest extends AbstractViewTest {
 
   "when a custom permission denies it, the view" should {
     "hide constrained content and show fallback content" in new WithApplication(testApp(handler(subject = user, drh = drhDeny))) {
-      val html = patternOrContent(value = "something arbitrary", patternType = PatternType.CUSTOM)(AuthenticatedRequest(FakeRequest(), user))
+      val html = patternOrContent(value = "something arbitrary", patternType = PatternType.CUSTOM)(new AuthenticatedRequest(FakeRequest(), user))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")

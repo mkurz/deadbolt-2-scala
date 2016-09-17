@@ -33,7 +33,7 @@ class RegexTest extends AbstractViewTest {
 
   "when the subject has a permission that matches the pattern, the view" should {
      "show constrained content" in new WithApplication(testApp(handler(subject = userZombie, drh = drHandler))) {
-       val html = patternContent(value = "killer.undead.*", patternType = PatternType.REGEX)(AuthenticatedRequest(FakeRequest(), userZombie))
+       val html = patternContent(value = "killer.undead.*", patternType = PatternType.REGEX)(new AuthenticatedRequest(FakeRequest(), userZombie))
 
        private val content: String = Helpers.contentAsString(html)
        content must contain("This is before the constraint.")
@@ -44,7 +44,7 @@ class RegexTest extends AbstractViewTest {
 
   "when the subject has no permissions that match the pattern, the view" should {
     "hide constrained content" in new WithApplication(testApp(handler(subject = userFooBar, drh = drHandler))) {
-      val html = patternContent(value = "killer.undead.*", patternType = PatternType.REGEX)(AuthenticatedRequest(FakeRequest(), userFooBar))
+      val html = patternContent(value = "killer.undead.*", patternType = PatternType.REGEX)(new AuthenticatedRequest(FakeRequest(), userFooBar))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")

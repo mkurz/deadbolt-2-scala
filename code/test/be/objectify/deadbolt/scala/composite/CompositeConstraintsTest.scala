@@ -206,7 +206,7 @@ object CompositeConstraintsTest extends PlaySpecification with Mockito {
           val subject = Some(User())
           val drh = mock[DynamicResourceHandler]
           val dh = handler(subject, Some(drh))
-          drh.checkPermission(Matchers.eq("foo"), Matchers.eq(None), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future {false}(ec)
+          drh.checkPermission(Matchers.eq("foo"), Matchers.eq(None), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future.successful(false)
           val result: Future[Boolean] = constraints.Pattern("foo",
                                                             PatternType.CUSTOM,
                                                             meta = None,
@@ -219,7 +219,7 @@ object CompositeConstraintsTest extends PlaySpecification with Mockito {
           val subject = Some(User())
           val drh = mock[DynamicResourceHandler]
           val dh = handler(subject, Some(drh))
-          drh.checkPermission(Matchers.eq("foo"), Matchers.eq(None), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future {true}(ec)
+          drh.checkPermission(Matchers.eq("foo"), Matchers.eq(None), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future.successful(true)
           val result: Future[Boolean] = constraints.Pattern("foo",
                                                             PatternType.CUSTOM,
                                                             meta = None,
@@ -242,7 +242,7 @@ object CompositeConstraintsTest extends PlaySpecification with Mockito {
         val subject = Some(User())
         val drh = mock[DynamicResourceHandler]
         val dh = handler(subject, Some(drh))
-        drh.isAllowed(Matchers.eq("foo"), Matchers.eq(Some("bar")), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future {false}(ec)
+        drh.isAllowed(Matchers.eq("foo"), Matchers.eq(Some("bar")), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future.successful(false)
         val result: Future[Boolean] = constraints.Dynamic("foo",
                                                            Some("bar"))(request(subject), dh)
         await(result) should beFalse
@@ -253,7 +253,7 @@ object CompositeConstraintsTest extends PlaySpecification with Mockito {
         val subject = Some(User())
         val drh = mock[DynamicResourceHandler]
         val dh = handler(subject, Some(drh))
-        drh.isAllowed(Matchers.eq("foo"), Matchers.eq(Some("bar")), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future {true}(ec)
+        drh.isAllowed(Matchers.eq("foo"), Matchers.eq(Some("bar")), Matchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future.successful(true)
         val result: Future[Boolean] = constraints.Dynamic("foo",
                                                            Some("bar"))(request(subject), dh)
         await(result) should beTrue
@@ -286,7 +286,7 @@ object CompositeConstraintsTest extends PlaySpecification with Mockito {
     }
   }
 
-  private def request[A](maybeSubject: Option[Subject]): AuthenticatedRequest[A] = AuthenticatedRequest(mock[Request[A]], maybeSubject)
+  private def request[A](maybeSubject: Option[Subject]): AuthenticatedRequest[A] = new AuthenticatedRequest(mock[Request[A]], maybeSubject)
 
   private def handler(maybeSubject: Option[Subject]): DeadboltHandler = handler(maybeSubject, None)
 

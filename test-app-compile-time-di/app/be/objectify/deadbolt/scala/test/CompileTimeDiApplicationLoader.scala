@@ -4,16 +4,21 @@ import java.util.regex.Pattern
 
 import _root_.controllers.Assets
 import be.objectify.deadbolt.scala.test.controllers.composed.Composite
-import be.objectify.deadbolt.scala.{ExecutionContextProvider, DeadboltComponents}
-import be.objectify.deadbolt.scala.cache.{PatternCache, HandlerCache}
-import be.objectify.deadbolt.scala.test.dao.{TestSubjectDao, SubjectDao}
+import be.objectify.deadbolt.scala.{DeadboltComponents, ExecutionContextProvider}
+import be.objectify.deadbolt.scala.cache.{CompositeCache, HandlerCache, PatternCache}
+import be.objectify.deadbolt.scala.composite.Constraint
+import be.objectify.deadbolt.scala.test.dao.{SubjectDao, TestSubjectDao}
 import be.objectify.deadbolt.scala.test.security.{MyCompositeConstraints, MyHandlerCache}
-import play.api.{BuiltInComponentsFromContext, Application, ApplicationLoader}
+import play.api.{Application, ApplicationLoader, BuiltInComponentsFromContext}
 import play.api.ApplicationLoader.Context
 import play.api.routing.Router
+
 import scala.concurrent.ExecutionContext
 import be.objectify.deadbolt.scala.test.controllers._
+import play.api.mvc.AnyContent
 import router.Routes
+
+import scala.collection.mutable
 
 /**
  * Application loader for enabling compile-time DI.
@@ -66,4 +71,13 @@ class ApplicationComponents(context: Context) extends BuiltInComponentsFromConte
                                                 "")
 
   lazy val assets = new Assets(httpErrorHandler)
+
+  override def compositeCache: CompositeCache = new CompositeCache {
+
+    val composites: scala.collection.mutable.Map[String, Constraint[AnyContent]] = mutable.Map()
+
+    override def register(name: String, constraint: Constraint[AnyContent]): Unit = composites.put(name, constraint)
+
+    override def apply(name: String): Constraint[AnyContent] = composites(name)
+  }
 }

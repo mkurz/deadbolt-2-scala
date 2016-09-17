@@ -365,7 +365,7 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
     }
   }
 
-  private def request[A](maybeSubject: Option[Subject]): AuthenticatedRequest[A] = AuthenticatedRequest(mock[Request[A]], maybeSubject)
+  private def request[A](maybeSubject: Option[Subject]): AuthenticatedRequest[A] = new AuthenticatedRequest(mock[Request[A]], maybeSubject)
 
   private def handler(maybeSubject: Option[Subject]): DeadboltHandler = handler(maybeSubject, None)
 

@@ -189,7 +189,7 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
                         (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
     SubjectActionBuilder(None).async(bodyParser) { authRequest =>
       handler.getSubject(authRequest).flatMap{ maybeSubject =>
-        block(AuthenticatedRequest(authRequest, maybeSubject))
+        block(new AuthenticatedRequest(authRequest, maybeSubject))
       }(ec)
     }
 

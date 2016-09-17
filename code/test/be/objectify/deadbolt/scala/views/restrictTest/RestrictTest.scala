@@ -37,7 +37,7 @@ class RestrictTest extends AbstractViewTest {
 
   "when protected by a single role, the view" should {
     "hide constrained content when subject is not present" in new WithApplication(testApp(handler())) {
-      val html = restrictContent(allOfGroup("foo"))(AuthenticatedRequest(FakeRequest(), None))
+      val html = restrictContent(allOfGroup("foo"))(new AuthenticatedRequest(FakeRequest(), None))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -46,7 +46,7 @@ class RestrictTest extends AbstractViewTest {
     }
 
     "hide constrained content when subject does not have necessary role" in new WithApplication(testApp(handler(subject = regularUser))) {
-      val html = restrictContent(allOfGroup("admin"))(AuthenticatedRequest(FakeRequest(), regularUser))
+      val html = restrictContent(allOfGroup("admin"))(new AuthenticatedRequest(FakeRequest(), regularUser))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -55,7 +55,7 @@ class RestrictTest extends AbstractViewTest {
     }
 
     "hide constrained content when subject does not have any roles" in new WithApplication(testApp(handler(subject = noRoles))) {
-      val html = restrictContent(allOfGroup("admin"))(AuthenticatedRequest(FakeRequest(), noRoles))
+      val html = restrictContent(allOfGroup("admin"))(new AuthenticatedRequest(FakeRequest(), noRoles))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -64,7 +64,7 @@ class RestrictTest extends AbstractViewTest {
     }
 
     "hide constrained content when subject has other roles" in new WithApplication(testApp(handler(subject = regularUser))) {
-      val html = restrictContent(allOfGroup("admin"))(AuthenticatedRequest(FakeRequest(), regularUser))
+      val html = restrictContent(allOfGroup("admin"))(new AuthenticatedRequest(FakeRequest(), regularUser))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -73,7 +73,7 @@ class RestrictTest extends AbstractViewTest {
     }
 
     "show constrained content when subject has necessary role" in new WithApplication(testApp(handler(subject = admin))) {
-      val html = restrictContent(allOfGroup("admin"))(AuthenticatedRequest(FakeRequest(), admin))
+      val html = restrictContent(allOfGroup("admin"))(new AuthenticatedRequest(FakeRequest(), admin))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -84,7 +84,7 @@ class RestrictTest extends AbstractViewTest {
 
   "when protected by two ANDed roles, the view" should {
     "hide constrained content when subject is not present" in new WithApplication(testApp(handler())) {
-      val html = restrictContent(allOfGroup("admin", "watchdog"))(AuthenticatedRequest(FakeRequest(), None))
+      val html = restrictContent(allOfGroup("admin", "watchdog"))(new AuthenticatedRequest(FakeRequest(), None))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -93,7 +93,7 @@ class RestrictTest extends AbstractViewTest {
     }
 
     "hide constrained content when subject does not have necessary role" in new WithApplication(testApp(handler(subject = regularUser))) {
-      val html = restrictContent(allOfGroup("admin", "watchdog"))(AuthenticatedRequest(FakeRequest(), regularUser))
+      val html = restrictContent(allOfGroup("admin", "watchdog"))(new AuthenticatedRequest(FakeRequest(), regularUser))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -102,7 +102,7 @@ class RestrictTest extends AbstractViewTest {
     }
 
     "hide constrained content when subject does not have any roles" in new WithApplication(testApp(handler(subject = noRoles))) {
-      val html = restrictContent(allOfGroup("admin", "watchdog"))(AuthenticatedRequest(FakeRequest(), noRoles))
+      val html = restrictContent(allOfGroup("admin", "watchdog"))(new AuthenticatedRequest(FakeRequest(), noRoles))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -111,7 +111,7 @@ class RestrictTest extends AbstractViewTest {
     }
 
     "show constrained content when subject has both roles" in new WithApplication(testApp(handler(subject = adminWatchdog))) {
-      val html = restrictContent(allOfGroup("admin", "watchdog"))(AuthenticatedRequest(FakeRequest(), adminWatchdog))
+      val html = restrictContent(allOfGroup("admin", "watchdog"))(new AuthenticatedRequest(FakeRequest(), adminWatchdog))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -124,7 +124,7 @@ class RestrictTest extends AbstractViewTest {
   "when protected by two ORed roles, the view" should {
 
     "hide constrained content when subject is not present" in new WithApplication(testApp(handler())) {
-      val html = restrictContent(anyOfRoles(allOfRoles("admin"), allOfRoles("watchdog")))(AuthenticatedRequest(FakeRequest(), None))
+      val html = restrictContent(anyOfRoles(allOfRoles("admin"), allOfRoles("watchdog")))(new AuthenticatedRequest(FakeRequest(), None))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -133,7 +133,7 @@ class RestrictTest extends AbstractViewTest {
     }
 
     "hide constrained content when subject does not have either of the necessary roles" in new WithApplication(testApp(handler(subject = regularUser))) {
-      val html = restrictContent(anyOfRoles(allOfRoles("admin"), allOfRoles("watchdog")))(AuthenticatedRequest(FakeRequest(), regularUser))
+      val html = restrictContent(anyOfRoles(allOfRoles("admin"), allOfRoles("watchdog")))(new AuthenticatedRequest(FakeRequest(), regularUser))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -142,7 +142,7 @@ class RestrictTest extends AbstractViewTest {
     }
 
     "hide constrained content when subject does not have any roles" in new WithApplication(testApp(handler(subject = noRoles))) {
-      val html = restrictContent(anyOfRoles(allOfRoles("admin"), allOfRoles("watchdog")))(AuthenticatedRequest(FakeRequest(), noRoles))
+      val html = restrictContent(anyOfRoles(allOfRoles("admin"), allOfRoles("watchdog")))(new AuthenticatedRequest(FakeRequest(), noRoles))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -151,7 +151,7 @@ class RestrictTest extends AbstractViewTest {
     }
 
     "show constrained content when subject has both roles" in new WithApplication(testApp(handler(subject = adminWatchdog))) {
-      val html = restrictContent(anyOfRoles(allOfRoles("admin"), allOfRoles("watchdog")))(AuthenticatedRequest(FakeRequest(), adminWatchdog))
+      val html = restrictContent(anyOfRoles(allOfRoles("admin"), allOfRoles("watchdog")))(new AuthenticatedRequest(FakeRequest(), adminWatchdog))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -160,7 +160,7 @@ class RestrictTest extends AbstractViewTest {
     }
 
     "show constrained content when subject has one of the roles" in new WithApplication(testApp(handler(subject = admin))) {
-      val html = restrictContent(anyOfRoles(allOfRoles("admin"), allOfRoles("watchdog")))(AuthenticatedRequest(FakeRequest(), admin))
+      val html = restrictContent(anyOfRoles(allOfRoles("admin"), allOfRoles("watchdog")))(new AuthenticatedRequest(FakeRequest(), admin))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -169,7 +169,7 @@ class RestrictTest extends AbstractViewTest {
     }
 
     "show constrained content when subject has another one of the roles" in new WithApplication(testApp(handler(subject = watchdog))) {
-      val html = restrictContent(anyOfRoles(allOfRoles("admin"), allOfRoles("watchdog")))(AuthenticatedRequest(FakeRequest(), watchdog))
+      val html = restrictContent(anyOfRoles(allOfRoles("admin"), allOfRoles("watchdog")))(new AuthenticatedRequest(FakeRequest(), watchdog))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -180,7 +180,7 @@ class RestrictTest extends AbstractViewTest {
 
   "when a single role is present and negated, the view" should {
     "hide constrained content when subject is not present" in new WithApplication(testApp(handler())) {
-      val html = restrictContent(allOfGroup("!foo"))(AuthenticatedRequest(FakeRequest(), None))
+      val html = restrictContent(allOfGroup("!foo"))(new AuthenticatedRequest(FakeRequest(), None))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -189,7 +189,7 @@ class RestrictTest extends AbstractViewTest {
     }
 
     "hide constrained content when subject has the negated role" in new WithApplication(testApp(handler(subject = admin))) {
-      val html = restrictContent(allOfGroup("!admin"))(AuthenticatedRequest(FakeRequest(), admin))
+      val html = restrictContent(allOfGroup("!admin"))(new AuthenticatedRequest(FakeRequest(), admin))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -198,7 +198,7 @@ class RestrictTest extends AbstractViewTest {
     }
 
     "show constrained content when subject does not have the negated role" in new WithApplication(testApp(handler(subject = regularUser))) {
-      val html = restrictContent(allOfGroup("!admin"))(AuthenticatedRequest(FakeRequest(), regularUser))
+      val html = restrictContent(allOfGroup("!admin"))(new AuthenticatedRequest(FakeRequest(), regularUser))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -209,7 +209,7 @@ class RestrictTest extends AbstractViewTest {
 
   "when ANDed roles contain a negated role, the view" should {
     "show constrained content when subject is not present" in new WithApplication(testApp(handler())) {
-      val html = restrictContent(allOfGroup("!admin", "watchdog"))(AuthenticatedRequest(FakeRequest(), None))
+      val html = restrictContent(allOfGroup("!admin", "watchdog"))(new AuthenticatedRequest(FakeRequest(), None))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -218,7 +218,7 @@ class RestrictTest extends AbstractViewTest {
     }
 
     "hide constrained content when subject has the negated role" in new WithApplication(testApp(handler(subject = adminWatchdog))) {
-      val html = restrictContent(allOfGroup("!admin", "watchdog"))(AuthenticatedRequest(FakeRequest(), adminWatchdog))
+      val html = restrictContent(allOfGroup("!admin", "watchdog"))(new AuthenticatedRequest(FakeRequest(), adminWatchdog))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
@@ -227,7 +227,7 @@ class RestrictTest extends AbstractViewTest {
     }
 
     "show constrained content when subject has the non-negated role but does not have the negated role" in new WithApplication(testApp(handler(subject = watchdog))) {
-      val html = restrictContent(allOfGroup("!admin", "watchdog"))(AuthenticatedRequest(FakeRequest(), watchdog))
+      val html = restrictContent(allOfGroup("!admin", "watchdog"))(new AuthenticatedRequest(FakeRequest(), watchdog))
 
       private val content: String = Helpers.contentAsString(html)
       content must contain("This is before the constraint.")
