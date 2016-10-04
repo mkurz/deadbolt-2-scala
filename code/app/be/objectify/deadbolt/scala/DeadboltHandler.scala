@@ -15,8 +15,10 @@
  */
 package be.objectify.deadbolt.scala
 
-import be.objectify.deadbolt.scala.models.Subject
+import be.objectify.deadbolt.scala.ConstraintPoint.ConstraintPoint
+import be.objectify.deadbolt.scala.models.{Permission, Subject}
 import play.api.mvc.{Request, Result}
+
 import scala.concurrent.Future
 
 /**
@@ -56,6 +58,7 @@ trait DeadboltHandler {
     * @param request the authenticated request
     * @param constraintType the type of constraint, e.g. dynamic, restrict, etc
     * @param constraintPoint the point at which the constraint was applied
+    * @since 2.5.1
     */
   def onAuthSuccess[A](request: AuthenticatedRequest[A], constraintType: String, constraintPoint: ConstraintPoint): Unit = {}
 
