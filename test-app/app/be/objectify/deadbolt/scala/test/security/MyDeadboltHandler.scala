@@ -1,5 +1,6 @@
 package be.objectify.deadbolt.scala.test.security
 
+import be.objectify.deadbolt.scala.ConstraintPoint._
 import be.objectify.deadbolt.scala.models.Subject
 import be.objectify.deadbolt.scala.test.dao.SubjectDao
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, ConstraintPoint, DeadboltHandler, DynamicResourceHandler}
