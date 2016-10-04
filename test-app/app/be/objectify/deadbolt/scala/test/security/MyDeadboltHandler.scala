@@ -2,7 +2,8 @@ package be.objectify.deadbolt.scala.test.security
 
 import be.objectify.deadbolt.scala.models.Subject
 import be.objectify.deadbolt.scala.test.dao.SubjectDao
-import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltHandler, DynamicResourceHandler}
+import be.objectify.deadbolt.scala.{AuthenticatedRequest, ConstraintPoint, DeadboltHandler, DynamicResourceHandler}
+import play.api.Logger
 import play.api.mvc.{Request, Result, Results}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -12,6 +13,8 @@ import scala.concurrent.Future
  * @author Steve Chaloner (steve@objectify.be)
  */
 class MyDeadboltHandler(subjectDao: SubjectDao) extends DeadboltHandler {
+
+  val logger: Logger = Logger(this.getClass)
 
   val dynamicHandler: Option[DynamicResourceHandler] = Some(new CompositeDynamicResourceHandler(Map("niceName" -> new NiceNameDynamicResourceHandler,
                                                                                                     "useMetaInfo" -> new UseMetaHintDynamicResourceHandler)))
@@ -31,4 +34,7 @@ class MyDeadboltHandler(subjectDao: SubjectDao) extends DeadboltHandler {
     }
 
   override def onAuthFailure[A](request: AuthenticatedRequest[A]): Future[Result] = Future(Results.Unauthorized)
+
+  override def onAuthSuccess[A](request: AuthenticatedRequest[A], constraintType: String, constraintPoint: ConstraintPoint): Unit =
+    logger.info(s"[${request.subject.getOrElse("no user")}] granted access to [${request.path}] with [$constraintPoint] [$constraintType]")
 }

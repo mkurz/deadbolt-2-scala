@@ -43,11 +43,21 @@ trait DeadboltHandler {
   def getSubject[A](request: AuthenticatedRequest[A]): Future[Option[Subject]]
 
   /**
-   * Invoked when an authorisation failure is detected for the request.
+   * Invoked when an authorization failure is detected for the request.
    *
+   * @param request the authenticated request
    * @return the action
    */
   def onAuthFailure[A](request: AuthenticatedRequest[A]): Future[Result]
+
+  /**
+    * Invoked when authorization succeeds.
+    *
+    * @param request the authenticated request
+    * @param constraintType the type of constraint, e.g. dynamic, restrict, etc
+    * @param constraintPoint the point at which the constraint was applied
+    */
+  def onAuthSuccess[A](request: AuthenticatedRequest[A], constraintType: String, constraintPoint: ConstraintPoint): Unit = {}
 
   /**
    * Gets the handler used for dealing with resources restricted to specific users/groups.

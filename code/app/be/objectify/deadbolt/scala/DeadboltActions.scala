@@ -73,7 +73,10 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
               logic.restrict(authRequest,
                              handler,
                              roleGroups,
-                             (ar: AuthenticatedRequest[A]) => block(ar),
+                             (ar: AuthenticatedRequest[A]) => {
+                               handler.onAuthSuccess(authRequest, "restrict", ConstraintPoint.CONTROLLER)
+                               block(ar)
+                             },
                              (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
 
 
@@ -98,7 +101,10 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
                                          handler,
                                          name,
                                          meta,
-                                         (ar: AuthenticatedRequest[A]) => block(ar),
+                                         (ar: AuthenticatedRequest[A]) => {
+                                           handler.onAuthSuccess(authRequest, "dynamic", ConstraintPoint.CONTROLLER)
+                                           block(ar)
+                                         },
                                          (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
 
   /**
@@ -126,7 +132,10 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
                                          patternType,
                                          meta,
                                          invert,
-                                         (ar: AuthenticatedRequest[A]) => block(ar),
+                                         (ar: AuthenticatedRequest[A]) => {
+                                           handler.onAuthSuccess(authRequest, "pattern", ConstraintPoint.CONTROLLER)
+                                           block(ar)
+                                         },
                                          (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
 
   /**
@@ -144,7 +153,10 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
             bodyParser,
             authRequest => logic.subjectPresent(authRequest,
                                                 handler,
-                                                (ar: AuthenticatedRequest[A]) => block(ar),
+                                                (ar: AuthenticatedRequest[A]) => {
+                                                  handler.onAuthSuccess(authRequest, "subjectPresent", ConstraintPoint.CONTROLLER)
+                                                  block(ar)
+                                                },
                                                 (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
 
   /**
@@ -162,7 +174,10 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
             authRequest => logic.subjectPresent(authRequest,
                                                 handler,
                                                 (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar),
-                                                (ar: AuthenticatedRequest[A]) => block(ar)))
+                                                (ar: AuthenticatedRequest[A]) => {
+                                                  handler.onAuthSuccess(authRequest, "subjectNotPresent", ConstraintPoint.CONTROLLER)
+                                                  block(ar)
+                                                }))
 
   /**
     * Allows access if the composite constraint resolves to true..
@@ -180,7 +195,10 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
             authRequest => constraint(authRequest,
                                       handler)
                            .flatMap(passed =>
-                                      if (passed) block(authRequest)
+                                      if (passed) {
+                                        handler.onAuthSuccess(authRequest, "composite", ConstraintPoint.CONTROLLER)
+                                        block(authRequest)
+                                      }
                                       else handler.onAuthFailure(authRequest)
                            )(ec))
 

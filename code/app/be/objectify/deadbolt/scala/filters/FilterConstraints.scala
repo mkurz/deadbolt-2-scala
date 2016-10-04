@@ -46,7 +46,10 @@ class FilterConstraints @Inject()(constraintLogic: ConstraintLogic,
                (ar: AuthenticatedRequest[AnyContent], rh: RequestHeader) =>
                  constraintLogic.subjectPresent(ar,
                                                  handler,
-                                                 (ar: AuthenticatedRequest[AnyContent]) => next(rh),
+                                                 (ar: AuthenticatedRequest[AnyContent]) => {
+                                                   handler.onAuthSuccess(ar, "subjectPresent", ConstraintPoint.FILTER)
+                                                   next(rh)
+                                                 },
                                                  (ar: AuthenticatedRequest[AnyContent]) => handler.onAuthFailure(ar)))
   }
 
@@ -59,7 +62,10 @@ class FilterConstraints @Inject()(constraintLogic: ConstraintLogic,
                  constraintLogic.subjectPresent(ar,
                                                  handler,
                                                  (ar: AuthenticatedRequest[AnyContent]) => handler.onAuthFailure(ar),
-                                                 (ar: AuthenticatedRequest[AnyContent]) => next(rh)))
+                                                 (ar: AuthenticatedRequest[AnyContent]) => {
+                                                   handler.onAuthSuccess(ar, "subjectNotPresent", ConstraintPoint.FILTER)
+                                                   next(rh)
+                                                 }))
   }
 
   def restrict(roleGroups: RoleGroups): FilterFunction = new FilterFunction {
@@ -71,7 +77,10 @@ class FilterConstraints @Inject()(constraintLogic: ConstraintLogic,
                  constraintLogic.restrict(ar,
                                            handler,
                                            roleGroups,
-                                           (ar: AuthenticatedRequest[AnyContent]) => next(rh),
+                                           (ar: AuthenticatedRequest[AnyContent]) => {
+                                             handler.onAuthSuccess(ar, "restrict", ConstraintPoint.FILTER)
+                                             next(rh)
+                                           },
                                            (ar: AuthenticatedRequest[AnyContent]) => handler.onAuthFailure(ar)))
   }
 
@@ -85,7 +94,10 @@ class FilterConstraints @Inject()(constraintLogic: ConstraintLogic,
                                           handler,
                                           name,
                                           meta,
-                                          (ar: AuthenticatedRequest[AnyContent]) => next(rh),
+                                          (ar: AuthenticatedRequest[AnyContent]) => {
+                                            handler.onAuthSuccess(ar, "dynamic", ConstraintPoint.FILTER)
+                                            next(rh)
+                                          },
                                           (ar: AuthenticatedRequest[AnyContent]) => handler.onAuthFailure(ar)))
   }
 
@@ -101,7 +113,10 @@ class FilterConstraints @Inject()(constraintLogic: ConstraintLogic,
                                           patternType,
                                           meta,
                                           invert,
-                                          (ar: AuthenticatedRequest[AnyContent]) => next(requestHeader),
+                                          (ar: AuthenticatedRequest[AnyContent]) => {
+                                            handler.onAuthSuccess(ar, "pattern", ConstraintPoint.FILTER)
+                                            next(rh)
+                                          },
                                           (ar: AuthenticatedRequest[AnyContent]) => handler.onAuthFailure(ar)))
   }
 
@@ -112,7 +127,10 @@ class FilterConstraints @Inject()(constraintLogic: ConstraintLogic,
                requestHeader,
                (ar: AuthenticatedRequest[AnyContent], rh: RequestHeader) =>
                  constraint(ar, handler).flatMap(passed =>
-                   if (passed) next(requestHeader)
+                   if (passed) {
+                     handler.onAuthSuccess(ar, "composite", ConstraintPoint.FILTER)
+                     next(rh)
+                   }
                    else handler.onAuthFailure(authRequest))(ec))
   }
 

@@ -57,7 +57,10 @@ class ViewSupport @Inject()(config: Configuration,
                         request: AuthenticatedRequest[A]): Boolean =
     tryToComplete(logic.subjectPresent(request,
                                         deadboltHandler,
-                                        (ar: AuthenticatedRequest[A]) => allow(ar),
+                                        (ar: AuthenticatedRequest[A]) => {
+                                          deadboltHandler.onAuthSuccess(request, "subjectPresent", ConstraintPoint.TEMPLATE)
+                                          allow(ar)
+                                        },
                                         (ar: AuthenticatedRequest[A]) => deny(ar)),
                    timeoutInMillis)
 
@@ -74,7 +77,10 @@ class ViewSupport @Inject()(config: Configuration,
     tryToComplete(logic.subjectPresent(request,
                                         deadboltHandler,
                                         (ar: AuthenticatedRequest[A]) => deny(ar),
-                                        (ar: AuthenticatedRequest[A]) => allow(ar)),
+                                        (ar: AuthenticatedRequest[A]) => {
+                                          deadboltHandler.onAuthSuccess(request, "subjectNotPresent", ConstraintPoint.TEMPLATE)
+                                          allow(ar)
+                                        }),
                    timeoutInMillis)
 
   /**
@@ -92,7 +98,10 @@ class ViewSupport @Inject()(config: Configuration,
     tryToComplete(logic.restrict(request,
                                   deadboltHandler,
                                   roles,
-                                  (ar: AuthenticatedRequest[A]) => allow(ar),
+                                  (ar: AuthenticatedRequest[A]) => {
+                                    deadboltHandler.onAuthSuccess(request, "restrict", ConstraintPoint.TEMPLATE)
+                                    allow(ar)
+                                  },
                                   (ar: AuthenticatedRequest[A]) => deny(ar)),
                    timeoutInMillis)
 
@@ -112,7 +121,10 @@ class ViewSupport @Inject()(config: Configuration,
                                  deadboltHandler,
                                  name,
                                  meta,
-                                 (ar: AuthenticatedRequest[A]) => allow(ar),
+                                 (ar: AuthenticatedRequest[A]) => {
+                                   deadboltHandler.onAuthSuccess(request, "dynamic", ConstraintPoint.TEMPLATE)
+                                   allow(ar)
+                                 },
                                  (ar: AuthenticatedRequest[A]) => deny(ar)),
                    timeoutInMillis)
 
@@ -138,7 +150,10 @@ class ViewSupport @Inject()(config: Configuration,
                                  patternType,
                                  meta,
                                  invert,
-                                 (ar: AuthenticatedRequest[A]) => allow(ar),
+                                 (ar: AuthenticatedRequest[A]) => {
+                                   deadboltHandler.onAuthSuccess(request, "pattern", ConstraintPoint.TEMPLATE)
+                                   allow(ar)
+                                 },
                                  (ar: AuthenticatedRequest[A]) => deny(ar)),
                    timeoutInMillis)
 

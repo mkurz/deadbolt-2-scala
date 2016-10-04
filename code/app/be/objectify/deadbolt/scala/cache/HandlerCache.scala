@@ -27,21 +27,25 @@ import scala.concurrent.Future
 trait HandlerCache extends Function[HandlerKey, DeadboltHandler] with Function0[DeadboltHandler] {
   val defaultHandlerName: String = "defaultHandler"
 
+
   /**
    * Wraps the default handler in another handler that caches the result of getSubject.  Use this on a per-request basis.
    *
    * @return a handler
    */
-  def withCaching: DeadboltHandler = new SubjectCachingHandler(apply())
+  @deprecated(message = "Use the subject accessible via AuthenticatedRequest instead.  This will be removed in Deadbolt 2.6.", since = "2.5.1")
+  def withCaching = new SubjectCachingHandler(apply())
 
   /**
    * Wraps the handler in another handler that caches the result of getSubject.  Use this on a per-request basis.
    *
    * @return a handler
    */
+  @deprecated(message = "Use the subject accessible via AuthenticatedRequest instead.  This will be removed in Deadbolt 2.6.", since = "2.5.1")
   def withCaching(handlerKey: HandlerKey): DeadboltHandler = new SubjectCachingHandler(apply(handlerKey))
 
-  private class SubjectCachingHandler(delegate: DeadboltHandler) extends DeadboltHandler {
+  @deprecated(message = "Use the subject accessible via AuthenticatedRequest instead.  This will be removed in Deadbolt 2.6.", since = "2.5.1")
+  class SubjectCachingHandler(delegate: DeadboltHandler) extends DeadboltHandler {
 
     override def beforeAuthCheck[A](request: Request[A]): Future[Option[Result]] = delegate.beforeAuthCheck(request)
 
