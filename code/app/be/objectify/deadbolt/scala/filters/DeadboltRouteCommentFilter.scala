@@ -72,6 +72,12 @@ import scala.concurrent.Future
   * <li>handler - optional.  The name of a handler in the HandlerCache</li>
   * </ul>
   * </li>
+  * <li>deadbolt:rbp:name[role name]:handler[handler name]
+  * <ul>
+  * <li>role name - required.  The role name passed to DeadboltHandler#getPermissionsForRole</li>
+  * <li>handler - optional.  The name of a handler in the HandlerCache</li>
+  * </ul>
+  * </li>
   * </ul>
   *
   * Restrict is a tricky one, because the possible combinations of roles leads to a nightmare to parse.  Instead, define your role constraints within the
@@ -95,6 +101,7 @@ class DeadboltRouteCommentFilter @Inject()(materializer: Materializer,
   val patternComment = """deadbolt\:(pattern)\:value\[(.+?)\]\:type\[(EQUALITY|REGEX|CUSTOM)\](?:\:invert\[(true|false)\]){0,1}(?:\:handler\[(.+?)\]){0,1}""".r
   val compositeComment = """deadbolt\:(composite)\:name\[(.+?)\](?:\:handler\[(.+?)\]){0,1}""".r
   val restrictComment = """deadbolt\:(restrict)\:name\[(.+?)\](?:\:handler\[(.+?)\]){0,1}""".r
+  val roleBasedPermissionsComment = """deadbolt\:(rbp)\:name\[(.+?)\](?:\:handler\[(.+?)\]){0,1}""".r
 
   val handler = handlerCache()
 
@@ -143,6 +150,11 @@ class DeadboltRouteCommentFilter @Inject()(materializer: Materializer,
                                                                                                                Option(handlerCache(SimpleHandlerKey(handlerName))).getOrElse(
                                                                                                                  handler),
                                                                                                                next)
+        case roleBasedPermissionsComment(constraintName, name, handlerName) => constraints.roleBasedPermissions(name)(requestHeader,
+                                                                                                                      authenticatedRequest,
+                                                                                                                      Option(handlerCache(SimpleHandlerKey(handlerName))).getOrElse(
+                                                                                                                        handler),
+                                                                                                                      next)
         case _ =>
           logger.error(s"Unknown Deadbolt route comment [$comment], denying access with default handler")
           handler.onAuthFailure(authenticatedRequest)

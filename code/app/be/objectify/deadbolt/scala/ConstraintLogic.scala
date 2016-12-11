@@ -25,7 +25,7 @@ import scala.concurrent.Future
 class ConstraintLogic @Inject()(analyzer: StaticConstraintAnalyzer,
                                 ecProvider: ExecutionContextProvider) {
 
-  val ec = ecProvider.get()
+  private val ec = ecProvider.get()
 
   def restrict[A, B](authRequest: AuthenticatedRequest[A],
                      handler: DeadboltHandler,
@@ -51,6 +51,24 @@ class ConstraintLogic @Inject()(analyzer: StaticConstraintAnalyzer,
     }
   }
 
+  def roleBasedPermissions[A, B](authRequest: AuthenticatedRequest[A],
+                                 handler: DeadboltHandler,
+                                 roleName: String,
+                                 pass: AuthenticatedRequest[A] => Future[B],
+                                 fail: AuthenticatedRequest[A] => Future[B]): Future[B] = {
+    handler.getPermissionsForRole(roleName)
+    .flatMap {
+      case Nil => fail(authRequest)
+      case permissions if permissions.isEmpty => fail(authRequest)
+      case permissions => handler.getSubject(authRequest).flatMap {
+        case None => fail(authRequest)
+        case subjectOption@Some(subject) =>
+          if (permissions.foldLeft(false)((state, p) => state || analyzer.checkRegexPattern(subjectOption, Option(p))))
+            pass(new AuthenticatedRequest(authRequest, subjectOption))
+          else fail(authRequest)
+      }(ec)}(ec)
+  }
+
   def dynamic[A, B](authRequest: AuthenticatedRequest[A],
                     handler: DeadboltHandler,
                     name: String,
@@ -62,9 +80,10 @@ class ConstraintLogic @Inject()(analyzer: StaticConstraintAnalyzer,
         case Some(dynamicHandler) =>
           handler.getSubject(authRequest).flatMap(subjectOption => {
             val maybeWithSubject = new AuthenticatedRequest(authRequest, subjectOption)
-            dynamicHandler.isAllowed(name, meta, handler, maybeWithSubject).flatMap((allowed: Boolean) => allowed match {
-              case true => pass(maybeWithSubject)
-              case false => fail(maybeWithSubject)
+            dynamicHandler.isAllowed(name, meta, handler, maybeWithSubject).flatMap((allowed: Boolean) => if (allowed) {
+              pass(maybeWithSubject)
+            } else {
+              fail(maybeWithSubject)
             })(ec)
           })(ec)
         case None =>
@@ -98,9 +117,10 @@ class ConstraintLogic @Inject()(analyzer: StaticConstraintAnalyzer,
               drhOption match {
                 case Some(dynamicHandler) =>
                   dynamicHandler.checkPermission(value, meta, handler, authRequest).flatMap((allowed: Boolean) => {
-                    (if (invert) !allowed else allowed) match {
-                      case true => pass(withSubject)
-                      case false => fail(withSubject)
+                    if (if (invert) !allowed else allowed) {
+                      pass(withSubject)
+                    } else {
+                      fail(withSubject)
                     }
                   })(ec)
                 case None =>

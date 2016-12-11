@@ -81,6 +81,30 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
 
 
   /**
+    * Check if the subject has at least one of the permissions defined by [[DeadboltHandler.getPermissionsForRole()]].
+    *
+    * @param roleName the constraints
+    * @param handler the handler to use for constraint testing
+    * @param bodyParser a body parser
+    * @param block the action functionality
+    * @return
+    */
+  def RoleBasedPermissions[A](roleName: String,
+    handler: DeadboltHandler = handlers())
+    (bodyParser: BodyParser[A] = parse.anyContent)
+    (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
+    execute(handler,
+      bodyParser,
+      authRequest => logic.roleBasedPermissions(authRequest,
+                                                handler,
+                                                roleName,
+                                                (ar: AuthenticatedRequest[A]) => {
+                                                  handler.onAuthSuccess(ar, "roleBasedPermissions", ConstraintPoint.CONTROLLER)
+                                                  block(ar)
+                                                },
+                                                (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
+
+  /**
     * Apply a dynamic constraint to a controller action.
     *
     * @param name the name of the dynamic constraint
@@ -102,7 +126,7 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
                                          name,
                                          meta,
                                          (ar: AuthenticatedRequest[A]) => {
-                                           handler.onAuthSuccess(authRequest, "dynamic", ConstraintPoint.CONTROLLER)
+                                           handler.onAuthSuccess(ar, "dynamic", ConstraintPoint.CONTROLLER)
                                            block(ar)
                                          },
                                          (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
@@ -133,7 +157,7 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
                                          meta,
                                          invert,
                                          (ar: AuthenticatedRequest[A]) => {
-                                           handler.onAuthSuccess(authRequest, "pattern", ConstraintPoint.CONTROLLER)
+                                           handler.onAuthSuccess(ar, "pattern", ConstraintPoint.CONTROLLER)
                                            block(ar)
                                          },
                                          (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
@@ -154,7 +178,7 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
             authRequest => logic.subjectPresent(authRequest,
                                                 handler,
                                                 (ar: AuthenticatedRequest[A]) => {
-                                                  handler.onAuthSuccess(authRequest, "subjectPresent", ConstraintPoint.CONTROLLER)
+                                                  handler.onAuthSuccess(ar, "subjectPresent", ConstraintPoint.CONTROLLER)
                                                   block(ar)
                                                 },
                                                 (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
@@ -175,7 +199,7 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
                                                 handler,
                                                 (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar),
                                                 (ar: AuthenticatedRequest[A]) => {
-                                                  handler.onAuthSuccess(authRequest, "subjectNotPresent", ConstraintPoint.CONTROLLER)
+                                                  handler.onAuthSuccess(ar, "subjectNotPresent", ConstraintPoint.CONTROLLER)
                                                   block(ar)
                                                 }))
 

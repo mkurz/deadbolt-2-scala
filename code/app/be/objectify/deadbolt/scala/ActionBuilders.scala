@@ -41,6 +41,17 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
     }
   }
 
+  object RoleBasedPermissionsAction {
+
+    def apply(roleName: String): RoleBasedPermissionsAction.RoleBasedPermissionsActionBuilder = RoleBasedPermissionsActionBuilder(roleName)
+
+    case class RoleBasedPermissionsActionBuilder(roleName: String) extends DeadboltActionBuilder {
+
+      override def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
+        deadboltActions.RoleBasedPermissions(roleName, handler)(bodyParser)(block)
+    }
+  }
+
   object DynamicAction {
 
     def apply(name: String, meta: Option[Any] = None): DynamicAction.DynamicActionBuilder = DynamicActionBuilder(name, meta)

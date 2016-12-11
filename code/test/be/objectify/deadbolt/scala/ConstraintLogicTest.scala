@@ -365,6 +365,40 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
     }
   }
 
+  "roleBasedPermissions" should {
+    "invoke the pass function when" >> {
+      "the subject has at least one permission defined by DeadboltHandler#getPermissionsForRole" >> {
+        val subject = Some(User(permissions = List(SecurityPermission("hurdy.gurdy"))))
+        val result: Future[Boolean] = logic.roleBasedPermissions(request(subject),
+                                                                 handler(subject),
+                                                                 "foo",
+                                                                 pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                                 fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
+        await(result) should beTrue
+      }
+    }
+    "invoke the fail function when" >> {
+      "the subject has no permissions" >> {
+        val subject = Some(User())
+        val result: Future[Boolean] = logic.roleBasedPermissions(request(subject),
+                                                                 handler(subject),
+                                                                 "foo",
+                                                                 pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+                                                                 fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
+        await(result) should beFalse
+      }
+      "the subject has at no matching permissions" >> {
+        val subject = Some(User(permissions = List(SecurityPermission("aze.eza"))))
+        val result: Future[Boolean] = logic.roleBasedPermissions(request(subject),
+          handler(subject),
+          "foo",
+          pass = (ar: AuthenticatedRequest[_]) => Future.successful(true),
+          fail = (ar: AuthenticatedRequest[_]) => Future.successful(false))
+        await(result) should beFalse
+      }
+    }
+  }
+
   private def request[A](maybeSubject: Option[Subject]): AuthenticatedRequest[A] = new AuthenticatedRequest(mock[Request[A]], maybeSubject)
 
   private def handler(maybeSubject: Option[Subject]): DeadboltHandler = handler(maybeSubject, None)
@@ -374,5 +408,6 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
     val handler = mock[DeadboltHandler]
     handler.getSubject(any[AuthenticatedRequest[_]]) returns Future {maybeSubject}(ec)
     handler.getDynamicResourceHandler(any[AuthenticatedRequest[_]]) returns Future {maybeDrh}(ec)
+    handler.getPermissionsForRole("foo") returns Future{List("hurdy.*")}(ec)
   }
 }

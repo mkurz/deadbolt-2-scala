@@ -75,4 +75,12 @@ trait DeadboltHandler {
    * @return whatever the implementor considers the canonical name of the handler to be
    */
   def handlerName = getClass.getName
+
+  /**
+    * Get the permissions associated with a role.
+    *
+    * @param roleName the role the permissions are associated with
+    * @return a non-null list containing the permissions associated with the role
+    */
+  def getPermissionsForRole(roleName: String): Future[List[String]] = Future.successful { Nil }
 }

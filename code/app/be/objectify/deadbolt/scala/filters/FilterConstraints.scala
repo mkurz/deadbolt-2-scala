@@ -46,11 +46,11 @@ class FilterConstraints @Inject()(constraintLogic: ConstraintLogic,
                (ar: AuthenticatedRequest[AnyContent], rh: RequestHeader) =>
                  constraintLogic.subjectPresent(ar,
                                                  handler,
-                                                 (ar: AuthenticatedRequest[AnyContent]) => {
-                                                   handler.onAuthSuccess(ar, "subjectPresent", ConstraintPoint.FILTER)
+                                                 (ar2: AuthenticatedRequest[AnyContent]) => {
+                                                   handler.onAuthSuccess(ar2, "subjectPresent", ConstraintPoint.FILTER)
                                                    next(rh)
                                                  },
-                                                 (ar: AuthenticatedRequest[AnyContent]) => handler.onAuthFailure(ar)))
+                                                 (ar2: AuthenticatedRequest[AnyContent]) => handler.onAuthFailure(ar2)))
   }
 
   val subjectNotPresent: FilterFunction = new FilterFunction {
@@ -61,9 +61,9 @@ class FilterConstraints @Inject()(constraintLogic: ConstraintLogic,
                (ar: AuthenticatedRequest[AnyContent], rh: RequestHeader) =>
                  constraintLogic.subjectPresent(ar,
                                                  handler,
-                                                 (ar: AuthenticatedRequest[AnyContent]) => handler.onAuthFailure(ar),
-                                                 (ar: AuthenticatedRequest[AnyContent]) => {
-                                                   handler.onAuthSuccess(ar, "subjectNotPresent", ConstraintPoint.FILTER)
+                                                 (ar2: AuthenticatedRequest[AnyContent]) => handler.onAuthFailure(ar2),
+                                                 (ar2: AuthenticatedRequest[AnyContent]) => {
+                                                   handler.onAuthSuccess(ar2, "subjectNotPresent", ConstraintPoint.FILTER)
                                                    next(rh)
                                                  }))
   }
@@ -77,11 +77,11 @@ class FilterConstraints @Inject()(constraintLogic: ConstraintLogic,
                  constraintLogic.restrict(ar,
                                            handler,
                                            roleGroups,
-                                           (ar: AuthenticatedRequest[AnyContent]) => {
-                                             handler.onAuthSuccess(ar, "restrict", ConstraintPoint.FILTER)
+                                           (ar2: AuthenticatedRequest[AnyContent]) => {
+                                             handler.onAuthSuccess(ar2, "restrict", ConstraintPoint.FILTER)
                                              next(rh)
                                            },
-                                           (ar: AuthenticatedRequest[AnyContent]) => handler.onAuthFailure(ar)))
+                                           (ar2: AuthenticatedRequest[AnyContent]) => handler.onAuthFailure(ar2)))
   }
 
   def dynamic(name: String, meta: Option[Any] = None): FilterFunction = new FilterFunction {
@@ -94,11 +94,11 @@ class FilterConstraints @Inject()(constraintLogic: ConstraintLogic,
                                           handler,
                                           name,
                                           meta,
-                                          (ar: AuthenticatedRequest[AnyContent]) => {
-                                            handler.onAuthSuccess(ar, "dynamic", ConstraintPoint.FILTER)
+                                          (ar2: AuthenticatedRequest[AnyContent]) => {
+                                            handler.onAuthSuccess(ar2, "dynamic", ConstraintPoint.FILTER)
                                             next(rh)
                                           },
-                                          (ar: AuthenticatedRequest[AnyContent]) => handler.onAuthFailure(ar)))
+                                          (ar2: AuthenticatedRequest[AnyContent]) => handler.onAuthFailure(ar2)))
   }
 
   def pattern(value: String, patternType: PatternType, meta: Option[Any] = None, invert: Boolean = false): FilterFunction = new FilterFunction {
@@ -113,11 +113,29 @@ class FilterConstraints @Inject()(constraintLogic: ConstraintLogic,
                                           patternType,
                                           meta,
                                           invert,
-                                          (ar: AuthenticatedRequest[AnyContent]) => {
-                                            handler.onAuthSuccess(ar, "pattern", ConstraintPoint.FILTER)
+                                          (ar2: AuthenticatedRequest[AnyContent]) => {
+                                            handler.onAuthSuccess(ar2, "pattern", ConstraintPoint.FILTER)
                                             next(rh)
                                           },
-                                          (ar: AuthenticatedRequest[AnyContent]) => handler.onAuthFailure(ar)))
+                                          (ar2: AuthenticatedRequest[AnyContent]) => handler.onAuthFailure(ar2)))
+  }
+
+  def roleBasedPermissions(name: String): FilterFunction = new FilterFunction {
+    override def apply(requestHeader: RequestHeader, authRequest: AuthenticatedRequest[AnyContent], handler: DeadboltHandler, next: (RequestHeader) => Future[Result]): Future[Result] =
+      execute(handler,
+        authRequest,
+        requestHeader,
+        (ar: AuthenticatedRequest[AnyContent], rh: RequestHeader) =>
+          constraintLogic.roleBasedPermissions(ar,
+            handler,
+            name,
+            (ar2: AuthenticatedRequest[AnyContent]) => {
+              handler.onAuthSuccess(ar2, "roleBasedPermissions", ConstraintPoint.FILTER)
+              next(rh)
+            },
+            (ar2: AuthenticatedRequest[AnyContent]) => handler.onAuthFailure(ar2)
+          )
+      )
   }
 
   def composite(constraint: Constraint[AnyContent]): FilterFunction = new FilterFunction {
