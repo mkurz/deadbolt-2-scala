@@ -31,11 +31,11 @@ import scala.concurrent.Future
   */
 @Singleton
 class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
-                                handlers: HandlerCache,
-                                ecProvider: ExecutionContextProvider,
-                                logic: ConstraintLogic) extends Results with BodyParsers {
+  handlers: HandlerCache,
+  ecProvider: ExecutionContextProvider,
+  logic: ConstraintLogic) extends Results with BodyParsers {
 
-  val ec = ecProvider.get()
+  private val ec = ecProvider.get()
 
   /**
     * Restrict access to an action to users that have all the specified roles.
@@ -46,11 +46,11 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
     * @return
     */
   def Restrict[A](roleNames: RoleGroup,
-                  handler: DeadboltHandler)
-                 (bodyParser: BodyParser[A])
-                 (block: AuthenticatedRequest[A] => Future[Result]): Action[A] = {
+    handler: DeadboltHandler)
+    (bodyParser: BodyParser[A])
+    (block: AuthenticatedRequest[A] => Future[Result]): Action[A] = {
     Restrict[A](List(roleNames),
-                handler)(bodyParser)(block)
+      handler)(bodyParser)(block)
   }
 
   /**
@@ -64,20 +64,20 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
     * @return
     */
   def Restrict[A](roleGroups: RoleGroups,
-                  handler: DeadboltHandler = handlers())
-                 (bodyParser: BodyParser[A] = parse.anyContent)
-                 (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
+    handler: DeadboltHandler = handlers())
+    (bodyParser: BodyParser[A] = parse.anyContent)
+    (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
     execute(handler,
-            bodyParser,
-            authRequest =>
-              logic.restrict(authRequest,
-                             handler,
-                             roleGroups,
-                             (ar: AuthenticatedRequest[A]) => {
-                               handler.onAuthSuccess(authRequest, "restrict", ConstraintPoint.CONTROLLER)
-                               block(ar)
-                             },
-                             (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
+      bodyParser,
+      authRequest =>
+        logic.restrict(authRequest,
+          handler,
+          roleGroups,
+          (ar: AuthenticatedRequest[A]) => {
+            handler.onAuthSuccess(authRequest, "restrict", ConstraintPoint.CONTROLLER)
+            block(ar)
+          },
+          (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
 
 
   /**
@@ -96,13 +96,13 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
     execute(handler,
       bodyParser,
       authRequest => logic.roleBasedPermissions(authRequest,
-                                                handler,
-                                                roleName,
-                                                (ar: AuthenticatedRequest[A]) => {
-                                                  handler.onAuthSuccess(ar, "roleBasedPermissions", ConstraintPoint.CONTROLLER)
-                                                  block(ar)
-                                                },
-                                                (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
+        handler,
+        roleName,
+        (ar: AuthenticatedRequest[A]) => {
+          handler.onAuthSuccess(ar, "roleBasedPermissions", ConstraintPoint.CONTROLLER)
+          block(ar)
+        },
+        (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
 
   /**
     * Apply a dynamic constraint to a controller action.
@@ -115,21 +115,21 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
     * @return the action to take
     */
   def Dynamic[A](name: String,
-                 meta: Option[Any] = None,
-                 handler: DeadboltHandler = handlers())
-                (bodyParser: BodyParser[A] = parse.anyContent)
-                (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
+    meta: Option[Any] = None,
+    handler: DeadboltHandler = handlers())
+    (bodyParser: BodyParser[A] = parse.anyContent)
+    (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
     execute(handler,
-            bodyParser,
-            authRequest => logic.dynamic(authRequest,
-                                         handler,
-                                         name,
-                                         meta,
-                                         (ar: AuthenticatedRequest[A]) => {
-                                           handler.onAuthSuccess(ar, "dynamic", ConstraintPoint.CONTROLLER)
-                                           block(ar)
-                                         },
-                                         (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
+      bodyParser,
+      authRequest => logic.dynamic(authRequest,
+        handler,
+        name,
+        meta,
+        (ar: AuthenticatedRequest[A]) => {
+          handler.onAuthSuccess(ar, "dynamic", ConstraintPoint.CONTROLLER)
+          block(ar)
+        },
+        (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
 
   /**
     *
@@ -142,25 +142,25 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
     * @return the action to take
     */
   def Pattern[A](value: String,
-                 patternType: PatternType = PatternType.EQUALITY,
-                 meta: Option[Any] = None,
-                 handler: DeadboltHandler = handlers(),
-                 invert: Boolean = false)
-                (bodyParser: BodyParser[A] = parse.anyContent)
-                (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
+    patternType: PatternType = PatternType.EQUALITY,
+    meta: Option[Any] = None,
+    handler: DeadboltHandler = handlers(),
+    invert: Boolean = false)
+    (bodyParser: BodyParser[A] = parse.anyContent)
+    (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
     execute(handler,
-            bodyParser,
-            authRequest => logic.pattern(authRequest,
-                                         handler,
-                                         value,
-                                         patternType,
-                                         meta,
-                                         invert,
-                                         (ar: AuthenticatedRequest[A]) => {
-                                           handler.onAuthSuccess(ar, "pattern", ConstraintPoint.CONTROLLER)
-                                           block(ar)
-                                         },
-                                         (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
+      bodyParser,
+      authRequest => logic.pattern(authRequest,
+        handler,
+        value,
+        patternType,
+        meta,
+        invert,
+        (ar: AuthenticatedRequest[A]) => {
+          handler.onAuthSuccess(ar, "pattern", ConstraintPoint.CONTROLLER)
+          block(ar)
+        },
+        (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
 
   /**
     * Allows access to the action if there is a subject present.
@@ -171,17 +171,17 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
     * @return the action to take
     */
   def SubjectPresent[A](handler: DeadboltHandler = handlers())
-                       (bodyParser: BodyParser[A] = parse.anyContent)
-                       (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
+    (bodyParser: BodyParser[A] = parse.anyContent)
+    (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
     execute(handler,
-            bodyParser,
-            authRequest => logic.subjectPresent(authRequest,
-                                                handler,
-                                                (ar: AuthenticatedRequest[A]) => {
-                                                  handler.onAuthSuccess(ar, "subjectPresent", ConstraintPoint.CONTROLLER)
-                                                  block(ar)
-                                                },
-                                                (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
+      bodyParser,
+      authRequest => logic.subjectPresent(authRequest,
+        handler,
+        (ar: AuthenticatedRequest[A]) => {
+          handler.onAuthSuccess(ar, "subjectPresent", ConstraintPoint.CONTROLLER)
+          block(ar)
+        },
+        (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar)))
 
   /**
     * Denies access to the action if there is a subject present.
@@ -191,17 +191,17 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
     * @return the action to take
     */
   def SubjectNotPresent[A](handler: DeadboltHandler = handlers())
-                          (bodyParser: BodyParser[A] = parse.anyContent)
-                          (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
+    (bodyParser: BodyParser[A] = parse.anyContent)
+    (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
     execute(handler,
-            bodyParser,
-            authRequest => logic.subjectPresent(authRequest,
-                                                handler,
-                                                (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar),
-                                                (ar: AuthenticatedRequest[A]) => {
-                                                  handler.onAuthSuccess(ar, "subjectNotPresent", ConstraintPoint.CONTROLLER)
-                                                  block(ar)
-                                                }))
+      bodyParser,
+      authRequest => logic.subjectPresent(authRequest,
+        handler,
+        (ar: AuthenticatedRequest[A]) => handler.onAuthFailure(ar),
+        (ar: AuthenticatedRequest[A]) => {
+          handler.onAuthSuccess(ar, "subjectNotPresent", ConstraintPoint.CONTROLLER)
+          block(ar)
+        }))
 
   /**
     * Allows access if the composite constraint resolves to true..
@@ -211,24 +211,26 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
     * @return the action to take
     */
   def Composite[A](handler: DeadboltHandler = handlers(),
-                   constraint: Constraint[A])
-                  (bodyParser: BodyParser[A] = parse.anyContent)
-                  (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
+    constraint: Constraint[A])
+    (bodyParser: BodyParser[A] = parse.anyContent)
+    (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
     execute(handler,
-            bodyParser,
-            authRequest => constraint(authRequest,
-                                      handler)
-                           .flatMap(passed =>
-                                      if (passed) {
-                                        handler.onAuthSuccess(authRequest, "composite", ConstraintPoint.CONTROLLER)
-                                        block(authRequest)
-                                      }
-                                      else handler.onAuthFailure(authRequest)
-                           )(ec))
+      bodyParser,
+      authRequest => handler.getSubject(authRequest).flatMap { maybeSubject =>
+        val ar = new AuthenticatedRequest(authRequest, maybeSubject)
+        constraint(ar,
+          handler)
+        .flatMap(passed =>
+          if (passed) {
+            handler.onAuthSuccess(ar, "composite", ConstraintPoint.CONTROLLER)
+            block(ar)
+          }
+          else handler.onAuthFailure(ar))(ec)
+      }(ec))
 
   def WithAuthRequest[A](handler: DeadboltHandler = handlers())
-                        (bodyParser: BodyParser[A] = parse.anyContent)
-                        (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
+    (bodyParser: BodyParser[A] = parse.anyContent)
+    (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
     SubjectActionBuilder(None).async(bodyParser) { authRequest =>
       handler.getSubject(authRequest).flatMap{ maybeSubject =>
         block(new AuthenticatedRequest(authRequest, maybeSubject))
@@ -243,12 +245,12 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
     * @return the action to take
     */
   def execute[A](handler: DeadboltHandler,
-                 bodyParser: BodyParser[A],
-                 block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
+    bodyParser: BodyParser[A],
+    block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
     SubjectActionBuilder(None).async(bodyParser) { authRequest =>
       handler.beforeAuthCheck(authRequest).flatMap {
-                                                     case Some(result) => Future.successful(result)
-                                                     case None => block(authRequest)
-                                                   }(ec)
-                                                 }
+        case Some(result) => Future.successful(result)
+        case None => block(authRequest)
+      }(ec)
+    }
 }

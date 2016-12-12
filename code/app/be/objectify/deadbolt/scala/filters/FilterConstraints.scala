@@ -36,7 +36,7 @@ import scala.concurrent.Future
 class FilterConstraints @Inject()(constraintLogic: ConstraintLogic,
                                   ecProvider: ExecutionContextProvider) {
 
-  val ec = ecProvider.get()
+  private val ec = ecProvider.get()
 
   val subjectPresent: FilterFunction = new FilterFunction {
     override def apply(requestHeader: RequestHeader, authRequest: AuthenticatedRequest[AnyContent], handler: DeadboltHandler, next: (RequestHeader) => Future[Result]): Future[Result] =
@@ -140,16 +140,19 @@ class FilterConstraints @Inject()(constraintLogic: ConstraintLogic,
 
   def composite(constraint: Constraint[AnyContent]): FilterFunction = new FilterFunction {
     override def apply(requestHeader: RequestHeader, authRequest: AuthenticatedRequest[AnyContent], handler: DeadboltHandler, next: (RequestHeader) => Future[Result]): Future[Result] =
-      execute(handler,
-               authRequest,
-               requestHeader,
-               (ar: AuthenticatedRequest[AnyContent], rh: RequestHeader) =>
-                 constraint(ar, handler).flatMap(passed =>
-                   if (passed) {
-                     handler.onAuthSuccess(ar, "composite", ConstraintPoint.FILTER)
-                     next(rh)
-                   }
-                   else handler.onAuthFailure(authRequest))(ec))
+      handler.getSubject(authRequest).flatMap { maybeSubject =>
+        val ar = new AuthenticatedRequest(authRequest, maybeSubject)
+        execute(handler,
+          ar,
+          requestHeader,
+          (ar2: AuthenticatedRequest[AnyContent], rh: RequestHeader) =>
+            constraint(ar2, handler).flatMap(passed =>
+              if (passed) {
+                handler.onAuthSuccess(ar2, "composite", ConstraintPoint.FILTER)
+                next(rh)
+              }
+              else handler.onAuthFailure(ar2))(ec))
+      }(ec)
   }
 
   private def execute(handler: DeadboltHandler,

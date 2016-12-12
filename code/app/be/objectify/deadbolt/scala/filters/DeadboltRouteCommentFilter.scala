@@ -103,7 +103,7 @@ class DeadboltRouteCommentFilter @Inject()(materializer: Materializer,
   val restrictComment = """deadbolt\:(restrict)\:name\[(.+?)\](?:\:handler\[(.+?)\]){0,1}""".r
   val roleBasedPermissionsComment = """deadbolt\:(rbp)\:name\[(.+?)\](?:\:handler\[(.+?)\]){0,1}""".r
 
-  val handler = handlerCache()
+  private val handler = handlerCache()
 
   override implicit def mat: Materializer = materializer
 
