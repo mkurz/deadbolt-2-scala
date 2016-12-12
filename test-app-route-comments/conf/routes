@@ -1,0 +1,40 @@
+#deadbolt:subjectPresent
+GET        /subject/mustBePresent                    be.objectify.deadbolt.scala.test.controllers.App.index
+#deadbolt:subjectNotPresent
+GET        /subject/mustNotBePresent                 be.objectify.deadbolt.scala.test.controllers.App.index
+
+#deadbolt:dynamic:name[niceName]
+GET        /dynamic/niceName                         be.objectify.deadbolt.scala.test.controllers.App.index
+
+#deadbolt:pattern:value[i-do-not-like-ice-cream]:type[CUSTOM]
+GET        /pattern/custom                           be.objectify.deadbolt.scala.test.controllers.App.index
+#deadbolt:pattern:value[i-do-not-like-ice-cream]:type[CUSTOM]:invert[true]
+GET        /pattern/custom/invert                    be.objectify.deadbolt.scala.test.controllers.App.index
+#deadbolt:pattern:value[killer.undead.zombie]:type[EQUALITY]
+GET        /pattern/equality                         be.objectify.deadbolt.scala.test.controllers.App.index
+#deadbolt:pattern:value[killer.undead.zombie]:type[EQUALITY]:invert[true]
+GET        /pattern/equality/invert                  be.objectify.deadbolt.scala.test.controllers.App.index
+#deadbolt:pattern:value[killer.undead.zombie]:type[REGEX]
+GET        /pattern/regex/zombieKillers              be.objectify.deadbolt.scala.test.controllers.App.index
+#deadbolt:pattern:value[killer.undead.zombie]:type[REGEX]:invert[true]
+GET        /pattern/regex/zombieKillers/invert       be.objectify.deadbolt.scala.test.controllers.App.index
+#deadbolt:pattern:value[killer.undead.*]:type[REGEX]
+GET        /pattern/regex/undeadKillers              be.objectify.deadbolt.scala.test.controllers.App.index
+#deadbolt:pattern:value[killer.undead.*]:type[REGEX]:invert[true]
+GET        /pattern/regex/undeadKillers/invert       be.objectify.deadbolt.scala.test.controllers.App.index
+
+#deadbolt:restrict:name[fooAndBar]
+GET        /restrict/fooAndBar                       be.objectify.deadbolt.scala.test.controllers.App.index
+#deadbolt:restrict:name[fooOrBar]
+GET        /restrict/fooOrBar                        be.objectify.deadbolt.scala.test.controllers.App.index
+#deadbolt:restrict:name[fooAndNotBar]
+GET        /restrict/fooAndNotBar                    be.objectify.deadbolt.scala.test.controllers.App.index
+#deadbolt:restrict:name[fooOrNotBar]
+GET        /restrict/fooOrNotBar                     be.objectify.deadbolt.scala.test.controllers.App.index
+
+GET        /composite/subjectNotPresent              be.objectify.deadbolt.scala.test.controllers.App.index
+GET        /composite/subjectHasPermission           be.objectify.deadbolt.scala.test.controllers.App.index
+GET        /composite/subjectDoesNotHavePermission   be.objectify.deadbolt.scala.test.controllers.App.index
+GET        /composite/roleButNotDynamic              be.objectify.deadbolt.scala.test.controllers.App.index
+GET        /composite/noRoleButPassesDynamic         be.objectify.deadbolt.scala.test.controllers.App.index
+GET        /composite/hasRoleAndPassesDynamic        be.objectify.deadbolt.scala.test.controllers.App.index
