@@ -19,5 +19,6 @@ resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
 
 resolvers += Resolver.sonatypeRepo("snapshots")
 
-
 fork in Test := true
+
+releasePublishArtifactsAction := PgpKeys.publishSigned.value
