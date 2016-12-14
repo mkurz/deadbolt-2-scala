@@ -18,6 +18,7 @@ script:
 - cd ../code
 after_success:
 - ! '[[ $TRAVIS_BRANCH == "master" ]] && { sbt publish; };'
+- python <(curl -s https://raw.githubusercontent.com/TouK/sputnik-ci/master/sputnik-ci.py)
 sudo: false
 env:
   global:
