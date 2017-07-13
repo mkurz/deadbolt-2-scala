@@ -1,8 +1,9 @@
 package be.objectify.deadbolt.scala.test.controllers.builder
 
+import javax.inject.Inject
+
 import be.objectify.deadbolt.scala.test.controllers.AbstractRestrict
 import be.objectify.deadbolt.scala.{ActionBuilders, allOf, allOfGroup, anyOf}
-import com.google.inject.Inject
 import play.api.mvc.Controller
 
 import scala.concurrent.ExecutionContext.Implicits.global

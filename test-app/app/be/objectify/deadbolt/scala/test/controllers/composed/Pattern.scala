@@ -1,11 +1,10 @@
 package be.objectify.deadbolt.scala.test.controllers.composed
 
-import be.objectify.deadbolt.scala.models.PatternType
 import be.objectify.deadbolt.scala.DeadboltActions
+import be.objectify.deadbolt.scala.models.PatternType
 import be.objectify.deadbolt.scala.test.controllers.AbstractPattern
-import com.google.inject.Inject
-import play.api.mvc.{Action, Controller}
-import play.mvc.BodyParser.AnyContent
+import javax.inject.Inject
+import play.api.mvc.Controller
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

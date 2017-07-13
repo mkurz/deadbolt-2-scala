@@ -2,7 +2,7 @@ package be.objectify.deadbolt.scala.test.controllers.composed
 
 import be.objectify.deadbolt.scala.test.controllers.AbstractRestrict
 import be.objectify.deadbolt.scala.{DeadboltActions, allOf, allOfGroup, anyOf}
-import com.google.inject.Inject
+import javax.inject.Inject
 import play.api.mvc.Controller
 
 import scala.concurrent.ExecutionContext.Implicits.global

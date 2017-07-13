@@ -3,7 +3,7 @@ package be.objectify.deadbolt.scala.test.controllers
 import be.objectify.deadbolt.scala.test.dao.{SubjectDao, TestSubjectDao}
 import play.api.inject._
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.ws.{WSAPI, WSClient}
+import play.api.libs.ws.WSClient
 import play.api.test.PlaySpecification
 import play.api.{Application, Mode}
 

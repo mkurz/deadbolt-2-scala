@@ -1,11 +1,6 @@
 package be.objectify.deadbolt.scala.test.controllers
 
-import be.objectify.deadbolt.scala.{DeadboltActions, allOf, allOfGroup, anyOf}
-import com.google.inject.Inject
-import play.api.mvc.{Action, AnyContent, Controller}
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import play.api.mvc.{Action, AnyContent}
 
 /**
   * @author Steve Chaloner (steve@objectify.be)
