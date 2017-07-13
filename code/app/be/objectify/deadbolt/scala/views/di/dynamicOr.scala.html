@@ -1,0 +1,8 @@
+@this(viewSupport: be.objectify.deadbolt.scala.ViewSupport, handlerCache: be.objectify.deadbolt.scala.cache.HandlerCache)
+@(handler: be.objectify.deadbolt.scala.DeadboltHandler = handlerCache.apply(), name: String, meta: Option[Any] = None, timeout: Function0[Long] = viewSupport.defaultTimeout)(body: => play.twirl.api.Html)(alternativeBody: => play.twirl.api.Html)(implicit request: be.objectify.deadbolt.scala.AuthenticatedRequest[Any])
+
+@if(viewSupport.dynamic(name, meta, handler, timeout(), request)) {
+@body
+} else {
+@alternativeBody
+}

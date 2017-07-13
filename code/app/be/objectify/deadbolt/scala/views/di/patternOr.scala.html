@@ -1,0 +1,8 @@
+@this(viewSupport: be.objectify.deadbolt.scala.ViewSupport, handlerCache: be.objectify.deadbolt.scala.cache.HandlerCache)
+@(handler: be.objectify.deadbolt.scala.DeadboltHandler = handlerCache.apply(), value: String, patternType: be.objectify.deadbolt.scala.models.PatternType = be.objectify.deadbolt.scala.models.PatternType.EQUALITY, meta: Option[Any] = None, invert: Boolean = false, timeout: Function0[Long] = viewSupport.defaultTimeout)(body: => play.twirl.api.Html)(alternativeBody: => play.twirl.api.Html)(implicit request: be.objectify.deadbolt.scala.AuthenticatedRequest[Any])
+
+@if(viewSupport.pattern(value, patternType, meta, invert, handler, timeout(), request)) {
+@body
+} else {
+@alternativeBody
+}

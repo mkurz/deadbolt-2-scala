@@ -1,0 +1,12 @@
+@this(patternOr: be.objectify.deadbolt.scala.views.html.di.patternOr)
+@(value: String, patternType: be.objectify.deadbolt.scala.models.PatternType)(implicit request: be.objectify.deadbolt.scala.AuthenticatedRequest[Any])
+
+This is before the constraint.
+
+@patternOr(value = value, patternType = patternType) {
+    This is protected by the constraint.
+}{
+    This is default content in case the constraint denies access to the protected content.
+}
+
+This is after the constraint.

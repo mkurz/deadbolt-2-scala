@@ -1,0 +1,10 @@
+@this(dynamic: be.objectify.deadbolt.scala.views.html.di.dynamic)
+@(name: String, meta: Option[Any])(implicit request: be.objectify.deadbolt.scala.AuthenticatedRequest[Any])
+
+This is before the constraint.
+
+@dynamic(name = name, meta = meta) {
+    This is protected by the constraint.
+}
+
+This is after the constraint.

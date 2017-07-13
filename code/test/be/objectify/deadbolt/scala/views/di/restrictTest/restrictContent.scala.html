@@ -1,0 +1,10 @@
+@this(restrict: be.objectify.deadbolt.scala.views.html.di.restrict)
+@(roles: be.objectify.deadbolt.scala.RoleGroups)(implicit request: be.objectify.deadbolt.scala.AuthenticatedRequest[Any])
+
+This is before the constraint.
+
+@restrict(roles = roles) {
+    This is protected by the constraint.
+}
+
+This is after the constraint.

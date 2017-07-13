@@ -1,0 +1,12 @@
+@this(subjectNotPresentOr: be.objectify.deadbolt.scala.views.html.di.subjectNotPresentOr)
+@(implicit request: be.objectify.deadbolt.scala.AuthenticatedRequest[Any])
+
+This is before the constraint.
+
+@subjectNotPresentOr() {
+    This is protected by the constraint.
+}{
+    This is default content in case the constraint denies access to the protected content.
+}
+
+This is after the constraint.

@@ -1,0 +1,10 @@
+@this(subjectPresent: be.objectify.deadbolt.scala.views.html.di.subjectPresent)
+@(implicit request: be.objectify.deadbolt.scala.AuthenticatedRequest[Any])
+
+This is before the constraint.
+
+@subjectPresent() {
+    This is protected by the constraint.
+}
+
+This is after the constraint.

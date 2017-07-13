@@ -1,9 +1,0 @@
-@import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltHandler}
-@import play.api.Play.current
-@import be.objectify.deadbolt.scala.ViewAccessPoint.Implicits._
-@import be.objectify.deadbolt.scala.models.PatternType
-@(handler: DeadboltHandler = handlerCache.apply(), value: String, patternType: PatternType = PatternType.EQUALITY, meta: Option[Any] = None, invert: Boolean = false, timeout: Function0[Long] = viewSupport.defaultTimeout)(body: => play.twirl.api.Html)(implicit request: AuthenticatedRequest[Any])
-
-@if(viewSupport.pattern(value, patternType, meta, invert, handler, timeout(), request)) {
-@body
-}

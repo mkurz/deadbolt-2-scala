@@ -1,0 +1,12 @@
+@this(dynamicOr: be.objectify.deadbolt.scala.views.html.di.dynamicOr)
+@(name: String, meta: Option[Any])(implicit request: be.objectify.deadbolt.scala.AuthenticatedRequest[Any])
+
+This is before the constraint.
+
+@dynamicOr(name = name, meta = meta) {
+    This is protected by the constraint.
+}{
+    This is default content in case the constraint denies access to the protected content.
+}
+
+This is after the constraint.
