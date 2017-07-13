@@ -16,21 +16,25 @@
 package be.objectify.deadbolt.scala
 
 import be.objectify.deadbolt.scala.models.Subject
-import play.api.mvc.{ActionBuilder, ActionTransformer, Request}
+import play.api.mvc.{ActionBuilder, ActionTransformer, BodyParser, Request}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * @author Steve Chaloner (steve@objectify.be)
   */
 object SubjectActionBuilder {
 
-  def apply(subject: Option[Subject]) = AuthenticatedActionBuilder(subject)
+  def apply[B](subject: Option[Subject], executionContext: ExecutionContext, parser: BodyParser[B]) =
+    AuthenticatedActionBuilder(subject, executionContext, parser)
 
-  case class AuthenticatedActionBuilder(subject: Option[Subject]) extends SubjectActionBuilder
+  case class AuthenticatedActionBuilder[B](subject: Option[Subject],
+                                           override val executionContext: ExecutionContext,
+                                           override val parser: BodyParser[B]
+                                          ) extends SubjectActionBuilder[B]
 }
 
-trait SubjectActionBuilder extends ActionBuilder[AuthenticatedRequest] with ActionTransformer[Request, AuthenticatedRequest] {
+trait SubjectActionBuilder[B] extends ActionBuilder[AuthenticatedRequest, B] with ActionTransformer[Request, AuthenticatedRequest] {
 
   def subject: Option[Subject]
 

@@ -2,12 +2,14 @@ package be.objectify.deadbolt.scala
 
 import java.util.regex.Pattern
 
+import akka.stream.Materializer
 import be.objectify.deadbolt.scala.cache.{HandlerCache, PatternCache}
 import be.objectify.deadbolt.scala.composite.CompositeConstraints
 import be.objectify.deadbolt.scala.models.Subject
 import be.objectify.deadbolt.scala.testhelpers.User
 import org.specs2.mock.Mockito
-import play.api.mvc.{Request, Result, Results}
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.{PlayBodyParsers, Request, Result, Results}
 import play.api.test.PlaySpecification
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -16,6 +18,9 @@ import scala.concurrent.{ExecutionContext, Future}
   * @author Steve Chaloner (steve@objectify.be)
   */
 object DeadboltActionsTest extends PlaySpecification with Mockito {
+
+  implicit lazy val materializer: Materializer = GuiceApplicationBuilder().build().materializer
+
   private val ec = scala.concurrent.ExecutionContext.Implicits.global
   private val analyzer = new StaticConstraintAnalyzer(new PatternCache {
     override def apply(value: String): Option[Pattern] = Some(Pattern.compile(value))
@@ -29,13 +34,16 @@ object DeadboltActionsTest extends PlaySpecification with Mockito {
   val composite: CompositeConstraints = new CompositeConstraints(logic,
     ecProvider)
 
+  val parsers: PlayBodyParsers = PlayBodyParsers()
+
   private def deadbolt(handler: DeadboltHandler): DeadboltActions = new DeadboltActions(analyzer,
     new HandlerCache {
       override def apply(): DeadboltHandler = handler
       override def apply(v1: HandlerKey): DeadboltHandler = handler
     },
     ecProvider,
-    logic)
+    logic,
+    parsers)
 
   private def request[A](maybeSubject: Option[Subject]): AuthenticatedRequest[A] = new AuthenticatedRequest(mock[Request[A]], maybeSubject)
 
