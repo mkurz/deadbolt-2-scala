@@ -27,9 +27,7 @@ object ViewSupportTest extends PlaySpecification with Mockito {
                                                       override def get(): ExecutionContext = ec
                                                     })
 
-  val config: Configuration = mock[Configuration]
-  config.getLong("deadbolt.scala.view-timeout") returns None
-  val viewSupport: ViewSupport = new ViewSupport(config,
+  val viewSupport: ViewSupport = new ViewSupport(Configuration.empty,
                                                   new DefaultTemplateFailureListenerProvider(mock[Provider[Application]]),
                                                   logic)
 

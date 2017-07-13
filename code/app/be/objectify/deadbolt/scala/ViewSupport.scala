@@ -18,7 +18,7 @@ package be.objectify.deadbolt.scala
 import javax.inject.{Inject, Singleton}
 
 import be.objectify.deadbolt.scala.models.PatternType
-import play.api.{Configuration, Logger}
+import play.api.{ConfigLoader, Configuration, Logger}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -35,7 +35,7 @@ class ViewSupport @Inject()(config: Configuration,
 
   val logger: Logger = Logger("deadbolt.template")
 
-  val timeout: Long = config.getLong("deadbolt.scala.view-timeout").getOrElse(1000L)
+  val timeout: Long = config.getOptional[Long]("deadbolt.scala.view-timeout").getOrElse(1000L)
   logger.info(s"Default timeout period for blocking views is [$timeout]ms")
 
   val defaultTimeout: () => Long = () => timeout
