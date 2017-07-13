@@ -2,17 +2,17 @@ language: scala
 jdk:
 - oraclejdk8
 scala:
-- 2.11.7
+- 2.11.11
 script:
 - cd code
-- sbt --warn ++$TRAVIS_SCALA_VERSION test
-- sbt --warn ++$TRAVIS_SCALA_VERSION publishLocal
+- sbt --warn ++$TRAVIS_SCALA_VERSION +test
+- sbt --warn ++$TRAVIS_SCALA_VERSION +publishLocal
 - cd ../test-app
-- sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.6.0 test
-- sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.6.1 test
+- sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.6.0 +test
+- sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.6.1 +test
 - cd ../code
 after_success:
-- ! '[[ $TRAVIS_BRANCH == "master" ]] && { sbt publish; };'
+- ! '[[ $TRAVIS_BRANCH == "master" ]] && { sbt +publish; };'
 - python <(curl -s https://raw.githubusercontent.com/TouK/sputnik-ci/master/sputnik-ci.py)
 sudo: false
 env:
