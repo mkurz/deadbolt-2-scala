@@ -23,7 +23,7 @@ import be.objectify.deadbolt.scala.cache.{CompositeCache, HandlerCache}
 import be.objectify.deadbolt.scala.models.PatternType
 import play.api.Logger
 import play.api.mvc._
-import play.api.routing.Router.Tags
+import play.api.routing.Router
 
 import scala.concurrent.Future
 
@@ -108,7 +108,7 @@ class DeadboltRouteCommentFilter @Inject()(materializer: Materializer,
   override implicit def mat: Materializer = materializer
 
   override def apply(next: (RequestHeader) => Future[Result])(requestHeader: RequestHeader): Future[Result] = {
-    val comment: String = requestHeader.tags.getOrElse(Tags.RouteComments, "")
+    val comment: String = requestHeader.attrs.get(Router.Attrs.HandlerDef).map(handlerDef => handlerDef.comments).getOrElse("")
     if (comment startsWith "deadbolt:") {
       val authenticatedRequest = new AuthenticatedRequest[AnyContent](Request[AnyContent](requestHeader, AnyContentAsEmpty), None)
       comment match {

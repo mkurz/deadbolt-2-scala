@@ -21,6 +21,7 @@ import akka.stream.Materializer
 import be.objectify.deadbolt.scala.cache.HandlerCache
 import be.objectify.deadbolt.scala.AuthenticatedRequest
 import play.api.mvc._
+import play.api.routing.Router
 import play.api.routing.Router.Tags
 
 import scala.concurrent.Future
@@ -44,7 +45,7 @@ class DeadboltRoutePathFilter @Inject()(val materializer: Materializer, handlerC
 
   override def apply(next: (RequestHeader) => Future[Result])(requestHeader: RequestHeader): Future[Result] =
 
-    authorizedRoutes(requestHeader.method, requestHeader.tags(Tags.RoutePattern)) match {
+    authorizedRoutes(requestHeader.method, requestHeader.attrs(Router.Attrs.HandlerDef).path) match {
       case Some(authRoute) => authRoute.constraint(requestHeader,
                                                     new AuthenticatedRequest[AnyContent](Request[AnyContent](requestHeader, AnyContentAsEmpty), None),
                                                     authRoute.handler.getOrElse(handler),
