@@ -20,15 +20,13 @@ import javax.inject.Provider
 import be.objectify.deadbolt.scala.ViewSupportTest.{logic, mock}
 import be.objectify.deadbolt.scala.cache.HandlerCache
 import be.objectify.deadbolt.scala.models.{Permission, Role, Subject}
-import be.objectify.deadbolt.scala.testhelpers.{FakeCache, User}
+import be.objectify.deadbolt.scala.testhelpers.User
 import be.objectify.deadbolt.scala._
-import com.typesafe.config.Config
-import play.api.cache.CacheApi
 import play.api.inject._
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{Request, Result, Results}
 import play.api.test.PlaySpecification
-import play.api.{Application, ConfigLoader, Configuration, Mode}
+import play.api.{Application, Configuration, Mode}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -41,7 +39,6 @@ class AbstractViewTest extends PlaySpecification {
   def testApp(handler: DeadboltHandler): Application = new GuiceApplicationBuilder()
                                                        .bindings(new DeadboltModule())
                                                        .bindings(bind[HandlerCache].toInstance(LightweightHandlerCache(handler)))
-                                                       .overrides(bind[CacheApi].to[FakeCache])
                                                        .in(Mode.Test)
                                                        .build()
 

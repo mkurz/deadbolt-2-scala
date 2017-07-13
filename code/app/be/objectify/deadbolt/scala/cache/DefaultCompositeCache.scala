@@ -15,22 +15,22 @@
  */
 package be.objectify.deadbolt.scala.cache
 
-import javax.inject.Inject
-
 import be.objectify.deadbolt.scala.composite.Constraint
-import play.api.cache.CacheApi
 import play.api.mvc.AnyContent
+
+import scala.collection.mutable
 
 /**
   * @author Steve Chaloner (steve@objectify.be)
   */
-class DefaultCompositeCache @Inject() (cache: CacheApi) extends CompositeCache {
+class DefaultCompositeCache extends CompositeCache {
 
-  override def register(name: String, constraint: Constraint[AnyContent]): Unit = cache.set(s"Deadbolt.composite.$name", constraint)
+  private val cache: mutable.Map[String, Constraint[AnyContent]] = mutable.Map[String, Constraint[AnyContent]]()
+
+  override def register(name: String, constraint: Constraint[AnyContent]): Unit = cache.put(name, constraint)
 
   override def apply(name: String): Constraint[AnyContent] = {
-    val maybeConstraint = cache.get[Constraint[AnyContent]](s"Deadbolt.composite.$name")
-    maybeConstraint match {
+    cache.get(name) match {
       case Some(constraint) => constraint
       case None => throw new IllegalStateException(s"No composite constraint with name [$name] registered")
     }

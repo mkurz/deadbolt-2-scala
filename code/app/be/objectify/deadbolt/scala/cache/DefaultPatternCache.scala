@@ -16,15 +16,17 @@
 package be.objectify.deadbolt.scala.cache
 
 import java.util.regex.Pattern
-import javax.inject.{Inject, Singleton}
+import javax.inject.Singleton
 
-import play.api.cache.CacheApi
+import scala.collection.mutable
 
 /**
  * @author Steve Chaloner (steve@objectify.be)
  */
 @Singleton
-class DefaultPatternCache @Inject() (cache: CacheApi) extends PatternCache {
+class DefaultPatternCache extends PatternCache {
 
-  override def apply(value: String): Option[Pattern] = cache.getOrElse[Option[Pattern]](key = s"Deadbolt.pattern.$value") { Some(Pattern.compile(value)) }
+  private val cache: mutable.Map[String, Option[Pattern]] = mutable.Map[String, Option[Pattern]]()
+
+  override def apply(value: String): Option[Pattern] = cache.getOrElse[Option[Pattern]](value, Some(Pattern.compile(value)))
 }
