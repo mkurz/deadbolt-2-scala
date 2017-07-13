@@ -33,7 +33,8 @@ import scala.concurrent.Future
 class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
   handlers: HandlerCache,
   ecProvider: ExecutionContextProvider,
-  logic: ConstraintLogic) extends Results with BodyParsers {
+  logic: ConstraintLogic,
+  playBodyParsers: PlayBodyParsers) extends Results with BodyParsers {
 
   private val ec = ecProvider.get()
 
@@ -231,7 +232,7 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
   def WithAuthRequest[A](handler: DeadboltHandler = handlers())
     (bodyParser: BodyParser[A] = parse.anyContent)
     (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
-    SubjectActionBuilder(None).async(bodyParser) { authRequest =>
+    SubjectActionBuilder(None, ec, playBodyParsers.anyContent).async(bodyParser) { authRequest =>
       handler.getSubject(authRequest).flatMap{ maybeSubject =>
         block(new AuthenticatedRequest(authRequest, maybeSubject))
       }(ec)
@@ -247,7 +248,7 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
   def execute[A](handler: DeadboltHandler,
     bodyParser: BodyParser[A],
     block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
-    SubjectActionBuilder(None).async(bodyParser) { authRequest =>
+    SubjectActionBuilder(None, ec, playBodyParsers.anyContent).async(bodyParser) { authRequest =>
       handler.beforeAuthCheck(authRequest).flatMap {
         case Some(result) => Future.successful(result)
         case None => block(authRequest)

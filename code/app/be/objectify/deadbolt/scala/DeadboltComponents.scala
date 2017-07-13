@@ -15,9 +15,10 @@
  */
 package be.objectify.deadbolt.scala
 
-import be.objectify.deadbolt.scala.cache.{DefaultCompositeCache, CompositeCache, HandlerCache, PatternCache}
+import be.objectify.deadbolt.scala.cache.{CompositeCache, DefaultCompositeCache, HandlerCache, PatternCache}
 import be.objectify.deadbolt.scala.composite.CompositeConstraints
 import play.api.Configuration
+import play.api.mvc.{ControllerComponents, PlayBodyParsers}
 
 import scala.concurrent.ExecutionContext
 
@@ -27,7 +28,9 @@ import scala.concurrent.ExecutionContext
  * 
  * @author Steve Chaloner (steve@objectify.be)
  */
-trait DeadboltComponents {
+trait DeadboltComponents extends ControllerComponents {
+
+  def controllerComponents: ControllerComponents
 
   def patternCache: PatternCache
   def compositeCache: CompositeCache
@@ -50,7 +53,8 @@ trait DeadboltComponents {
   lazy val deadboltActions: DeadboltActions = new DeadboltActions(scalaAnalyzer,
                                                                   handlers,
                                                                   ecContextProvider,
-                                                                   constraintLogic)
+                                                                  constraintLogic,
+                                                                  playBodyParsers)
   lazy val actionBuilders: ActionBuilders = new ActionBuilders(deadboltActions,
                                                                handlers)
   lazy val viewSupport: ViewSupport = new ViewSupport(configuration,
@@ -58,4 +62,6 @@ trait DeadboltComponents {
                                                        constraintLogic)
   lazy val compositeConstraints: CompositeConstraints = new CompositeConstraints(constraintLogic,
                                                                                  ecContextProvider)
+
+  lazy val playBodyParsers: PlayBodyParsers = controllerComponents.parsers
 }
