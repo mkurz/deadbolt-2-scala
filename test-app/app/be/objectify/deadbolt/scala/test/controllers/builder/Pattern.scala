@@ -5,7 +5,7 @@ import javax.inject.Inject
 import be.objectify.deadbolt.scala.ActionBuilders
 import be.objectify.deadbolt.scala.models.PatternType
 import be.objectify.deadbolt.scala.test.controllers.AbstractPattern
-import play.api.mvc.Controller
+import play.api.mvc.{AbstractController, ControllerComponents}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -13,7 +13,7 @@ import scala.concurrent.Future
 /**
   * @author Steve Chaloner (steve@objectify.be)
   */
-class Pattern @Inject()(actionBuilder: ActionBuilders) extends Controller with AbstractPattern {
+class Pattern @Inject()(actionBuilder: ActionBuilders, controllerComponents: ControllerComponents) extends AbstractController(controllerComponents) with AbstractPattern {
 
   def custom =
     actionBuilder.PatternAction(value = "i-do-not-like-ice-cream",

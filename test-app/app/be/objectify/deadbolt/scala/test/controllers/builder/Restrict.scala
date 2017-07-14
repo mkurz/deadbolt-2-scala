@@ -3,8 +3,8 @@ package be.objectify.deadbolt.scala.test.controllers.builder
 import javax.inject.Inject
 
 import be.objectify.deadbolt.scala.test.controllers.AbstractRestrict
-import be.objectify.deadbolt.scala.{ActionBuilders, allOf, allOfGroup, anyOf}
-import play.api.mvc.Controller
+import be.objectify.deadbolt.scala.{ActionBuilders, allOf, anyOf}
+import play.api.mvc.{AbstractController, ControllerComponents}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -12,7 +12,7 @@ import scala.concurrent.Future
 /**
   * @author Steve Chaloner (steve@objectify.be)
   */
-class Restrict @Inject()(actionBuilder: ActionBuilders) extends Controller with AbstractRestrict {
+class Restrict @Inject()(actionBuilder: ActionBuilders, controllerComponents: ControllerComponents) extends AbstractController(controllerComponents) with AbstractRestrict {
 
   def restrictedToFooAndBar =
     actionBuilder.RestrictAction("foo", "bar")

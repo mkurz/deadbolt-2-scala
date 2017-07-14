@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 import be.objectify.deadbolt.scala.DeadboltActions
 import be.objectify.deadbolt.scala.test.security.MyCompositeConstraints
-import play.api.mvc.Controller
+import play.api.mvc.{AbstractController, ControllerComponents}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -13,7 +13,8 @@ import scala.concurrent.Future
   * @author Steve Chaloner (steve@objectify.be)
   */
 class Composite @Inject()(deadbolt: DeadboltActions,
-                          compositeConstraints: MyCompositeConstraints) extends Controller {
+                          compositeConstraints: MyCompositeConstraints,
+                          controllerComponents: ControllerComponents) extends AbstractController(controllerComponents) {
 
 
   def subjectNotPresent =
