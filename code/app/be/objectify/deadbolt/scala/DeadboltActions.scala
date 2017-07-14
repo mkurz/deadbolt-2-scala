@@ -35,7 +35,7 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
                                 ecProvider: ExecutionContextProvider,
                                 logic: ConstraintLogic,
                                 bodyParsers: PlayBodyParsers)
-  extends Results with BodyParsers {
+  extends Results {
 
   private val ec = ecProvider.get()
 
@@ -67,7 +67,7 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
     */
   def Restrict[A](roleGroups: RoleGroups,
     handler: DeadboltHandler = handlers())
-    (bodyParser: BodyParser[A] = bodyParsers.anyContent.asInstanceOf[BodyParser[A]])
+    (bodyParser: BodyParser[A] = bodyParsers.anyContent)
     (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
     execute(handler,
       bodyParser,
@@ -93,7 +93,7 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
     */
   def RoleBasedPermissions[A](roleName: String,
     handler: DeadboltHandler = handlers())
-    (bodyParser: BodyParser[A] = bodyParsers.anyContent.asInstanceOf[BodyParser[A]])
+    (bodyParser: BodyParser[A] = bodyParsers.anyContent)
     (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
     execute(handler,
       bodyParser,
@@ -119,7 +119,7 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
   def Dynamic[A](name: String,
     meta: Option[Any] = None,
     handler: DeadboltHandler = handlers())
-    (bodyParser: BodyParser[A] = bodyParsers.anyContent.asInstanceOf[BodyParser[A]])
+    (bodyParser: BodyParser[A] = bodyParsers.anyContent)
     (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
     execute(handler,
       bodyParser,
@@ -148,7 +148,7 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
     meta: Option[Any] = None,
     handler: DeadboltHandler = handlers(),
     invert: Boolean = false)
-    (bodyParser: BodyParser[A] = bodyParsers.anyContent.asInstanceOf[BodyParser[A]])
+    (bodyParser: BodyParser[A] = bodyParsers.anyContent)
     (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
     execute(handler,
       bodyParser,
@@ -173,7 +173,7 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
     * @return the action to take
     */
   def SubjectPresent[A](handler: DeadboltHandler = handlers())
-    (bodyParser: BodyParser[A] = bodyParsers.anyContent.asInstanceOf[BodyParser[A]])
+    (bodyParser: BodyParser[A] = bodyParsers.anyContent)
     (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
     execute(handler,
       bodyParser,
@@ -193,7 +193,7 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
     * @return the action to take
     */
   def SubjectNotPresent[A](handler: DeadboltHandler = handlers())
-    (bodyParser: BodyParser[A] = bodyParsers.anyContent.asInstanceOf[BodyParser[A]])
+    (bodyParser: BodyParser[A] = bodyParsers.anyContent)
     (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
     execute(handler,
       bodyParser,
@@ -214,7 +214,7 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
     */
   def Composite[A](handler: DeadboltHandler = handlers(),
     constraint: Constraint[A])
-    (bodyParser: BodyParser[A] = bodyParsers.anyContent.asInstanceOf[BodyParser[A]])
+    (bodyParser: BodyParser[A] = bodyParsers.anyContent)
     (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
     execute(handler,
       bodyParser,
@@ -231,7 +231,7 @@ class DeadboltActions @Inject()(analyzer: StaticConstraintAnalyzer,
       }(ec))
 
   def WithAuthRequest[A](handler: DeadboltHandler = handlers())
-    (bodyParser: BodyParser[A] = bodyParsers.anyContent.asInstanceOf[BodyParser[A]])
+    (bodyParser: BodyParser[A] = bodyParsers.anyContent)
     (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
     SubjectActionBuilder(None, ec, bodyParsers.anyContent).async(bodyParser) { authRequest =>
       handler.getSubject(authRequest).flatMap{ maybeSubject =>

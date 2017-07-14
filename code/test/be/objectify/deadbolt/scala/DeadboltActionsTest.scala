@@ -60,11 +60,11 @@ object DeadboltActionsTest extends PlaySpecification with Mockito {
   "composite" should {
     "propagate the authorized request when" >> {
       "a subject is present" >> {
-        val result: Future[Result] = deadbolt(handler(Option(User()))).Composite(constraint = composite.SubjectPresent())()((ar: AuthenticatedRequest[AnyContent]) => Future.successful(if (ar.subject.isDefined) Results.Ok("ok") else Results.Unauthorized("no user"))).apply(request(None))
+        val result: Future[Result] = deadbolt(handler(Option(User()))).Composite(constraint = composite.SubjectPresent())()(ar => Future.successful(if (ar.subject.isDefined) Results.Ok("ok") else Results.Unauthorized("no user"))).apply(request(None))
         await(result).header.status should beEqualTo(200)
       }
       "no subject is present" >> {
-        val result: Future[Result] = deadbolt(handler(None)).Composite(constraint = composite.SubjectNotPresent())()((ar: AuthenticatedRequest[AnyContent]) => Future.successful(if (ar.subject.isDefined) Results.Ok("ok") else Results.Unauthorized("no user"))).apply(request(None))
+        val result: Future[Result] = deadbolt(handler(None)).Composite(constraint = composite.SubjectNotPresent())()(ar => Future.successful(if (ar.subject.isDefined) Results.Ok("ok") else Results.Unauthorized("no user"))).apply(request(None))
         await(result).header.status should beEqualTo(401)
       }
     }
