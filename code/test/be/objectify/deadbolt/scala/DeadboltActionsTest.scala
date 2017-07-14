@@ -8,8 +8,7 @@ import be.objectify.deadbolt.scala.composite.CompositeConstraints
 import be.objectify.deadbolt.scala.models.Subject
 import be.objectify.deadbolt.scala.testhelpers.User
 import org.specs2.mock.Mockito
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.{PlayBodyParsers, Request, Result, Results}
+import play.api.mvc._
 import play.api.test.PlaySpecification
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -19,7 +18,7 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 object DeadboltActionsTest extends PlaySpecification with Mockito {
 
-  implicit lazy val materializer: Materializer = GuiceApplicationBuilder().build().materializer
+  private val materializer: Materializer = mock[Materializer]
 
   private val ec = scala.concurrent.ExecutionContext.Implicits.global
   private val analyzer = new StaticConstraintAnalyzer(new PatternCache {
@@ -34,7 +33,7 @@ object DeadboltActionsTest extends PlaySpecification with Mockito {
   val composite: CompositeConstraints = new CompositeConstraints(logic,
     ecProvider)
 
-  val parsers: PlayBodyParsers = PlayBodyParsers()
+  val parsers: PlayBodyParsers = PlayBodyParsers()(materializer)
 
   private def deadbolt(handler: DeadboltHandler): DeadboltActions = new DeadboltActions(analyzer,
     new HandlerCache {
