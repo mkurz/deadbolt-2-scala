@@ -8,8 +8,7 @@ import be.objectify.deadbolt.scala.composite.CompositeConstraints
 import be.objectify.deadbolt.scala.models.Subject
 import be.objectify.deadbolt.scala.testhelpers.User
 import org.specs2.mock.Mockito
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.{PlayBodyParsers, Request, Result, Results}
+import play.api.mvc._
 import play.api.test.PlaySpecification
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -19,7 +18,7 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 object DeadboltActionsTest extends PlaySpecification with Mockito {
 
-  implicit lazy val materializer: Materializer = GuiceApplicationBuilder().build().materializer
+  private val materializer: Materializer = mock[Materializer]
 
   private val ec = scala.concurrent.ExecutionContext.Implicits.global
   private val analyzer = new StaticConstraintAnalyzer(new PatternCache {
@@ -34,7 +33,7 @@ object DeadboltActionsTest extends PlaySpecification with Mockito {
   val composite: CompositeConstraints = new CompositeConstraints(logic,
     ecProvider)
 
-  val parsers: PlayBodyParsers = PlayBodyParsers()
+  val parsers: PlayBodyParsers = PlayBodyParsers()(materializer)
 
   private def deadbolt(handler: DeadboltHandler): DeadboltActions = new DeadboltActions(analyzer,
     new HandlerCache {
@@ -61,11 +60,11 @@ object DeadboltActionsTest extends PlaySpecification with Mockito {
   "composite" should {
     "propagate the authorized request when" >> {
       "a subject is present" >> {
-        val result: Future[Result] = deadbolt(handler(Option(User()))).Composite(constraint = composite.SubjectPresent())()(ar => Future.successful(if (ar.subject.isDefined) Results.Ok("ok") else Results.Unauthorized("no user"))).apply(request(None))
+        val result: Future[Result] = deadbolt(handler(Option(User()))).Composite(constraint = composite.SubjectPresent())()((ar: AuthenticatedRequest[AnyContent]) => Future.successful(if (ar.subject.isDefined) Results.Ok("ok") else Results.Unauthorized("no user"))).apply(request(None))
         await(result).header.status should beEqualTo(200)
       }
       "no subject is present" >> {
-        val result: Future[Result] = deadbolt(handler(None)).Composite(constraint = composite.SubjectNotPresent())()(ar => Future.successful(if (ar.subject.isDefined) Results.Ok("ok") else Results.Unauthorized("no user"))).apply(request(None))
+        val result: Future[Result] = deadbolt(handler(None)).Composite(constraint = composite.SubjectNotPresent())()((ar: AuthenticatedRequest[AnyContent]) => Future.successful(if (ar.subject.isDefined) Results.Ok("ok") else Results.Unauthorized("no user"))).apply(request(None))
         await(result).header.status should beEqualTo(401)
       }
     }
