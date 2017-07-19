@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 Steve Chaloner
+ * Copyright 2012-2017 Steve Chaloner
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package be.objectify.deadbolt.scala
 
-import be.objectify.deadbolt.scala.cache.{CompositeCache, DefaultCompositeCache, HandlerCache, PatternCache}
+import be.objectify.deadbolt.scala.cache.{CompositeCache, HandlerCache, PatternCache}
 import be.objectify.deadbolt.scala.composite.CompositeConstraints
-import play.api.Configuration
-import play.api.mvc.{ControllerComponents, PlayBodyParsers}
+import play.api.BuiltInComponents
+import play.api.mvc.PlayBodyParsers
 
 import scala.concurrent.ExecutionContext
 
@@ -28,14 +28,11 @@ import scala.concurrent.ExecutionContext
  * 
  * @author Steve Chaloner (steve@objectify.be)
  */
-trait DeadboltComponents extends ControllerComponents {
-
-  def controllerComponents: ControllerComponents
+trait DeadboltComponents extends BuiltInComponents {
 
   def patternCache: PatternCache
   def compositeCache: CompositeCache
   def handlers: HandlerCache
-  def configuration: Configuration
 
   lazy val defaultEcContextProvider: ExecutionContextProvider = new ExecutionContextProvider {
     override val get: ExecutionContext = scala.concurrent.ExecutionContext.global
@@ -50,18 +47,16 @@ trait DeadboltComponents extends ControllerComponents {
   lazy val scalaAnalyzer: StaticConstraintAnalyzer = new StaticConstraintAnalyzer(patternCache)
   lazy val constraintLogic: ConstraintLogic = new ConstraintLogic(scalaAnalyzer,
                                                                    defaultEcContextProvider)
-  lazy val deadboltActions: DeadboltActions = new DeadboltActions(scalaAnalyzer,
-                                                                  handlers,
-                                                                  ecContextProvider,
-                                                                  constraintLogic,
-                                                                  playBodyParsers)
-  lazy val actionBuilders: ActionBuilders = new ActionBuilders(deadboltActions,
-                                                               handlers)
+  def deadboltActions(parsers: PlayBodyParsers): DeadboltActions = new DeadboltActions(scalaAnalyzer,
+                                                                                        handlers,
+                                                                                        ecContextProvider,
+                                                                                        constraintLogic,
+                                                                                        parsers)
+  def actionBuilders(deadboltActions: DeadboltActions): ActionBuilders = new ActionBuilders(deadboltActions,
+                                                                                             handlers)
   lazy val viewSupport: ViewSupport = new ViewSupport(configuration,
                                                        templateFailureListenerProvider,
                                                        constraintLogic)
   lazy val compositeConstraints: CompositeConstraints = new CompositeConstraints(constraintLogic,
-                                                                                 ecContextProvider)
-
-  lazy val playBodyParsers: PlayBodyParsers = controllerComponents.parsers
+                                                                                  ecContextProvider)
 }
