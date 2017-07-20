@@ -10,6 +10,7 @@ script:
 - cd ../test-app
 - sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.6.0 +test
 - sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.6.1 +test
+- sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.6.2 +test
 - cd ../code
 after_success:
 - ! '[[ $TRAVIS_BRANCH == "master" ]] && { sbt +publish; };'
