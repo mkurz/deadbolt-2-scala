@@ -10,7 +10,7 @@ import be.objectify.deadbolt.scala.{DeadboltHandler, HandlerKey}
  * @author Steve Chaloner (steve@objectify.be)
  */
 @Singleton
-class MyHandlerCache @Inject() (subjectDao: SubjectDao) extends HandlerCache {
+class MyHandlerCache @Inject() (subjectDao: SubjectDao, constraints: MyCompositeConstraints) extends HandlerCache {
   val defaultHandler: DeadboltHandler = new MyDeadboltHandler(subjectDao)
 
   override def apply(): DeadboltHandler = defaultHandler
