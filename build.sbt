@@ -39,7 +39,7 @@ lazy val code = (project in file("code"))
     releasePublishArtifactsAction := PgpKeys.publishSigned.value
   ).enablePlugins(PlayScala).disablePlugins(PlayFilters)
 
-lazy val testApp = (project in file("test-app"))
+lazy val `test-app` = (project in file("test-app"))
   .settings(
     commonsSetting,
     name := """test-app""",
@@ -49,7 +49,7 @@ lazy val testApp = (project in file("test-app"))
   .dependsOn(code)
   .enablePlugins(PlayScala)
 
-lazy val testAppCompileTimeDi = (project in file("test-app-compile-time-di"))
+lazy val `test-app-compile-time-di` = (project in file("test-app-compile-time-di"))
   .settings(
     commonsSetting,
     name := """test-app-compile-time-di""",
@@ -58,7 +58,7 @@ lazy val testAppCompileTimeDi = (project in file("test-app-compile-time-di"))
   .dependsOn(code)
   .enablePlugins(PlayScala)
 
-lazy val testAppRouteComments = (project in file("test-app-route-comments"))
+lazy val `test-app-route-comments` = (project in file("test-app-route-comments"))
   .settings(
     commonsSetting,
     name := """test-app-route-comments""",
@@ -68,7 +68,7 @@ lazy val testAppRouteComments = (project in file("test-app-route-comments"))
   .enablePlugins(PlayScala)
 
 lazy val root = (project in file(".")).settings(commonsSetting)
-  .aggregate(code, testApp, testAppCompileTimeDi, testAppRouteComments)
+  .aggregate(code, `test-app`, `test-app-compile-time-di`, `test-app-route-comments`)
   .settings(aggregate in publish := false)
 
 publish in root := publish in code
