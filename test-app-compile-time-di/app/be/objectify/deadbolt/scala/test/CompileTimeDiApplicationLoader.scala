@@ -70,7 +70,9 @@ class ApplicationComponents(context: Context) extends BuiltInComponentsFromConte
                                                 composedComposite,
                                                 "")
 
-  lazy val assets = new Assets(httpErrorHandler)
+//  lazy val assets = new Assets(httpErrorHandler)
+
+  override def httpFilters = Seq.empty
 
   override def compositeCache: CompositeCache = new CompositeCache {
 
