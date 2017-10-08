@@ -71,7 +71,5 @@ lazy val root = (project in file(".")).settings(commonsSetting)
   .aggregate(code, `test-app`, `test-app-compile-time-di`)
   .settings(aggregate in publish := false)
 
-publish in root := publish in code
-
 
 

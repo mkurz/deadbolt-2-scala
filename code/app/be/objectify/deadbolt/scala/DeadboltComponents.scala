@@ -49,21 +49,16 @@ trait DeadboltComponents extends BuiltInComponents {
   def templateFailureListenerProvider: TemplateFailureListenerProvider = defaultTemplateFailureListenerProvider
 
   lazy val scalaAnalyzer: StaticConstraintAnalyzer = new StaticConstraintAnalyzer(patternCache)
-  lazy val constraintLogic: ConstraintLogic = new ConstraintLogic(scalaAnalyzer,
-    defaultEcContextProvider)
 
-  val deadboltActions: DeadboltActions = new DeadboltActions(scalaAnalyzer,
-    handlers,
-    ecContextProvider,
-    constraintLogic,
-    playBodyParsers)
+  lazy val constraintLogic: ConstraintLogic = new ConstraintLogic(scalaAnalyzer, defaultEcContextProvider)
 
-  val actionBuilders: ActionBuilders =
+  lazy val deadboltActions: DeadboltActions =
+    new DeadboltActions(scalaAnalyzer, handlers, ecContextProvider, constraintLogic, playBodyParsers)
+
+  lazy val actionBuilders: ActionBuilders =
     new ActionBuilders(deadboltActions, handlers, playBodyParsers)
 
-  lazy val viewSupport: ViewSupport = new ViewSupport(configuration,
-    templateFailureListenerProvider,
-    constraintLogic)
-  lazy val compositeConstraints: CompositeConstraints = new CompositeConstraints(constraintLogic,
-    ecContextProvider)
+  lazy val viewSupport: ViewSupport = new ViewSupport(configuration, templateFailureListenerProvider, constraintLogic)
+
+  lazy val compositeConstraints: CompositeConstraints = new CompositeConstraints(constraintLogic, ecContextProvider)
 }
