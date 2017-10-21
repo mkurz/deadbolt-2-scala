@@ -17,7 +17,7 @@ package be.objectify.deadbolt.scala.test.security
 
 import javax.inject.{Inject, Singleton}
 
-import be.objectify.deadbolt.scala.cache.CompositeCache
+import be.objectify.deadbolt.scala.cache.{CompositeCache, DefaultCompositeCache}
 import be.objectify.deadbolt.scala.composite.CompositeConstraints
 import be.objectify.deadbolt.scala.composite.Operators.||
 import be.objectify.deadbolt.scala.models.PatternType
@@ -31,7 +31,7 @@ import scala.concurrent.ExecutionContext
   */
 @Singleton
 class MyCompositeConstraints @Inject()(constraints: CompositeConstraints,
-                                       compositeCache: CompositeCache,
+                                       compositeCache: DefaultCompositeCache,
                                        ecProvider: ExecutionContextProvider) {
 
   val ec: ExecutionContext = ecProvider.get()

@@ -23,40 +23,42 @@ import play.api.mvc.PlayBodyParsers
 import scala.concurrent.ExecutionContext
 
 /**
- * Individual components of Deadbolt.  Use this trait if your 
- * application uses compile-time dependency injection.
- * 
- * @author Steve Chaloner (steve@objectify.be)
- */
+  * Individual components of Deadbolt.  Use this trait if your
+  * application uses compile-time dependency injection.
+  *
+  * @author Steve Chaloner (steve@objectify.be)
+  */
 trait DeadboltComponents extends BuiltInComponents {
 
   def patternCache: PatternCache
+
   def compositeCache: CompositeCache
+
   def handlers: HandlerCache
 
   lazy val defaultEcContextProvider: ExecutionContextProvider = new ExecutionContextProvider {
     override val get: ExecutionContext = scala.concurrent.ExecutionContext.global
   }
+
   def ecContextProvider: ExecutionContextProvider = defaultEcContextProvider
 
   lazy val defaultTemplateFailureListenerProvider: TemplateFailureListenerProvider = new TemplateFailureListenerProvider {
     override def get(): TemplateFailureListener = new NoOpTemplateFailureListener
   }
+
   def templateFailureListenerProvider: TemplateFailureListenerProvider = defaultTemplateFailureListenerProvider
 
   lazy val scalaAnalyzer: StaticConstraintAnalyzer = new StaticConstraintAnalyzer(patternCache)
-  lazy val constraintLogic: ConstraintLogic = new ConstraintLogic(scalaAnalyzer,
-                                                                   defaultEcContextProvider)
-  def deadboltActions(parsers: PlayBodyParsers): DeadboltActions = new DeadboltActions(scalaAnalyzer,
-                                                                                        handlers,
-                                                                                        ecContextProvider,
-                                                                                        constraintLogic,
-                                                                                        parsers)
-  def actionBuilders(deadboltActions: DeadboltActions): ActionBuilders = new ActionBuilders(deadboltActions,
-                                                                                             handlers)
-  lazy val viewSupport: ViewSupport = new ViewSupport(configuration,
-                                                       templateFailureListenerProvider,
-                                                       constraintLogic)
-  lazy val compositeConstraints: CompositeConstraints = new CompositeConstraints(constraintLogic,
-                                                                                  ecContextProvider)
+
+  lazy val constraintLogic: ConstraintLogic = new ConstraintLogic(scalaAnalyzer, defaultEcContextProvider)
+
+  lazy val deadboltActions: DeadboltActions =
+    new DeadboltActions(scalaAnalyzer, handlers, ecContextProvider, constraintLogic, playBodyParsers)
+
+  lazy val actionBuilders: ActionBuilders =
+    new ActionBuilders(deadboltActions, handlers, playBodyParsers)
+
+  lazy val viewSupport: ViewSupport = new ViewSupport(configuration, templateFailureListenerProvider, constraintLogic)
+
+  lazy val compositeConstraints: CompositeConstraints = new CompositeConstraints(constraintLogic, ecContextProvider)
 }

@@ -27,18 +27,16 @@ import scala.concurrent.Future
  * Provides helpers for creating Play Actions wrapped by DeadboltActions.
  */
 @Singleton
-class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: HandlerCache) {
+class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: HandlerCache, bodyParsers: PlayBodyParsers) {
 
   object RestrictAction {
 
-    def apply(roles: RoleGroups)(implicit bodyParsers: PlayBodyParsers): RestrictAction.RestrictActionBuilder =
+    def apply(roles: RoleGroups): RestrictAction.RestrictActionBuilder =
       RestrictActionBuilder(roles)
-    def apply(roles: String*)(implicit bodyParsers: PlayBodyParsers): RestrictAction.RestrictActionBuilder =
+    def apply(roles: String*): RestrictAction.RestrictActionBuilder =
       RestrictActionBuilder(List(roles.toArray))
 
-    case class RestrictActionBuilder(roles: RoleGroups)
-                                    (implicit val bodyParsers: PlayBodyParsers)
-      extends DeadboltActionBuilder {
+    case class RestrictActionBuilder(roles: RoleGroups) extends DeadboltActionBuilder {
 
       override def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
         deadboltActions.Restrict(roles, handler)(bodyParser)(block)
@@ -47,12 +45,10 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
   object RoleBasedPermissionsAction {
 
-    def apply(roleName: String)(implicit bodyParsers: PlayBodyParsers): RoleBasedPermissionsAction.RoleBasedPermissionsActionBuilder =
+    def apply(roleName: String): RoleBasedPermissionsAction.RoleBasedPermissionsActionBuilder =
       RoleBasedPermissionsActionBuilder(roleName)
 
-    case class RoleBasedPermissionsActionBuilder(roleName: String)
-                                                (implicit val bodyParsers: PlayBodyParsers)
-      extends DeadboltActionBuilder {
+    case class RoleBasedPermissionsActionBuilder(roleName: String) extends DeadboltActionBuilder {
 
       override def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
         deadboltActions.RoleBasedPermissions(roleName, handler)(bodyParser)(block)
@@ -61,12 +57,10 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
   object DynamicAction {
 
-    def apply(name: String, meta: Option[Any] = None)(implicit bodyParsers: PlayBodyParsers): DynamicAction.DynamicActionBuilder =
+    def apply(name: String, meta: Option[Any] = None): DynamicAction.DynamicActionBuilder =
       DynamicActionBuilder(name, meta)
 
-    case class DynamicActionBuilder(name: String, meta: Option[Any] = None)
-                                   (implicit val bodyParsers: PlayBodyParsers)
-      extends DeadboltActionBuilder {
+    case class DynamicActionBuilder(name: String, meta: Option[Any] = None) extends DeadboltActionBuilder {
 
       override def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
         deadboltActions.Dynamic(name, meta, handler)(bodyParser)(block)
@@ -75,14 +69,13 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
   object PatternAction {
 
-    def apply(value: String, patternType: PatternType, meta: Option[Any] = None, invert: Boolean = false)(implicit bodyParsers: PlayBodyParsers): PatternAction.PatternActionBuilder =
+    def apply(value: String, patternType: PatternType, meta: Option[Any] = None, invert: Boolean = false): PatternAction.PatternActionBuilder =
       PatternActionBuilder(value, patternType, meta, invert)
 
     case class PatternActionBuilder(value: String,
                                     patternType: PatternType = PatternType.EQUALITY,
                                     meta: Option[Any] = None,
                                     invert: Boolean = false)
-                                   (implicit val bodyParsers: PlayBodyParsers)
       extends DeadboltActionBuilder {
 
       override def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
@@ -92,10 +85,10 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
   object SubjectPresentAction {
 
-    def apply()(implicit bodyParsers: PlayBodyParsers): SubjectPresentAction.SubjectPresentActionBuilder =
+    def apply(): SubjectPresentAction.SubjectPresentActionBuilder =
       SubjectPresentActionBuilder()
 
-    case class SubjectPresentActionBuilder()(implicit val bodyParsers: PlayBodyParsers) extends DeadboltActionBuilder {
+    case class SubjectPresentActionBuilder() extends DeadboltActionBuilder {
 
       override def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
         deadboltActions.SubjectPresent(handler)(bodyParser)(block)
@@ -104,11 +97,10 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
   object SubjectNotPresentAction {
 
-    def apply()(implicit bodyParsers: PlayBodyParsers): SubjectNotPresentAction.SubjectNotPresentActionBuilder =
+    def apply(): SubjectNotPresentAction.SubjectNotPresentActionBuilder =
       SubjectNotPresentActionBuilder()
 
-    case class SubjectNotPresentActionBuilder()(implicit val bodyParsers: PlayBodyParsers)
-      extends DeadboltActionBuilder {
+    case class SubjectNotPresentActionBuilder() extends DeadboltActionBuilder {
 
       override def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
         deadboltActions.SubjectNotPresent(handler)(bodyParser)(block)
@@ -117,11 +109,10 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
 
   object WithAuthRequestAction {
 
-    def apply()(implicit bodyParsers: PlayBodyParsers): WithAuthRequestAction.WithAuthRequestActionBuilder =
+    def apply(): WithAuthRequestAction.WithAuthRequestActionBuilder =
       WithAuthRequestActionBuilder()
 
-    case class WithAuthRequestActionBuilder()(implicit val bodyParsers: PlayBodyParsers)
-      extends DeadboltActionBuilder {
+    case class WithAuthRequestActionBuilder() extends DeadboltActionBuilder {
 
       override def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler) : Action[A] =
         deadboltActions.WithAuthRequest(handler)(bodyParser)(block)
@@ -129,9 +120,6 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
   }
 
   trait DeadboltActionBuilder {
-
-    val bodyParsers: PlayBodyParsers
-
     def apply(block: => Future[Result])(implicit deadboltHandler: DeadboltHandler): Action[AnyContent] = apply(_ => block)(deadboltHandler)
     def apply(block: AuthenticatedRequest[AnyContent] => Future[Result])(implicit deadboltHandler: DeadboltHandler): Action[AnyContent] = apply(bodyParsers.anyContent)(block)(deadboltHandler)
     def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler): Action[A]
