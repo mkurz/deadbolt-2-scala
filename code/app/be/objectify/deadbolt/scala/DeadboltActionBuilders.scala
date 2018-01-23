@@ -5,14 +5,15 @@ import scala.concurrent.{ExecutionContext, Future}
 import be.objectify.deadbolt.scala.cache.HandlerCache
 import be.objectify.deadbolt.scala.models.PatternType
 import javax.inject.{Inject, Singleton}
-import play.api.mvc.{ActionFunction, ActionTransformer, BodyParsers, Result}
+import play.api.mvc.{ActionFunction, ActionTransformer, PlayBodyParsers, Result}
 
 
 @Singleton
 class DeadboltActionBuilders @Inject() (handlers: HandlerCache, ecProvider: ExecutionContextProvider,
-  logic: ConstraintLogic, parser: BodyParsers.Default) {
+  logic: ConstraintLogic, bodyParsers: PlayBodyParsers) {
 
   private val ec = ecProvider.get()
+  private val parser = bodyParsers.anyContent
 
   private type AuthRequest = AuthenticatedRequest[_]
   private type Block = AuthRequest => Future[Result]

@@ -52,8 +52,11 @@ trait DeadboltComponents extends BuiltInComponents {
 
   lazy val constraintLogic: ConstraintLogic = new ConstraintLogic(scalaAnalyzer, defaultEcContextProvider)
 
+  lazy val deadboltActionBuilders: DeadboltActionBuilders =
+    new DeadboltActionBuilders(handlers, ecContextProvider, constraintLogic, playBodyParsers)
+
   lazy val deadboltActions: DeadboltActions =
-    new DeadboltActions(scalaAnalyzer, handlers, ecContextProvider, constraintLogic, playBodyParsers)
+    new DeadboltActions(deadboltActionBuilders, scalaAnalyzer, handlers, ecContextProvider, constraintLogic, playBodyParsers)
 
   lazy val actionBuilders: ActionBuilders =
     new ActionBuilders(deadboltActions, handlers, playBodyParsers)

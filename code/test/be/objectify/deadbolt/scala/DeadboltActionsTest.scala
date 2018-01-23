@@ -35,7 +35,12 @@ object DeadboltActionsTest extends PlaySpecification with Mockito {
 
   val parsers: PlayBodyParsers = PlayBodyParsers()(materializer)
 
-  private def deadbolt(handler: DeadboltHandler): DeadboltActions = new DeadboltActions(analyzer,
+  private def deadbolt(handler: DeadboltHandler): DeadboltActions = new DeadboltActions(
+    new DeadboltActionBuilders(new HandlerCache {
+      override def apply(): DeadboltHandler = handler
+      override def apply(v1: HandlerKey): DeadboltHandler = handler
+    } , ecProvider, logic, parsers),
+    analyzer,
     new HandlerCache {
       override def apply(): DeadboltHandler = handler
       override def apply(v1: HandlerKey): DeadboltHandler = handler
