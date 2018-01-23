@@ -34,7 +34,6 @@ class DeadboltActions @Inject()(actionBuilders: DeadboltActionBuilders,
                                 analyzer: StaticConstraintAnalyzer,
                                 handlers: HandlerCache,
                                 ecProvider: ExecutionContextProvider,
-                                logic: ConstraintLogic,
                                 bodyParsers: PlayBodyParsers)
   extends Results {
 
@@ -173,6 +172,7 @@ class DeadboltActions @Inject()(actionBuilders: DeadboltActionBuilders,
     * @param block the function to call if beforeAuthCheck does not return a result
     * @return the action to take
     */
+  @deprecated(message = "this method will be removed", since = "???")
   def execute[A](handler: DeadboltHandler,
     bodyParser: BodyParser[A],
     block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
