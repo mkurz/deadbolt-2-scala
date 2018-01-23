@@ -3,6 +3,7 @@ package be.objectify.deadbolt.scala
 import scala.concurrent.{ExecutionContext, Future}
 
 import be.objectify.deadbolt.scala.cache.HandlerCache
+import be.objectify.deadbolt.scala.composite.Constraint
 import be.objectify.deadbolt.scala.models.PatternType
 import javax.inject.{Inject, Singleton}
 import play.api.mvc.{ActionFunction, ActionTransformer, PlayBodyParsers, Result}
@@ -88,6 +89,19 @@ class DeadboltActionBuilders @Inject() (handlers: HandlerCache, ecProvider: Exec
         block(ar)
       }
     )
+  )
+
+  def Composite[A](constraint: Constraint[A])(implicit handler: DeadboltHandler = handlers()) = createActionBuilder(handler,
+    (block: Block) => (authRequest: AuthRequest) => handler.getSubject(authRequest).flatMap { maybeSubject =>
+      val ar = new AuthenticatedRequest(authRequest.asInstanceOf[AuthenticatedRequest[A]], maybeSubject)
+      constraint(ar, handler)
+        .flatMap(passed =>
+          if (passed) {
+            handler.onAuthSuccess(ar, "composite", ConstraintPoint.CONTROLLER)
+            block(ar)
+          }
+          else handler.onAuthFailure(ar))(ec)
+    }(ec)
   )
 
   def WithAuthRequestAction(implicit handler: DeadboltHandler = handlers()) =

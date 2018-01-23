@@ -159,19 +159,7 @@ class DeadboltActions @Inject()(actionBuilders: DeadboltActionBuilders,
     constraint: Constraint[A])
     (bodyParser: BodyParser[A] = bodyParsers.anyContent)
     (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
-    execute(handler,
-      bodyParser,
-      authRequest => handler.getSubject(authRequest).flatMap { maybeSubject =>
-        val ar = new AuthenticatedRequest(authRequest, maybeSubject)
-        constraint(ar,
-          handler)
-        .flatMap(passed =>
-          if (passed) {
-            handler.onAuthSuccess(ar, "composite", ConstraintPoint.CONTROLLER)
-            block(ar)
-          }
-          else handler.onAuthFailure(ar))(ec)
-      }(ec))
+      actionBuilders.Composite(constraint)(handler).async(bodyParser)(block)
 
   def WithAuthRequest[A](handler: DeadboltHandler = handlers())
     (bodyParser: BodyParser[A] = bodyParsers.anyContent)
