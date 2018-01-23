@@ -120,7 +120,7 @@ class DeadboltActions @Inject()(actionBuilders: DeadboltActionBuilders,
     invert: Boolean = false)
     (bodyParser: BodyParser[A] = bodyParsers.anyContent)
     (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
-      actionBuilders.PatternAction(value, patternType, meta, invert).async(bodyParser)(block)
+      actionBuilders.PatternAction(value, patternType, meta, invert)(handler).async(bodyParser)(block)
 
   /**
     * Allows access to the action if there is a subject present.
