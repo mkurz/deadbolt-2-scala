@@ -146,7 +146,7 @@ class DeadboltActions @Inject()(actionBuilders: DeadboltActionBuilders,
   def SubjectNotPresent[A](handler: DeadboltHandler = handlers())
     (bodyParser: BodyParser[A] = bodyParsers.anyContent)
     (block: AuthenticatedRequest[A] => Future[Result]): Action[A] =
-      actionBuilders.SubjectNotPresent(handler).async(bodyParser)(block)
+      actionBuilders.SubjectNotPresentAction(handler).async(bodyParser)(block)
 
   /**
     * Allows access if the composite constraint resolves to true..

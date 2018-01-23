@@ -80,7 +80,7 @@ class DeadboltActionBuilders @Inject() (handlers: HandlerCache, ecProvider: Exec
     )
   )
 
-  def SubjectNotPresent(implicit handler: DeadboltHandler = handlers()) = createActionBuilder(handler,
+  def SubjectNotPresentAction(implicit handler: DeadboltHandler = handlers()) = createActionBuilder(handler,
     (block: Block) => (authRequest: AuthRequest) => logic.subjectPresent(authRequest, handler,
       (ar: AuthRequest) => handler.onAuthFailure(ar),
       (ar: AuthRequest) => {
