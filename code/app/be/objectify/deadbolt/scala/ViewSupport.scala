@@ -17,6 +17,7 @@ package be.objectify.deadbolt.scala
 
 import javax.inject.{Inject, Singleton}
 
+import be.objectify.deadbolt.scala.composite.Constraint
 import be.objectify.deadbolt.scala.models.PatternType
 import play.api.{ConfigLoader, Configuration, Logger}
 
@@ -156,6 +157,10 @@ class ViewSupport @Inject()(config: Configuration,
                                  },
                                  (ar: AuthenticatedRequest[A]) => deny(ar)),
                    timeoutInMillis)
+
+  def composite[A](constraint: Constraint[A],
+      deadboltHandler: DeadboltHandler, timeoutInMillis: Long, request: AuthenticatedRequest[A]): Boolean =
+    tryToComplete(constraint(request, deadboltHandler), timeoutInMillis)
 
   /**
     * Attempts to complete the future within the given number of milliseconds.

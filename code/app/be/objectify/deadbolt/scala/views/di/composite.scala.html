@@ -1,0 +1,13 @@
+@import be.objectify.deadbolt.scala._
+@import be.objectify.deadbolt.scala.cache.HandlerCache
+@import be.objectify.deadbolt.scala.composite.Constraint
+
+
+@this(viewSupport: ViewSupport, handlerCache: HandlerCache)
+
+@(constraint: Constraint[Any], handler: DeadboltHandler = handlerCache.apply(), timeout: Function0[Long] = viewSupport.defaultTimeout)(body: => Html)(implicit request: AuthenticatedRequest[Any])
+
+
+@if(viewSupport.composite(constraint, handler, timeout(), request)) {
+  @body
+}
