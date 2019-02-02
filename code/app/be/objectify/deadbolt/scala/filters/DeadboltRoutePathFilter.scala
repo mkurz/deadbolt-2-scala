@@ -15,14 +15,12 @@
  */
 package be.objectify.deadbolt.scala.filters
 
-import javax.inject.Inject
-
 import akka.stream.Materializer
-import be.objectify.deadbolt.scala.cache.HandlerCache
 import be.objectify.deadbolt.scala.AuthenticatedRequest
+import be.objectify.deadbolt.scala.cache.HandlerCache
+import javax.inject.Inject
 import play.api.mvc._
 import play.api.routing.Router
-import play.api.routing.Router.Tags
 
 import scala.concurrent.Future
 
