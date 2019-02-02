@@ -1,5 +1,5 @@
 val commonsSetting = Seq(
-  scalaVersion := "2.11.11",
+  scalaVersion := "2.12.8",
   resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
 )
 
@@ -24,7 +24,7 @@ lazy val code = (project in file("code"))
     organization := "be.objectify",
 
 
-    crossScalaVersions := Seq("2.11.11", "2.12.2"),
+    crossScalaVersions := Seq("2.11.11", "2.12.8"),
 
     libraryDependencies ++= Seq(
       specs2 % Test
@@ -42,8 +42,8 @@ lazy val `test-app` = (project in file("test-app"))
   .settings(
     commonsSetting,
     name := """test-app""",
-    crossScalaVersions := Seq("2.11.11", "2.12.2"),
-    version := "2.6.1-SNAPSHOT",
+    crossScalaVersions := Seq("2.11.11", "2.12.8"),
+    version := "2.7.0-SNAPSHOT",
     testSettings
   )
   .dependsOn(code)
@@ -53,7 +53,7 @@ lazy val `test-app-compile-time-di` = (project in file("test-app-compile-time-di
   .settings(
     commonsSetting,
     name := """test-app-compile-time-di""",
-    version := "2.6.1-SNAPSHOT",
+    version := "2.7.0-SNAPSHOT",
     testSettings
   )
   .dependsOn(code)
@@ -63,7 +63,7 @@ lazy val `test-app-route-comments` = (project in file("test-app-route-comments")
   .settings(
     commonsSetting,
     name := """test-app-route-comments""",
-    version := "2.6.1-SNAPSHOT",
+    version := "2.7.0-SNAPSHOT",
     testSettings
   )
   .dependsOn(code)
