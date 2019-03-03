@@ -4,6 +4,7 @@ import java.io.File
 
 import akka.stream.Materializer
 import be.objectify.deadbolt.scala.test.CompileTimeDiApplicationLoader
+import org.specs2.specification.AfterEach
 import play.api._
 import play.api.inject.{ApplicationLifecycle, DefaultApplicationLifecycle}
 import play.api.libs.ws.ahc.AhcWSComponents
@@ -11,7 +12,7 @@ import play.api.test.PlaySpecification
 
 import scala.concurrent.ExecutionContext
 
-abstract class AbstractControllerSpec extends PlaySpecification with PathSegmentProvider with AhcWSComponents {
+abstract class AbstractControllerSpec extends PlaySpecification with PathSegmentProvider with AhcWSComponents with AfterEach {
   sequential
   isolated
 
@@ -19,7 +20,7 @@ abstract class AbstractControllerSpec extends PlaySpecification with PathSegment
                                                   classLoader = ApplicationLoader.getClass.getClassLoader,
                                                   mode = Mode.Test)
 
-  lazy val app: Application =  new CompileTimeDiApplicationLoader().load(ApplicationLoader.createContext(environment))
+  lazy val app: Application =  new CompileTimeDiApplicationLoader().load(ApplicationLoader.Context.create(environment))
 
 
   override def executionContext: ExecutionContext = app.actorSystem.dispatchers.lookup("deadbolt-dispatcher")
@@ -29,4 +30,8 @@ abstract class AbstractControllerSpec extends PlaySpecification with PathSegment
   override def applicationLifecycle: ApplicationLifecycle = new DefaultApplicationLifecycle()
 
   override def materializer: Materializer = app.materializer
+
+  override def after: Any = {
+    wsClient.close()
+  }
 }

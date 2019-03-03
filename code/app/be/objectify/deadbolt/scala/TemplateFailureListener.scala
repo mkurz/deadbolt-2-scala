@@ -23,5 +23,5 @@ package be.objectify.deadbolt.scala
  */
 trait TemplateFailureListener {
 
-  def failure(message: String, timeout: Long)
+  def failure(message: String, timeout: Long) : Unit
 }

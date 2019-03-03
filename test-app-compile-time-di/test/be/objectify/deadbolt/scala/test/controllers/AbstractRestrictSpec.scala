@@ -11,15 +11,15 @@ abstract class AbstractRestrictSpec extends AbstractControllerSpec {
       }
 
       "allow access if the subject has the foo and bar roles" in new WithServer(app = app, port = 3333) {
-        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooAndBar").withHeaders(("x-deadbolt-test-user", "greet")).get()).status must equalTo(OK)
+        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooAndBar").addHttpHeaders(("x-deadbolt-test-user", "greet")).get()).status must equalTo(OK)
       }
 
       "deny access if the subject has the foo but not the bar roles" in new WithServer(app = app, port = 3333) {
-        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooAndBar").withHeaders(("x-deadbolt-test-user", "trippel")).get()).status must equalTo(UNAUTHORIZED)
+        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooAndBar").addHttpHeaders(("x-deadbolt-test-user", "trippel")).get()).status must equalTo(UNAUTHORIZED)
       }
 
       "deny access if the subject has the bar but not the foo roles" in new WithServer(app = app, port = 3333) {
-        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooAndBar").withHeaders(("x-deadbolt-test-user", "steve")).get()).status must equalTo(UNAUTHORIZED)
+        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooAndBar").addHttpHeaders(("x-deadbolt-test-user", "steve")).get()).status must equalTo(UNAUTHORIZED)
       }
     }
 
@@ -29,19 +29,19 @@ abstract class AbstractRestrictSpec extends AbstractControllerSpec {
       }
 
       "allow access if the subject has the foo and bar roles" in new WithServer(app = app, port = 3333) {
-        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooOrBar").withHeaders(("x-deadbolt-test-user", "greet")).get()).status must equalTo(OK)
+        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooOrBar").addHttpHeaders(("x-deadbolt-test-user", "greet")).get()).status must equalTo(OK)
       }
 
       "allow access if the subject has the foo but not the bar roles" in new WithServer(app = app, port = 3333) {
-        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooOrBar").withHeaders(("x-deadbolt-test-user", "trippel")).get()).status must equalTo(OK)
+        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooOrBar").addHttpHeaders(("x-deadbolt-test-user", "trippel")).get()).status must equalTo(OK)
       }
 
       "allow access if the subject has the bar but not the foo roles" in new WithServer(app = app, port = 3333) {
-        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooOrBar").withHeaders(("x-deadbolt-test-user", "steve")).get()).status must equalTo(OK)
+        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooOrBar").addHttpHeaders(("x-deadbolt-test-user", "steve")).get()).status must equalTo(OK)
       }
 
       "deny access if the subject has neither the bar or foo roles" in new WithServer(app = app, port = 3333) {
-        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooOrBar").withHeaders(("x-deadbolt-test-user", "lotte")).get()).status must equalTo(UNAUTHORIZED)
+        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooOrBar").addHttpHeaders(("x-deadbolt-test-user", "lotte")).get()).status must equalTo(UNAUTHORIZED)
       }
     }
 
@@ -51,19 +51,19 @@ abstract class AbstractRestrictSpec extends AbstractControllerSpec {
       }
 
       "deny access if the subject has the foo and bar roles" in new WithServer(app = app, port = 3333) {
-        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooAndNotBar").withHeaders(("x-deadbolt-test-user", "greet")).get()).status must equalTo(UNAUTHORIZED)
+        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooAndNotBar").addHttpHeaders(("x-deadbolt-test-user", "greet")).get()).status must equalTo(UNAUTHORIZED)
       }
 
       "allow access if the subject has the foo but not the bar roles" in new WithServer(app = app, port = 3333) {
-        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooAndNotBar").withHeaders(("x-deadbolt-test-user", "trippel")).get()).status must equalTo(OK)
+        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooAndNotBar").addHttpHeaders(("x-deadbolt-test-user", "trippel")).get()).status must equalTo(OK)
       }
 
       "deny access if the subject has the bar but not the foo roles" in new WithServer(app = app, port = 3333) {
-        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooAndNotBar").withHeaders(("x-deadbolt-test-user", "steve")).get()).status must equalTo(UNAUTHORIZED)
+        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooAndNotBar").addHttpHeaders(("x-deadbolt-test-user", "steve")).get()).status must equalTo(UNAUTHORIZED)
       }
 
       "deny access if the subject has neither the bar or foo roles" in new WithServer(app = app, port = 3333) {
-        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooAndNotBar").withHeaders(("x-deadbolt-test-user", "lotte")).get()).status must equalTo(UNAUTHORIZED)
+        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooAndNotBar").addHttpHeaders(("x-deadbolt-test-user", "lotte")).get()).status must equalTo(UNAUTHORIZED)
       }
     }
 
@@ -73,19 +73,19 @@ abstract class AbstractRestrictSpec extends AbstractControllerSpec {
       }
 
       "allow access if the subject has the foo and bar roles" in new WithServer(app = app, port = 3333) {
-        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooOrNotBar").withHeaders(("x-deadbolt-test-user", "greet")).get()).status must equalTo(OK)
+        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooOrNotBar").addHttpHeaders(("x-deadbolt-test-user", "greet")).get()).status must equalTo(OK)
       }
 
       "allow access if the subject has the foo but not the bar roles" in new WithServer(app = app, port = 3333) {
-        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooOrNotBar").withHeaders(("x-deadbolt-test-user", "trippel")).get()).status must equalTo(OK)
+        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooOrNotBar").addHttpHeaders(("x-deadbolt-test-user", "trippel")).get()).status must equalTo(OK)
       }
 
       "deny access if the subject only has the bar role" in new WithServer(app = app, port = 3333) {
-        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooOrNotBar").withHeaders(("x-deadbolt-test-user", "steve")).get()).status must equalTo(UNAUTHORIZED)
+        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooOrNotBar").addHttpHeaders(("x-deadbolt-test-user", "steve")).get()).status must equalTo(UNAUTHORIZED)
       }
 
       "allow access if the subject has neither the bar or foo roles" in new WithServer(app = app, port = 3333) {
-        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooOrNotBar").withHeaders(("x-deadbolt-test-user", "lotte")).get()).status must equalTo(OK)
+        await(wsClient.url(s"http://localhost:3333/$pathSegment/restrict/fooOrNotBar").addHttpHeaders(("x-deadbolt-test-user", "lotte")).get()).status must equalTo(OK)
       }
     }
   }

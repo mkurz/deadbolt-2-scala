@@ -46,17 +46,17 @@ class ApplicationComponents(context: Context) extends BuiltInComponentsFromConte
 
   override lazy val handlers: HandlerCache = new MyHandlerCache(subjectDao) 
 
-  lazy val builderDynamic: builder.Dynamic = new builder.Dynamic(actionBuilders)
-  lazy val builderPattern: builder.Pattern = new builder.Pattern(actionBuilders)
-  lazy val builderRestrict: builder.Restrict = new builder.Restrict(actionBuilders)
-  lazy val builderSubject: builder.Subject = new builder.Subject(actionBuilders)
+  lazy val builderDynamic: builder.Dynamic = new builder.Dynamic(actionBuilders, controllerComponents)
+  lazy val builderPattern: builder.Pattern = new builder.Pattern(actionBuilders, controllerComponents)
+  lazy val builderRestrict: builder.Restrict = new builder.Restrict(actionBuilders, controllerComponents)
+  lazy val builderSubject: builder.Subject = new builder.Subject(actionBuilders, controllerComponents)
 
-  lazy val composedDynamic: composed.Dynamic = new composed.Dynamic(deadboltActions)
-  lazy val composedPattern: composed.Pattern = new composed.Pattern(deadboltActions)
-  lazy val composedRestrict: composed.Restrict = new composed.Restrict(deadboltActions)
-  lazy val composedSubject: composed.Subject = new composed.Subject(deadboltActions)
+  lazy val composedDynamic: composed.Dynamic = new composed.Dynamic(deadboltActions, controllerComponents)
+  lazy val composedPattern: composed.Pattern = new composed.Pattern(deadboltActions, controllerComponents)
+  lazy val composedRestrict: composed.Restrict = new composed.Restrict(deadboltActions, controllerComponents)
+  lazy val composedSubject: composed.Subject = new composed.Subject(deadboltActions, controllerComponents)
   lazy val composedComposite: composed.Composite = new Composite(deadboltActions,
-                                                                 myCompositeConstraints)
+                                                                 myCompositeConstraints, controllerComponents)
 
   override lazy val router: Router = new Routes(httpErrorHandler,
                                                 builderDynamic,

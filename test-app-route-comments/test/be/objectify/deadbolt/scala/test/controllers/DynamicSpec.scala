@@ -10,11 +10,11 @@ class DynamicSpec extends AbstractControllerSpec {
     }
 
     "deny access if the subject does not have the same user name as my wife" in new WithServer(app = testApp, port = 3333) {
-      await(ws(implicitApp).url(s"http://localhost:3333/dynamic/niceName").withHeaders(("x-deadbolt-test-user", "steve")).get()).status must equalTo(UNAUTHORIZED)
+      await(ws(implicitApp).url(s"http://localhost:3333/dynamic/niceName").addHttpHeaders(("x-deadbolt-test-user", "steve")).get()).status must equalTo(UNAUTHORIZED)
     }
 
     "allow access if the subject has the same user name as my wife" in new WithServer(app = testApp, port = 3333) {
-      await(ws(implicitApp).url(s"http://localhost:3333/dynamic/niceName").withHeaders(("x-deadbolt-test-user", "greet")).get()).status must equalTo(OK)
+      await(ws(implicitApp).url(s"http://localhost:3333/dynamic/niceName").addHttpHeaders(("x-deadbolt-test-user", "greet")).get()).status must equalTo(OK)
     }
   }
 }
