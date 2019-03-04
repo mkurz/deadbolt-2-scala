@@ -9,7 +9,7 @@ import be.objectify.deadbolt.scala.testhelpers.{SecurityPermission, User, Securi
 import org.specs2.mock.Mockito
 import play.api.{Application, Configuration}
 import play.api.test.PlaySpecification
-import org.mockito.Matchers.{eq => eqTo}
+import org.mockito.ArgumentMatchers.{eq => eqTo}
 
 import scala.concurrent.{Future, ExecutionContext}
 

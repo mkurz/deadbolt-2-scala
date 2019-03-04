@@ -23,5 +23,5 @@ import play.api.mvc.AnyContent
   */
 trait CompositeCache extends Function[String, Constraint[AnyContent]] {
 
-  def register(name: String, constraint: Constraint[AnyContent])
+  def register(name: String, constraint: Constraint[AnyContent]): Unit
 }

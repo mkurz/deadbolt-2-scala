@@ -2,7 +2,7 @@ package be.objectify.deadbolt.scala.test.controllers.composed
 
 import be.objectify.deadbolt.scala.models.PatternType
 import be.objectify.deadbolt.scala.DeadboltActions
-import play.api.mvc.Controller
+import play.api.mvc.{AbstractController, ControllerComponents}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -10,7 +10,7 @@ import scala.concurrent.Future
 /**
  * @author Steve Chaloner (steve@objectify.be)
  */
-class Pattern(deadbolt: DeadboltActions) extends Controller {
+class Pattern(deadbolt: DeadboltActions, components: ControllerComponents) extends AbstractController(components) {
 
   def custom =
     deadbolt.Pattern(value = "i-do-not-like-ice-cream",

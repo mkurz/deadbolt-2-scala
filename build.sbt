@@ -1,6 +1,11 @@
 val commonsSetting = Seq(
   scalaVersion := "2.12.8",
-  resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
+  crossScalaVersions := Seq("2.11.12", "2.12.8", "2.13.0-M5"),
+  resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
+
+  // Workaround until omnidoc gets published for Scala 2.13
+  // http://central.maven.org/maven2/com/typesafe/play/play-omnidoc_2.13/
+  PlayKeys.playOmnidoc := false
 )
 
 val testSettings = Seq(
@@ -23,9 +28,6 @@ lazy val code = (project in file("code"))
 
     organization := "be.objectify",
 
-
-    crossScalaVersions := Seq("2.11.11", "2.12.8"),
-
     libraryDependencies ++= Seq(
       specs2 % Test
     ),
@@ -42,7 +44,6 @@ lazy val `test-app` = (project in file("test-app"))
   .settings(
     commonsSetting,
     name := """test-app""",
-    crossScalaVersions := Seq("2.11.11", "2.12.8"),
     version := "2.7.0-SNAPSHOT",
     testSettings
   )
