@@ -165,7 +165,7 @@ class ViewSupport @Inject()(config: Configuration,
     * @return false if the future times out, otherwise the result of the future
     */
   private def tryToComplete(future: Future[Boolean], timeoutInMillis: Long): Boolean =
-    Try(Await.result(future, timeoutInMillis milliseconds)) match {
+    Try(Await.result(future, timeoutInMillis.milliseconds)) match {
       case Success(allowed) => allowed
       case Failure(ex) =>
         logger.error("Error when checking view constraint", ex)
