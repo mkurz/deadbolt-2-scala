@@ -1,7 +1,7 @@
 val commonsSetting = Seq(
   scalaVersion := "2.13.1",
   crossScalaVersions := Seq("2.12.10", "2.13.1"),
-  resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
+  resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
 )
 
 val testSettings = Seq(
