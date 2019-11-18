@@ -1,13 +1,20 @@
 language: scala
-jdk:
-- openjdk8
+
 scala:
 - 2.12.10
 - 2.13.1
+
+env:
+  - TRAVIS_JDK=8
+
+before_install: curl -Ls https://git.io/jabba | bash && . ~/.jabba/jabba.sh
+install: jabba install "adopt@~1.$TRAVIS_JDK.0-0" && jabba use "$_" && java -Xmx32m -version
+
 script:
 - sbt --info ++$TRAVIS_SCALA_VERSION publishLocal
-- sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.8.0-RC1 test
+- sbt --info ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.8.0-RC1 test
 after_success:
-- ! '[[ $TRAVIS_BRANCH == "master" ]] && { sbt +publish; };'
+- ! '[[ $TRAVIS_BRANCH == "master" ]] && { sbt --info +publish; };'
 - python <(curl -s https://raw.githubusercontent.com/TouK/sputnik-ci/master/sputnik-ci.py)
+
 sudo: false
