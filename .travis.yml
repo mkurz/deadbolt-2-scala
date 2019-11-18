@@ -2,12 +2,11 @@ language: scala
 jdk:
 - openjdk8
 scala:
-- 2.11.12
-- 2.12.8
-- 2.13.0
+- 2.12.10
+- 2.13.1
 script:
 - sbt --info ++$TRAVIS_SCALA_VERSION publishLocal
-- sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.7.3 test
+- sbt --warn ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.8.0-RC1 test
 after_success:
 - ! '[[ $TRAVIS_BRANCH == "master" ]] && { sbt +publish; };'
 - python <(curl -s https://raw.githubusercontent.com/TouK/sputnik-ci/master/sputnik-ci.py)
