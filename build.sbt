@@ -34,7 +34,7 @@ lazy val code = (project in file("code"))
     fork in Test := true,
 
     releasePublishArtifactsAction := PgpKeys.publishSigned.value
-  ).enablePlugins(PlayScala).disablePlugins(PlayFilters)
+  ).enablePlugins(PlayScala).disablePlugins(PlayFilters, PlayLogback, PlayAkkaHttpServer)
 
 lazy val `test-app` = (project in file("test-app"))
   .settings(
