@@ -41,7 +41,7 @@ lazy val `test-app` = (project in file("test-app"))
   .settings(
     commonsSetting,
     name := """test-app""",
-    version := "2.8.2-SNAPSHOT",
+    version := "2.8.3-SNAPSHOT",
     testSettings
   )
   .dependsOn(code)
@@ -51,7 +51,7 @@ lazy val `test-app-compile-time-di` = (project in file("test-app-compile-time-di
   .settings(
     commonsSetting,
     name := """test-app-compile-time-di""",
-    version := "2.8.2-SNAPSHOT",
+    version := "2.8.3-SNAPSHOT",
     testSettings
   )
   .dependsOn(code)
@@ -61,7 +61,7 @@ lazy val `test-app-route-comments` = (project in file("test-app-route-comments")
   .settings(
     commonsSetting,
     name := """test-app-route-comments""",
-    version := "2.8.2-SNAPSHOT",
+    version := "2.8.3-SNAPSHOT",
     testSettings
   )
   .dependsOn(code)
