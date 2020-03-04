@@ -24,7 +24,8 @@ lazy val code = (project in file("code"))
 
     organization := "be.objectify",
 
-    libraryDependencies ++= Seq(
+    libraryDependencies := libraryDependencies.value.filterNot(m => m.name == "twirl-api" || m.name == "play-server") ++ Seq(
+      playCore % "provided",
       specs2 % Test
     ),
 
