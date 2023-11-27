@@ -4,6 +4,7 @@ val commonsSetting = Seq(
   resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
   homepage := Some(url("https://github.com/mkurz/deadbolt-2-java")), // Some(url("http://deadbolt.ws"))
   licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
+  publish / skip := true,
 )
 
 val testSettings = Seq(
@@ -28,6 +29,7 @@ Global / onLoad := (Global / onLoad).value.andThen { s =>
 lazy val code = (project in file("code"))
   .settings(
     commonsSetting,
+    publish / skip := false, // override what commonsSetting just set
     name := "deadbolt-scala",
 
     organization := "be.objectify",
@@ -86,4 +88,6 @@ lazy val `test-app-route-comments` = (project in file("test-app-route-comments")
 
 lazy val root = (project in file(".")).settings(commonsSetting)
   .aggregate(code, `test-app`, `test-app-compile-time-di`)
-  .settings(publish / aggregate := false)
+  .settings(
+    publish / skip := true,
+  )
