@@ -1,7 +1,9 @@
 val commonsSetting = Seq(
-  crossScalaVersions := Seq("2.13.12", "3.3.1"),
+  crossScalaVersions := Seq("2.13.12" /*, "3.3.1"*/),
   scalaVersion := crossScalaVersions.value.head,
   resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
+  homepage := Some(url("https://github.com/mkurz/deadbolt-2-java")), // Some(url("http://deadbolt.ws"))
+  licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
 )
 
 val testSettings = Seq(
@@ -11,9 +13,17 @@ val testSettings = Seq(
   ),
 
   Test / parallelExecution := false,
-
-  resolvers += Resolver.sonatypeRepo("snapshots"),
 )
+
+// Customise sbt-dynver's behaviour to make it work with tags which aren't v-prefixed
+ThisBuild / dynverVTagPrefix := false
+
+// Sanity-check: assert that version comes from a tag (e.g. not a too-shallow clone)
+// https://github.com/dwijnand/sbt-dynver/#sanity-checking-the-version
+Global / onLoad := (Global / onLoad).value.andThen { s =>
+  dynverAssertTagVersion.value
+  s
+}
 
 lazy val code = (project in file("code"))
   .settings(
@@ -32,14 +42,25 @@ lazy val code = (project in file("code"))
 
     Test / fork := true,
 
-    releasePublishArtifactsAction := PgpKeys.publishSigned.value
+    developers ++= List(Developer(
+        "mkurz",
+        "Matthias Kurz",
+        "m.kurz@irregular.at",
+        url("https://github.com/mkurz")
+      ),
+      Developer(
+        "schaloner",
+        "Steve Chaloner",
+        "john.doe@example.com",
+        url("https://github.com/schaloner")
+      ),
+    )
   ).enablePlugins(PlayScala).disablePlugins(PlayFilters, PlayLogback, PlayAkkaHttpServer)
 
 lazy val `test-app` = (project in file("test-app"))
   .settings(
     commonsSetting,
-    name := """test-app""",
-    version := "2.9.0-SNAPSHOT",
+    name := "test-app",
     testSettings
   )
   .dependsOn(code)
@@ -48,8 +69,7 @@ lazy val `test-app` = (project in file("test-app"))
 lazy val `test-app-compile-time-di` = (project in file("test-app-compile-time-di"))
   .settings(
     commonsSetting,
-    name := """test-app-compile-time-di""",
-    version := "2.9.0-SNAPSHOT",
+    name := "test-app-compile-time-di",
     testSettings
   )
   .dependsOn(code)
@@ -58,8 +78,7 @@ lazy val `test-app-compile-time-di` = (project in file("test-app-compile-time-di
 lazy val `test-app-route-comments` = (project in file("test-app-route-comments"))
   .settings(
     commonsSetting,
-    name := """test-app-route-comments""",
-    version := "2.9.0-SNAPSHOT",
+    name := "test-app-route-comments",
     testSettings
   )
   .dependsOn(code)
