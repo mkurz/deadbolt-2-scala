@@ -1,12 +1,4 @@
-# Extracted from https://github.com/ulrich/macaron-factory/blob/master/.gitignore
-# Ignore all dotfiles...
-.*
-# except for .gitignore
 !.gitignore
-!.travis.yml
-
-# Ignore Play! working directory #
-db
 eclipse
 lib
 log
@@ -22,3 +14,6 @@ server.pid
 *.iml
 *.eml
 atlassian-ide-plugin.xml
+bin/
+.bsp/
+.idea/
