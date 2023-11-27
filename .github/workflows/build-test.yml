@@ -21,7 +21,7 @@ jobs:
       scala: 2.13.x
       cmd: |
         sbt ++$MATRIX_SCALA publishLocal;
-        sbt ++$MATRIX_SCALA -DplayTestVersion=2.9.0 test;
+        sbt ++$MATRIX_SCALA test;
 
   finish:
     name: Finish
