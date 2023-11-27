@@ -1,11 +1,11 @@
 val commonsSetting = Seq(
   crossScalaVersions := Seq("2.13.12" /*, "3.3.1"*/),
   scalaVersion := crossScalaVersions.value.head,
-  resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
   organization := "be.objectify",
   homepage := Some(url("https://github.com/mkurz/deadbolt-2-java")), // Some(url("http://deadbolt.ws"))
   licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
   publish / skip := true,
+  scalacOptions ++= Seq("-release:11"),
 )
 
 val testSettings = Seq(
