@@ -1,6 +1,6 @@
 val commonsSetting = Seq(
-  scalaVersion := "2.13.1",
-  crossScalaVersions := Seq("2.12.10", "2.13.1"),
+  scalaVersion := "2.13.12",
+  crossScalaVersions := Seq("2.13.12", "3.3.1"),
   resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
 )
 
@@ -10,11 +10,9 @@ val testSettings = Seq(
     specs2 % Test
   ),
 
-  parallelExecution in Test := false,
+  Test / parallelExecution := false,
 
   resolvers += Resolver.sonatypeRepo("snapshots"),
-
-  routesGenerator := InjectedRoutesGenerator
 )
 
 lazy val code = (project in file("code"))
@@ -29,10 +27,10 @@ lazy val code = (project in file("code"))
       specs2 % Test
     ),
 
-    parallelExecution in Test := false,
+    Test / parallelExecution  := false,
 
 
-    fork in Test := true,
+    Test / fork := true,
 
     releasePublishArtifactsAction := PgpKeys.publishSigned.value
   ).enablePlugins(PlayScala).disablePlugins(PlayFilters, PlayLogback, PlayAkkaHttpServer)
@@ -41,7 +39,7 @@ lazy val `test-app` = (project in file("test-app"))
   .settings(
     commonsSetting,
     name := """test-app""",
-    version := "2.8.3-SNAPSHOT",
+    version := "2.9.0-SNAPSHOT",
     testSettings
   )
   .dependsOn(code)
@@ -51,7 +49,7 @@ lazy val `test-app-compile-time-di` = (project in file("test-app-compile-time-di
   .settings(
     commonsSetting,
     name := """test-app-compile-time-di""",
-    version := "2.8.3-SNAPSHOT",
+    version := "2.9.0-SNAPSHOT",
     testSettings
   )
   .dependsOn(code)
@@ -61,7 +59,7 @@ lazy val `test-app-route-comments` = (project in file("test-app-route-comments")
   .settings(
     commonsSetting,
     name := """test-app-route-comments""",
-    version := "2.8.3-SNAPSHOT",
+    version := "2.9.0-SNAPSHOT",
     testSettings
   )
   .dependsOn(code)
@@ -69,4 +67,4 @@ lazy val `test-app-route-comments` = (project in file("test-app-route-comments")
 
 lazy val root = (project in file(".")).settings(commonsSetting)
   .aggregate(code, `test-app`, `test-app-compile-time-di`)
-  .settings(aggregate in publish := false)
+  .settings(publish / aggregate := false)

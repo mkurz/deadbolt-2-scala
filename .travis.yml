@@ -12,7 +12,7 @@ install: jabba install $(jabba ls-remote "adopt@~1.$TRAVIS_JDK.0-0" --latest=pat
 
 script:
 - sbt --info ++$TRAVIS_SCALA_VERSION publishLocal
-- sbt --info ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.8.0 test
+- sbt --info ++$TRAVIS_SCALA_VERSION -DplayTestVersion=2.9.0 test
 after_success:
 - ! '[[ $TRAVIS_BRANCH == "master" ]] && { sbt --info +publish; };'
 - python <(curl -s https://raw.githubusercontent.com/TouK/sputnik-ci/master/sputnik-ci.py)
