@@ -1,6 +1,6 @@
 val commonsSetting = Seq(
-  scalaVersion := "2.13.12",
   crossScalaVersions := Seq("2.13.12", "3.3.1"),
+  scalaVersion := crossScalaVersions.value.head,
   resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
 )
 
