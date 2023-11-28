@@ -84,7 +84,7 @@ import scala.concurrent.Future
   * composite cache and use the named constraint instead.  deadbolt:restrict is actually a synonym for deadbolt:composite.
   *
   * @param materializer the materializer
-  * @param handlerCache the cache of handlers.  The default handler (defined by [[HandlerCache.apply()]]) will be passed into any constraint that doesn't have a handler associated with it.
+  * @param handlerCache the cache of handlers.  The default handler (defined by [[be.objectify.deadbolt.scala.cache.HandlerCache.apply()]]) will be passed into any constraint that doesn't have a handler associated with it.
   * @author Steve Chaloner (steve@objectify.be)
   * @since 2.5.1
   */

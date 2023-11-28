@@ -30,7 +30,7 @@ import scala.concurrent.Future
   * [[be.objectify.deadbolt.scala.DeadboltHandler.onAuthFailure()]] is invoked.
   *
   * @param materializer the materializer
-  * @param handlerCache the cache of handlers.  The default handler (defined by [[HandlerCache.apply()]]) will be passed into any constraint that doesn't have a handler associated with it.
+  * @param handlerCache the cache of handlers.  The default handler (defined by [[be.objectify.deadbolt.scala.cache.HandlerCache.apply()]]) will be passed into any constraint that doesn't have a handler associated with it.
   * @param authorizedRoutes all authorized routes
   * @author Steve Chaloner (steve@objectify.be)
   * @since 2.5.1
