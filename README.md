@@ -1,6 +1,8 @@
 # Deadbolt 2 for Play 2
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/be.objectify/deadbolt-scala_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/be.objectify/deadbolt-scala_2.13) [![Build Status](https://travis-ci.org/schaloner/deadbolt-2-scala.svg?branch=master)](https://travis-ci.org/schaloner/deadbolt-2-scala) [![Sputnik](https://sputnik.ci/conf/badge)](https://sputnik.ci/app#/builds/schaloner/deadbolt-2-scala) [![Dependency Status](https://www.versioneye.com/user/projects/5811c2df9cfcf73c9d94bf83/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/5811c2df9cfcf73c9d94bf83) [![Join the chat at https://gitter.im/schaloner/deadbolt-2](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/schaloner/deadbolt-2?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://github.com/mkurz/deadbolt-2-scala/actions/workflows/build-test.yml/badge.svg)](https://github.com/mkurz/deadbolt-2-scala/actions/workflows/build-test.yml)
+[![Maven](https://img.shields.io/maven-central/v/be.objectify/deadbolt-scala_2.13.svg?logo=apache-maven)](https://mvnrepository.com/artifact/be.objectify/deadbolt-scala_2.13)
+[![Repository size](https://img.shields.io/github/repo-size/mkurz/deadbolt-2-scala.svg?logo=git)](https://github.com/mkurz/deadbolt-2-scala)
 
 
 Deadbolt 2 is an authorization library for Play 2, and features APIs for both Java- and Scala-based applications.  It allows you to apply constraints to controller actions, and to customize template rendering based on the current user.
