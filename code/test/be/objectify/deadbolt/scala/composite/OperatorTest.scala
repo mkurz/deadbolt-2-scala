@@ -19,7 +19,8 @@ import be.objectify.deadbolt.scala.composite.Operators._
 import be.objectify.deadbolt.scala.models.Subject
 import be.objectify.deadbolt.scala.testhelpers.User
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltHandler}
-import org.specs2.mock.Mockito
+import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers._
 import play.api.mvc.Request
 import play.api.test.PlaySpecification
 
@@ -28,7 +29,7 @@ import scala.concurrent.Future
 /**
   * @author Steve Chaloner (steve@objectify.be)
   */
-object OperatorTest extends PlaySpecification with Mockito {
+object OperatorTest extends PlaySpecification {
 
   val ec = scala.concurrent.ExecutionContext.Implicits.global
   val subject = Some(User())
@@ -99,20 +100,20 @@ object OperatorTest extends PlaySpecification with Mockito {
   }
 
   private def composite[A](op: Operator[A], c1Result: Boolean, c2Result: Boolean) = {
-    val c1 = mock[Constraint[A]]
-    c1(req, dh) returns Future.successful(c1Result)
-    val c2 = mock[Constraint[A]]
-    c2(req, dh) returns Future.successful(c2Result)
+    val c1 = mock(classOf[Constraint[A]])
+    when(c1(req, dh)).thenReturn(Future.successful(c1Result))
+    val c2 = mock(classOf[Constraint[A]])
+    when(c2(req, dh)).thenReturn(Future.successful(c2Result))
     op(c1, c2)
   }
 
-  private def request[A](maybeSubject: Option[Subject]): AuthenticatedRequest[A] = new AuthenticatedRequest(mock[Request[A]], maybeSubject)
+  private def request[A](maybeSubject: Option[Subject]): AuthenticatedRequest[A] = new AuthenticatedRequest(mock(classOf[Request[A]]), maybeSubject)
 
   private def handler(maybeSubject: Option[Subject]): DeadboltHandler = {
-    val handler = mock[DeadboltHandler]
-    handler.getSubject(any[AuthenticatedRequest[_]]) returns Future {
+    val handler = mock(classOf[DeadboltHandler])
+    when(handler.getSubject(any[AuthenticatedRequest[_]])).thenReturn(Future {
       maybeSubject
-    }(ec)
+    }(ec))
     handler
   }
 

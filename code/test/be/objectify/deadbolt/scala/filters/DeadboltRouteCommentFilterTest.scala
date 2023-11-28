@@ -2,18 +2,18 @@ package be.objectify.deadbolt.scala.filters
 
 import akka.stream.Materializer
 import be.objectify.deadbolt.scala.cache.{CompositeCache, HandlerCache}
-import org.specs2.mock.Mockito
+import org.mockito.Mockito._
 import play.api.test.PlaySpecification
 
 /**
   * @author Steve Chaloner (steve@objectify.be)
   */
-class DeadboltRouteCommentFilterTest extends PlaySpecification with Mockito {
+class DeadboltRouteCommentFilterTest extends PlaySpecification {
 
-  val materializer = mock[Materializer]
-  val handlerCache = mock[HandlerCache]
-  val constraints = mock[FilterConstraints]
-  val compositeCache = mock[CompositeCache]
+  val materializer = mock(classOf[Materializer])
+  val handlerCache = mock(classOf[HandlerCache])
+  val constraints = mock(classOf[FilterConstraints])
+  val compositeCache = mock(classOf[CompositeCache])
   val filter: DeadboltRouteCommentFilter = new DeadboltRouteCommentFilter(materializer, handlerCache, constraints, compositeCache)
 
   "subjectPresent should" >> {

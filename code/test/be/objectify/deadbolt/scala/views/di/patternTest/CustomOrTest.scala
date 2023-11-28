@@ -35,25 +35,29 @@ class CustomOrTest extends AbstractViewTest {
 
   "when a custom permission allows it, the view" should {
     "show constrained content and hide fallback content" in new WithApplication(testApp(handler(subject = user, drh = drhAllow))) {
-      val html = constraint(handler(subject = user, drh = drhAllow)).apply(value = "something arbitrary", patternType = PatternType.CUSTOM)(new AuthenticatedRequest(FakeRequest(), user))
+      override def running() = {
+        val html = constraint(handler(subject = user, drh = drhAllow)).apply(value = "something arbitrary", patternType = PatternType.CUSTOM)(new AuthenticatedRequest(FakeRequest(), user))
 
-      private val content: String = Helpers.contentAsString(html)
-      content must contain("This is before the constraint.")
-      content must contain("This is protected by the constraint.")
-      content must not contain("This is default content in case the constraint denies access]to the protected content.")
-      content must contain("This is after the constraint.")
+        val content: String = Helpers.contentAsString(html)
+        content must contain("This is before the constraint.")
+        content must contain("This is protected by the constraint.")
+        content must not contain("This is default content in case the constraint denies access]to the protected content.")
+        content must contain("This is after the constraint.")
+      }
     }
   }
 
   "when a custom permission denies it, the view" should {
     "hide constrained content and show fallback content" in new WithApplication(testApp(handler(subject = user, drh = drhDeny))) {
-      val html = constraint(handler(subject = user, drh = drhDeny)).apply(value = "something arbitrary", patternType = PatternType.CUSTOM)(new AuthenticatedRequest(FakeRequest(), user))
+      override def running() = {
+        val html = constraint(handler(subject = user, drh = drhDeny)).apply(value = "something arbitrary", patternType = PatternType.CUSTOM)(new AuthenticatedRequest(FakeRequest(), user))
 
-      private val content: String = Helpers.contentAsString(html)
-      content must contain("This is before the constraint.")
-      content must not contain("This is protected by the constraint.")
-      content must contain("This is default content in case the constraint denies access to the protected content.")
-      content must contain("This is after the constraint.")
+        val content: String = Helpers.contentAsString(html)
+        content must contain("This is before the constraint.")
+        content must not contain ("This is protected by the constraint.")
+        content must contain("This is default content in case the constraint denies access to the protected content.")
+        content must contain("This is after the constraint.")
+      }
     }
   }
 

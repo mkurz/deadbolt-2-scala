@@ -38,25 +38,29 @@ class EqualityOrTest extends AbstractViewTest {
 
   "when the subject has a permission that is equal to the pattern, the view" should {
      "show constrained content and hide fallback content" in new WithApplication(testApp(handler(subject = userZombie, drh = drHandler))) {
-       val html = constraint(handler(subject = userZombie, drh = drHandler)).apply(value = "killer.undead.zombie", patternType = PatternType.EQUALITY)(new AuthenticatedRequest(FakeRequest(), userZombie))
+       override def running() = {
+         val html = constraint(handler(subject = userZombie, drh = drHandler)).apply(value = "killer.undead.zombie", patternType = PatternType.EQUALITY)(new AuthenticatedRequest(FakeRequest(), userZombie))
 
-       private val content: String = Helpers.contentAsString(html)
-       content must contain("This is before the constraint.")
-       content must contain("This is protected by the constraint.")
-       content must not contain("This is default content in case the constraint denies access to the protected content.")
-       content must contain("This is after the constraint.")
+         val content: String = Helpers.contentAsString(html)
+         content must contain("This is before the constraint.")
+         content must contain("This is protected by the constraint.")
+         content must not contain ("This is default content in case the constraint denies access to the protected content.")
+         content must contain("This is after the constraint.")
+       }
      }
    }
 
   "when the subject has no permissions that are equal to the pattern, the view" should {
     "hide constrained content and show fallback content" in new WithApplication(testApp(handler(subject = userVampire,  drh = drHandler))) {
-      val html = constraint(handler(subject = userVampire, drh = drHandler)).apply(value = "killer.undead.zombie", patternType = PatternType.EQUALITY)(new AuthenticatedRequest(FakeRequest(), userVampire))
+      override def running() = {
+        val html = constraint(handler(subject = userVampire, drh = drHandler)).apply(value = "killer.undead.zombie", patternType = PatternType.EQUALITY)(new AuthenticatedRequest(FakeRequest(), userVampire))
 
-      private val content: String = Helpers.contentAsString(html)
-      content must contain("This is before the constraint.")
-      content must not contain("This is protected by the constraint.")
-      content must contain("This is default content in case the constraint denies access to the protected content.")
-      content must contain("This is after the constraint.")
+        val content: String = Helpers.contentAsString(html)
+        content must contain("This is before the constraint.")
+        content must not contain ("This is protected by the constraint.")
+        content must contain("This is default content in case the constraint denies access to the protected content.")
+        content must contain("This is after the constraint.")
+      }
     }
   }
 

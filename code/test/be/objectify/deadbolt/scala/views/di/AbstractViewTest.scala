@@ -17,7 +17,7 @@ package be.objectify.deadbolt.scala.views.di
 
 import javax.inject.Provider
 
-import be.objectify.deadbolt.scala.ViewSupportTest.{logic, mock}
+import be.objectify.deadbolt.scala.ViewSupportTest.logic
 import be.objectify.deadbolt.scala.cache.HandlerCache
 import be.objectify.deadbolt.scala.models.{Permission, Role, Subject}
 import be.objectify.deadbolt.scala.testhelpers.User
@@ -27,6 +27,8 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{Request, Result, Results}
 import play.api.test.PlaySpecification
 import play.api.{Application, Configuration, Mode}
+
+import org.mockito.Mockito._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -57,7 +59,7 @@ class AbstractViewTest extends PlaySpecification {
   def viewSupport(): ViewSupport = {
     val config: Configuration = Configuration.empty
     new ViewSupport(config,
-      new DefaultTemplateFailureListenerProvider(mock[Provider[Application]]),
+      new DefaultTemplateFailureListenerProvider(mock(classOf[Provider[Application]])),
       logic)
   }
 

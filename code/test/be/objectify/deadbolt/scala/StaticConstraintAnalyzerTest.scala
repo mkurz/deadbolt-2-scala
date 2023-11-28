@@ -19,7 +19,7 @@ import java.util.regex.Pattern
 
 import be.objectify.deadbolt.scala.cache.PatternCache
 import be.objectify.deadbolt.scala.testhelpers.{User, SecurityRole, SecurityPermission}
-import org.specs2.mock.Mockito
+import org.mockito.Mockito._
 import org.specs2.mutable.Specification
 
 import be.objectify.deadbolt.scala.models.Subject
@@ -27,7 +27,7 @@ import be.objectify.deadbolt.scala.models.Subject
 /**
   * @author Steve Chaloner (steve@objectify.be)
   */
-object StaticConstraintAnalyzerTest extends Specification with Mockito {
+object StaticConstraintAnalyzerTest extends Specification {
 
   val analyzer: StaticConstraintAnalyzer = new StaticConstraintAnalyzer(new PatternCache {
     override def apply(value: String): Option[Pattern] = Some(Pattern.compile(value))
@@ -39,8 +39,8 @@ object StaticConstraintAnalyzerTest extends Specification with Mockito {
         analyzer.getSubjectRoles(None).isEmpty
       }
       "the subject has no roles" >> {
-        val subject = mock[Subject]
-        subject.roles returns List()
+        val subject = mock(classOf[Subject])
+        when(subject.roles).thenReturn(List())
         analyzer.getSubjectRoles(Some(subject)).isEmpty
       }
     }

@@ -124,7 +124,19 @@ class ActionBuilders @Inject() (deadboltActions: DeadboltActions, handlers: Hand
     def apply(block: AuthenticatedRequest[AnyContent] => Future[Result])(implicit deadboltHandler: DeadboltHandler): Action[AnyContent] = apply(bodyParsers.anyContent)(block)(deadboltHandler)
     def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result])(implicit handler: DeadboltHandler): Action[A]
 
-    def withHandler(deadboltHandler: DeadboltHandler) = new {
+    trait HandlerFunctions {
+      // This trait was introduced as workaround to make the withHandler method below work in Scala 3:
+      // Despite in Scala 3 it's still possible to access members of an anonymous class, with some adjustments
+      // (see https://docs.scala-lang.org/scala3/guides/migration/incompat-type-inference.html#reflective-type)
+      // we still can't use `new { ... }` below, but have to use `new HandlerHelper { ... }`, because we end up with
+      // "Refinements cannot introduce overloaded definitions" errors when explicit defining the return type of
+      // withHandler.
+      def apply(block: => Future[Result]): Action[AnyContent];
+      def apply(block: AuthenticatedRequest[AnyContent] => Future[Result]): Action[AnyContent]
+      def apply[A](bodyParser: BodyParser[A])(block: AuthenticatedRequest[A] => Future[Result]): Action[A]
+    }
+
+    def withHandler(deadboltHandler: DeadboltHandler) = new HandlerFunctions {
       def apply(block: => Future[Result]): Action[AnyContent] =
         DeadboltActionBuilder.this.apply(block)(deadboltHandler)
 

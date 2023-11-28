@@ -21,7 +21,8 @@ import be.objectify.deadbolt.scala.cache.PatternCache
 import be.objectify.deadbolt.scala.models.{PatternType, Subject}
 import be.objectify.deadbolt.scala.testhelpers.{SecurityPermission, SecurityRole, User}
 import org.mockito.ArgumentMatchers
-import org.specs2.mock.Mockito
+import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers._
 import play.api.mvc.Request
 import play.api.test.PlaySpecification
 
@@ -30,7 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
   * @author Steve Chaloner (steve@objectify.be)
   */
-object ConstraintLogicTest extends PlaySpecification with Mockito {
+object ConstraintLogicTest extends PlaySpecification {
   val analyzer: StaticConstraintAnalyzer = new StaticConstraintAnalyzer(new PatternCache {
     override def apply(value: String): Option[Pattern] = Some(Pattern.compile(value))
   })
@@ -268,9 +269,9 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
         }
         "checkPermission returns false" >> {
           val subject = Some(User())
-          val drh = mock[DynamicResourceHandler]
+          val drh = mock(classOf[DynamicResourceHandler])
           val dh = handler(subject, Some(drh))
-          drh.checkPermission(ArgumentMatchers.eq("foo"), ArgumentMatchers.eq(None), ArgumentMatchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future.successful(false)
+          when(drh.checkPermission(ArgumentMatchers.eq("foo"), ArgumentMatchers.eq(None), ArgumentMatchers.eq(dh), any[AuthenticatedRequest[_]])).thenReturn(Future.successful(false))
           val result: Future[Boolean] = logic.pattern(request(subject),
                                                       dh,
                                                       "foo",
@@ -285,9 +286,10 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
       "call the pass function when" >> {
         "checkPermission returns true" >> {
           val subject = Some(User())
-          val drh = mock[DynamicResourceHandler]
+          val drh = mock(classOf[DynamicResourceHandler])
           val dh = handler(subject, Some(drh))
-          drh.checkPermission(ArgumentMatchers.eq("foo"), ArgumentMatchers.eq(None), ArgumentMatchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future.successful(true)
+
+          when(drh.checkPermission(ArgumentMatchers.eq("foo"), ArgumentMatchers.eq(None), ArgumentMatchers.eq(dh), any[AuthenticatedRequest[_]])).thenReturn(Future.successful(true))
           val result: Future[Boolean] = logic.pattern(request(subject),
                                                       dh,
                                                       "foo",
@@ -317,9 +319,9 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
       }
       "isAllowed returns false" >> {
         val subject = Some(User())
-        val drh = mock[DynamicResourceHandler]
+        val drh = mock(classOf[DynamicResourceHandler])
         val dh = handler(subject, Some(drh))
-        drh.isAllowed(ArgumentMatchers.eq("foo"), ArgumentMatchers.eq(Some("bar")), ArgumentMatchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future.successful(false)
+        when(drh.isAllowed(ArgumentMatchers.eq("foo"), ArgumentMatchers.eq(Some("bar")), ArgumentMatchers.eq(dh), any[AuthenticatedRequest[_]])).thenReturn(Future.successful(false))
         val result: Future[Boolean] = logic.dynamic(request(subject),
                                                      dh,
                                                      "foo",
@@ -332,9 +334,9 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
     "call the pass function when" >> {
       "isAllowed returns true" >> {
         val subject = Some(User())
-        val drh = mock[DynamicResourceHandler]
+        val drh = mock(classOf[DynamicResourceHandler])
         val dh = handler(subject, Some(drh))
-        drh.isAllowed(ArgumentMatchers.eq("foo"), ArgumentMatchers.eq(Some("bar")), ArgumentMatchers.eq(dh), any[AuthenticatedRequest[_]]) returns Future.successful(true)
+        when(drh.isAllowed(ArgumentMatchers.eq("foo"), ArgumentMatchers.eq(Some("bar")), ArgumentMatchers.eq(dh), any[AuthenticatedRequest[_]])).thenReturn(Future.successful(true))
         val result: Future[Boolean] = logic.dynamic(request(subject),
                                                      dh,
                                                      "foo",
@@ -399,15 +401,16 @@ object ConstraintLogicTest extends PlaySpecification with Mockito {
     }
   }
 
-  private def request[A](maybeSubject: Option[Subject]): AuthenticatedRequest[A] = new AuthenticatedRequest(mock[Request[A]], maybeSubject)
+  private def request[A](maybeSubject: Option[Subject]): AuthenticatedRequest[A] = new AuthenticatedRequest(mock(classOf[Request[A]]), maybeSubject)
 
   private def handler(maybeSubject: Option[Subject]): DeadboltHandler = handler(maybeSubject, None)
 
   private def handler(maybeSubject: Option[Subject],
                      maybeDrh: Option[DynamicResourceHandler]): DeadboltHandler = {
-    val handler = mock[DeadboltHandler]
-    handler.getSubject(any[AuthenticatedRequest[_]]) returns Future {maybeSubject}(ec)
-    handler.getDynamicResourceHandler(any[AuthenticatedRequest[_]]) returns Future {maybeDrh}(ec)
-    handler.getPermissionsForRole("foo") returns Future{List("hurdy.*")}(ec)
+    val handler = mock(classOf[DeadboltHandler])
+    when(handler.getSubject(any[AuthenticatedRequest[_]])).thenReturn(Future {maybeSubject}(ec))
+    when(handler.getDynamicResourceHandler(any[AuthenticatedRequest[_]])).thenReturn(Future {maybeDrh}(ec))
+    when(handler.getPermissionsForRole("foo")).thenReturn(Future {List("hurdy.*")}(ec))
+    handler
   }
 }

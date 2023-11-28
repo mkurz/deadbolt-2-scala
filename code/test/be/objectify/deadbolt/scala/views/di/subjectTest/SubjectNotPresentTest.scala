@@ -28,22 +28,26 @@ import play.api.test.{FakeRequest, Helpers, WithApplication}
 class SubjectNotPresentTest extends AbstractViewTest {
 
   "show constrained content when subject is not present" in new WithApplication(testApp(handler())) {
-    val html = constraint(handler()).render(new AuthenticatedRequest(FakeRequest(), None))
+    override def running() = {
+      val html = constraint(handler()).render(new AuthenticatedRequest(FakeRequest(), None))
 
-    private val content: String = Helpers.contentAsString(html)
-    content must contain("This is before the constraint.")
-    content must contain("This is protected by the constraint.")
-    content must contain("This is after the constraint.")
+      val content: String = Helpers.contentAsString(html)
+      content must contain("This is before the constraint.")
+      content must contain("This is protected by the constraint.")
+      content must contain("This is after the constraint.")
+    }
   }
 
   "hide constrained content when subject is present" in new WithApplication(testApp(handler(subject = Some(user())))) {
-    val user = new User("foo", List.empty, List.empty)
-    val html = constraint(handler(subject = Some(user))).render(new AuthenticatedRequest(FakeRequest(), Some(user)))
+    override def running() = {
+      val user = new User("foo", List.empty, List.empty)
+      val html = constraint(handler(subject = Some(user))).render(new AuthenticatedRequest(FakeRequest(), Some(user)))
 
-    private val content: String = Helpers.contentAsString(html)
-    content must contain("This is before the constraint.")
-    content must not contain("This is protected by the constraint.")
-    content must contain("This is after the constraint.")
+      val content: String = Helpers.contentAsString(html)
+      content must contain("This is before the constraint.")
+      content must not contain ("This is protected by the constraint.")
+      content must contain("This is after the constraint.")
+    }
   }
 
   def constraint(handler: DeadboltHandler) = new subjectNotPresentContent(new subjectNotPresent(viewSupport(), handlerCache(handler)))
