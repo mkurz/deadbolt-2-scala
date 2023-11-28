@@ -2,7 +2,7 @@ package be.objectify.deadbolt.scala
 
 import java.util.regex.Pattern
 
-import akka.stream.Materializer
+import org.apache.pekko.stream.Materializer
 import be.objectify.deadbolt.scala.cache.{HandlerCache, PatternCache}
 import be.objectify.deadbolt.scala.composite.CompositeConstraints
 import be.objectify.deadbolt.scala.models.Subject

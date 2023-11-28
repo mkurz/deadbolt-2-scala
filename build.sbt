@@ -56,7 +56,7 @@ lazy val code = (project in file("code"))
         url("https://github.com/schaloner")
       ),
     )
-  ).enablePlugins(PlayScala).disablePlugins(PlayFilters, PlayLogback, PlayAkkaHttpServer)
+  ).enablePlugins(PlayScala).disablePlugins(PlayFilters, PlayLogback, PlayPekkoHttpServer)
 
 lazy val `test-app` = (project in file("test-app"))
   .settings(
