@@ -17,25 +17,29 @@ class DynamicOrTest extends AbstractViewTest {
   "When using the DynamicOr constraint" should {
     "when allowed by the dynamic handler, the view" should {
       "show constrained content and hide fallback content" in new WithApplication(testApp(handler(drh = drhAllow))) {
-        val html = constraint(handler(drh = drhAllow)).apply(name = "the name of this constraint", meta = Some("some additional info"))(new AuthenticatedRequest(FakeRequest(), None))
+        override def running() = {
+          val html = constraint(handler(drh = drhAllow)).apply(name = "the name of this constraint", meta = Some("some additional info"))(new AuthenticatedRequest(FakeRequest(), None))
 
-        private val content: String = Helpers.contentAsString(html)
-        content must contain("This is before the constraint.")
-        content must contain("This is protected by the constraint.")
-        content must not contain("This is default content in case the constraint denies access to the protected content.")
-        content must contain("This is after the constraint.")
+          val content: String = Helpers.contentAsString(html)
+          content must contain("This is before the constraint.")
+          content must contain("This is protected by the constraint.")
+          content must not contain ("This is default content in case the constraint denies access to the protected content.")
+          content must contain("This is after the constraint.")
+        }
       }
     }
 
     "when denied by the dynamic handler, the view" should {
       "hide constrained content and show fallback content" in new WithApplication(testApp(handler(drh = drhDeny))) {
-        val html = constraint(handler(drh = drhDeny)).apply(name = "the name of this constraint", meta = Some("some additional info"))(new AuthenticatedRequest(FakeRequest(), None))
+        override def running() = {
+          val html = constraint(handler(drh = drhDeny)).apply(name = "the name of this constraint", meta = Some("some additional info"))(new AuthenticatedRequest(FakeRequest(), None))
 
-        private val content: String = Helpers.contentAsString(html)
-        content must contain("This is before the constraint.")
-        content must not contain("This is protected by the constraint.")
-        content must contain("This is default content in case the constraint denies access to the protected content.")
-        content must contain("This is after the constraint.")
+          val content: String = Helpers.contentAsString(html)
+          content must contain("This is before the constraint.")
+          content must not contain ("This is protected by the constraint.")
+          content must contain("This is default content in case the constraint denies access to the protected content.")
+          content must contain("This is after the constraint.")
+        }
       }
     }
   }
