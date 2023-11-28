@@ -17,7 +17,7 @@ package be.objectify.deadbolt.scala.filters
 
 import javax.inject.Inject
 
-import akka.stream.Materializer
+import org.apache.pekko.stream.Materializer
 import be.objectify.deadbolt.scala.AuthenticatedRequest
 import be.objectify.deadbolt.scala.cache.{CompositeCache, HandlerCache}
 import be.objectify.deadbolt.scala.models.PatternType

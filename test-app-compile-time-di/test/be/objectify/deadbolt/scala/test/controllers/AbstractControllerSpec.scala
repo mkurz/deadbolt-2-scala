@@ -2,7 +2,7 @@ package be.objectify.deadbolt.scala.test.controllers
 
 import java.io.File
 
-import akka.stream.Materializer
+import org.apache.pekko.stream.Materializer
 import be.objectify.deadbolt.scala.test.CompileTimeDiApplicationLoader
 import org.specs2.specification.AfterEach
 import play.api._

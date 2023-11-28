@@ -15,7 +15,7 @@
  */
 package be.objectify.deadbolt.scala.filters
 
-import akka.stream.Materializer
+import org.apache.pekko.stream.Materializer
 import be.objectify.deadbolt.scala.DeadboltComponents
 
 /**
