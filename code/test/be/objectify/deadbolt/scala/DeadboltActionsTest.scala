@@ -7,7 +7,8 @@ import be.objectify.deadbolt.scala.cache.{HandlerCache, PatternCache}
 import be.objectify.deadbolt.scala.composite.CompositeConstraints
 import be.objectify.deadbolt.scala.models.Subject
 import be.objectify.deadbolt.scala.testhelpers.User
-import org.specs2.mock.Mockito
+import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers._
 import play.api.mvc._
 import play.api.test.PlaySpecification
 
@@ -16,9 +17,9 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
   * @author Steve Chaloner (steve@objectify.be)
   */
-object DeadboltActionsTest extends PlaySpecification with Mockito {
+object DeadboltActionsTest extends PlaySpecification {
 
-  private val materializer: Materializer = mock[Materializer]
+  private val materializer: Materializer = mock(classOf[Materializer])
 
   private val ec = scala.concurrent.ExecutionContext.Implicits.global
   private val analyzer = new StaticConstraintAnalyzer(new PatternCache {
@@ -44,17 +45,18 @@ object DeadboltActionsTest extends PlaySpecification with Mockito {
     logic,
     parsers)
 
-  private def request[A](maybeSubject: Option[Subject]): AuthenticatedRequest[A] = new AuthenticatedRequest(mock[Request[A]], maybeSubject)
+  private def request[A](maybeSubject: Option[Subject]): AuthenticatedRequest[A] = new AuthenticatedRequest(mock(classOf[Request[A]]), maybeSubject)
 
   private def handler(maybeSubject: Option[Subject]): DeadboltHandler = handler(maybeSubject, None)
 
   private def handler(maybeSubject: Option[Subject],
     maybeDrh: Option[DynamicResourceHandler]): DeadboltHandler = {
-    val handler = mock[DeadboltHandler]
-    handler.getSubject(any[AuthenticatedRequest[_]]) returns Future {maybeSubject}(ec)
-    handler.getDynamicResourceHandler(any[AuthenticatedRequest[_]]) returns Future {maybeDrh}(ec)
-    handler.beforeAuthCheck(any[AuthenticatedRequest[_]]) returns Future {None}(ec)
-    handler.getPermissionsForRole("foo") returns Future{List("hurdy.*")}(ec)
+    val handler = mock(classOf[DeadboltHandler])
+    when(handler.getSubject(any[AuthenticatedRequest[_]])).thenReturn(Future {maybeSubject}(ec))
+    when(handler.getDynamicResourceHandler(any[AuthenticatedRequest[_]])).thenReturn(Future {maybeDrh}(ec))
+    when(handler.beforeAuthCheck(any[AuthenticatedRequest[_]])).thenReturn(Future {None}(ec))
+    when(handler.getPermissionsForRole("foo")).thenReturn(Future{List("hurdy.*")}(ec))
+    handler
   }
 
   "composite" should {
