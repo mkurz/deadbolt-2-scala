@@ -2,6 +2,6 @@
 logLevel := Level.Warn
 
 // The Play plugin
-addSbtPlugin("org.playframework" % "sbt-plugin" % "3.0.3")
+addSbtPlugin("org.playframework" % "sbt-plugin" % "3.0.4")
 
 addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.5.12")
