@@ -1,5 +1,5 @@
 val commonsSetting = Seq(
-  crossScalaVersions := Seq("2.13.18", "3.3.8"),
+  crossScalaVersions := Seq("2.13.18", "3.9.0"),
   scalaVersion := crossScalaVersions.value.head,
   organization := "be.objectify",
   homepage := Some(url("https://github.com/mkurz/deadbolt-2-java")), // Some(url("http://deadbolt.ws"))
